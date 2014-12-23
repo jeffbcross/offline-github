@@ -1,0 +1,22 @@
+<html>
+<head>
+  <title>Github Issues</title>
+  <script src="bower_components/angular/angular.js"></script>
+  <script src="lovefield.min.js"></script>
+  <script src="db/github_db_gen.js"></script>
+  <script src="app.js"></script>
+</head>
+<body ng-app="ghIssuesApp">
+  <div ng-controller="IssuesList">
+    {{error}}
+    <p ng-show="dataSource">
+      data came from {{dataSource}}
+    </p>
+    <ul>
+      <li ng-repeat="issue in issues">
+        {{issue.title}}
+      </li>
+    </ul>
+  </div>
+</body>
+</html>
