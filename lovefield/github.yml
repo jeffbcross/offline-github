@@ -1,0 +1,160 @@
+%YAML 1.2
+---
+name: github
+version: 1
+table:
+  Issues:
+    column:
+      id: string
+      url: string
+      html_url: string
+      number: integer
+      state: string
+      title: string
+      body: string
+      user: integer
+      #labels:
+      assignee: integer
+      milestone: integer
+      comments: integer
+      pull_request: integer
+      closed_at: datetime
+      created_at: datetime
+      updated_at: datetime
+    constraint:
+      nullable: [ closed_at ]
+      primaryKey: [ id ]
+      foreignKey:
+        fk_UserId:
+          localColumn: user
+          reference: Users
+          remoteColumn: id
+        fk_AssigneeId:
+          localColumn: assignee
+          reference: Users
+          remoteColumn: id
+        fk_MilestoneId:
+          localColumn: milestone
+          reference: Milestones
+          remoteColumn: number
+        fk_PullRequestId:
+          localColumn: pull_request
+          reference: PullRequests
+          remoteColumn: number
+  Users:
+    column:
+      login: string
+      id: integer
+      avatar_url: string
+      gravatar_id: string
+      url: string
+      html_url: string
+      followers_url: string
+      following_url: string
+      gists_url: string
+      starred_url: string
+      subscriptions_url: string
+      organizations_url: string
+      repos_url: string
+      events_url: string
+      received_events_url: string
+      type: string
+      site_admin: boolean
+      #nullables
+      name: string
+      company: string
+      blog: string
+      location: string
+      email: string
+      hireable: boolean
+      bio: string
+      public_repos: integer
+      public_gists: integer
+      followers: integer
+      following: integer
+      created_at: datetime
+      updated_at: datetime
+    constraint:
+      nullable: [ name, company, blog, location, email, bio, created_at, updated_at ]
+      primaryKey: [ id ]
+  Milestones:
+    column:
+      url: string
+      number: integer
+      state: string
+      title: string
+      description: string
+      creator: integer
+      open_issues: integer
+      closed_issues: integer
+      created_at: datetime
+      updated_at: datetime
+      closed_at: datetime
+      due_on: datetime
+    constraint:
+      nullable: [ due_on ]
+      primaryKey: [ number ]
+      foreignKey:
+        fk_CreatorId:
+          localColumn: creator
+          reference: Users
+          remoteColumn: id
+  PullRequests:
+    column:
+      id: integer
+      url: string
+      html_url: string
+      diff_url: string
+      patch_url: string
+      issue_url: string
+      commits_url: string
+      review_comments_url: string
+      review_comment_url: string
+      comments_url: string
+      statuses_url: string
+      number: integer
+      state: string
+      title: string
+      body: string
+      created_at: datetime
+      updated_at: datetime
+      closed_at: datetime
+      merged_at: datetime
+      head: string #sha
+      base: string #sha
+      user: integer
+    constraint:
+      primaryKey: [ id ]
+      foreignKey:
+        fk_HeadId:
+          localColumn: head
+          reference: Commits
+          remoteColumn: sha
+        fk_BaseId:
+          localColumn: base
+          reference: Commits
+          remoteColumn: sha
+        fk_UserId:
+          localColumn: user
+          reference: Users
+          remoteColumn: id
+  Commits:
+    column:
+      sha: string
+      url: string
+      author: integer
+      committer: integer
+      message: string
+      # tree: ref to Trees
+      # parents: [object Object]
+    constraint:
+      primaryKey: [ sha ]
+      foreignKey:
+        fk_AuthorId:
+          localColumn: author
+          reference: Users
+          remoteColumn: id
+        fk_CommitterId:
+          localColumn: committer
+          reference: Users
+          remoteColumn: id
