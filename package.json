@@ -15,5 +15,12 @@
   "bugs": {
     "url": "https://github.com/jeffbcross/offline-github/issues"
   },
-  "homepage": "https://github.com/jeffbcross/offline-github"
+  "homepage": "https://github.com/jeffbcross/offline-github",
+  "devDependencies": {
+    "jasmine-core": "^2.1.3",
+    "karma": "^0.12.28",
+    "karma-chrome-launcher": "^0.1.7",
+    "karma-jasmine": "^0.3.3",
+    "karma-ng-html2js-preprocessor": "^0.1.2"
+  }
 }

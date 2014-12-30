@@ -14,5 +14,8 @@
   "_source": "git://github.com/jeffbcross/offline-github.git",
   "_target": "~0.0.1",
   "_originalSource": "offline-github",
-  "_direct": true
+  "_direct": true,
+  "devDependencies": {
+    "angular-mocks": "~1.3.8"
+  }
 }
