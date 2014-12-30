@@ -2,16 +2,16 @@
 <head>
   <title>Github Issues</title>
   <script src="bower_components/angular/angular.js"></script>
+  <script src="bower_components/angular-route/angular-route.js"></script>
   <script src="lovefield.min.js"></script>
   <script src="db/github_db_gen.js"></script>
   <script src="components/issues-list-directive/issues-list-directive.js"></script>
   <script src="components/issues-service/issues-service.js"></script>
   <script src="components/db-service/db-service.js"></script>
   <script src="app.js"></script>
+  <script src="org/repo/issues/issues-list-controller.js"></script>
 </head>
 <body ng-app="ghIssuesApp">
-  <div ng-controller="IssuesList">
-    <gho-issues-list issues="issues"></gho-issues-list>
-  </div>
+  <ng-view></ng-view>
 </body>
 </html>

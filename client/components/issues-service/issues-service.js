@@ -25,7 +25,7 @@ angular.module('ghoIssuesService', ['ghoDBService']).
 
           function fetchFromHttp() {
             return Promise.resolve($http.get(
-              'https://api.github.com/repos/angular/angular.js/issues?client_id=' +
+              'https://api.github.com/repos/' + options.org + '/' + options.repo + '/issues?client_id=' +
               githubCredentials.id +
               '&client_secret=' +
               githubCredentials.secret
