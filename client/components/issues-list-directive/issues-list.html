@@ -6,7 +6,7 @@
   </label>
 
   <ul>
-    <li ng-repeat="issue in issues | filter:filterText">
+    <li ng-repeat="issue in issues | filter:filterText | limitTo:25">
       {{issue.title}}
     </li>
   </ul>
