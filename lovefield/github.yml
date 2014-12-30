@@ -1,11 +1,13 @@
 %YAML 1.2
 ---
 name: github
-version: 1
+version: 3
 table:
   Issues:
     column:
       id: string
+      organization: integer
+      repository: integer
       url: string
       html_url: string
       number: integer
@@ -41,6 +43,14 @@ table:
           localColumn: pull_request
           reference: PullRequests
           remoteColumn: number
+        fk_organizationId:
+          localColumn: organization
+          reference: Organizations
+          remoteColumn: id
+        fk_repositoryId:
+          localColumn: repository
+          reference: Repositories
+          remoteColumn: id
   Users:
     column:
       login: string
@@ -156,5 +166,69 @@ table:
           remoteColumn: id
         fk_CommitterId:
           localColumn: committer
+          reference: Users
+          remoteColumn: id
+  Organizations:
+    column:
+      id: integer
+      login: string
+      url: string
+      avatar_url: string
+      description: string
+      name: string
+      company: string
+      blog: string
+      location: string
+      email: string
+      public_repos: integer
+      public_gists: integer
+      followers: integer
+      following: integer
+      html_url: string
+      created_at: datetime
+      type: string
+    constraint:
+      nullable: [ avatar_url, description ]
+  Repositories:
+    column:
+      id: integer
+      owner: integer
+      name: string
+      full_name: string
+      description: string
+      private: boolean
+      fork: boolean
+      url: string
+      html_url: string
+      clone_url: string
+      git_url: string
+      ssh_url: string
+      svn_url: string
+      mirror_url: string
+      homepage: string
+      language: string
+      forks_count: integer
+      stargazers_count: integer
+      watchers_count: integer
+      size: integer
+      default_branch: string
+      open_issues_count: integer
+      has_issues: boolean
+      has_wiki: boolean
+      has_pages: boolean
+      has_downloads: boolean
+      pushed_at: datetime
+      created_at: datetime
+      updated_at: datetime
+      # permissions: {
+      #   admin: false
+      #   push: false
+      #   pull: true
+      # }
+    constraint:
+      nullable: [ language ]
+      foreignKey:
+        fk_ownerId:
+          localColumn: owner
           reference: Users
           remoteColumn: id

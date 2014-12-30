@@ -26,6 +26,10 @@ angular.module('ghIssuesApp').
 
         function cacheData(res) {
           if (res && res.data) {
+            res.data.forEach(function(data) {
+              data.repository = $routeParams.repo;
+              data.organization = $routeParams.org;
+            });
             Issues.insertOrReplace(res.data);
           }
           return res;

@@ -7,9 +7,15 @@ goog.provide('github.db.row.IssuesType');
 goog.provide('github.db.row.Milestones');
 goog.provide('github.db.row.MilestonesDbType');
 goog.provide('github.db.row.MilestonesType');
+goog.provide('github.db.row.Organizations');
+goog.provide('github.db.row.OrganizationsDbType');
+goog.provide('github.db.row.OrganizationsType');
 goog.provide('github.db.row.PullRequests');
 goog.provide('github.db.row.PullRequestsDbType');
 goog.provide('github.db.row.PullRequestsType');
+goog.provide('github.db.row.Repositories');
+goog.provide('github.db.row.RepositoriesDbType');
+goog.provide('github.db.row.RepositoriesType');
 goog.provide('github.db.row.Users');
 goog.provide('github.db.row.UsersDbType');
 goog.provide('github.db.row.UsersType');
@@ -17,7 +23,9 @@ goog.provide('github.db.schema.Commits');
 goog.provide('github.db.schema.Database');
 goog.provide('github.db.schema.Issues');
 goog.provide('github.db.schema.Milestones');
+goog.provide('github.db.schema.Organizations');
 goog.provide('github.db.schema.PullRequests');
+goog.provide('github.db.schema.Repositories');
 goog.provide('github.db.schema.Users');
 
 goog.require('lf.Row');
@@ -50,6 +58,12 @@ github.db.schema.Database = function() {
   /** @private {!github.db.schema.Commits} */
   this.commits_ = new github.db.schema.Commits();
 
+  /** @private {!github.db.schema.Organizations} */
+  this.organizations_ = new github.db.schema.Organizations();
+
+  /** @private {!github.db.schema.Repositories} */
+  this.repositories_ = new github.db.schema.Repositories();
+
 };
 
 
@@ -61,7 +75,7 @@ github.db.schema.Database.prototype.getName = function() {
 
 /** @override */
 github.db.schema.Database.prototype.getVersion = function() {
-  return 1;
+  return 3;
 };
 
 
@@ -72,7 +86,9 @@ github.db.schema.Database.prototype.getTables = function() {
     this.users_,
     this.milestones_,
     this.pullRequests_,
-    this.commits_
+    this.commits_,
+    this.organizations_,
+    this.repositories_
   ];
 };
 
@@ -107,6 +123,18 @@ github.db.schema.Database.prototype.getCommits = function() {
 };
 
 
+/** @return {!github.db.schema.Organizations} */
+github.db.schema.Database.prototype.getOrganizations = function() {
+  return this.organizations_;
+};
+
+
+/** @return {!github.db.schema.Repositories} */
+github.db.schema.Database.prototype.getRepositories = function() {
+  return this.repositories_;
+};
+
+
 
 /**
  * @extends {lf.schema.Table.<!github.db.row.IssuesType,
@@ -120,6 +148,16 @@ github.db.schema.Issues = function() {
   this.id = new lf.schema.BaseColumn(
       this, 'id', true, lf.Type.STRING);
   cols.push(this.id);
+
+  /** @type {!lf.schema.BaseColumn.<number>} */
+  this.organization = new lf.schema.BaseColumn(
+      this, 'organization', false, lf.Type.INTEGER);
+  cols.push(this.organization);
+
+  /** @type {!lf.schema.BaseColumn.<number>} */
+  this.repository = new lf.schema.BaseColumn(
+      this, 'repository', false, lf.Type.INTEGER);
+  cols.push(this.repository);
 
   /** @type {!lf.schema.BaseColumn.<string>} */
   this.url = new lf.schema.BaseColumn(
@@ -212,6 +250,8 @@ github.db.schema.Issues.prototype.deserializeRow = function(dbRecord) {
   var data = dbRecord['value'];
   var payload = new github.db.row.IssuesType();
   payload.id = data.id;
+  payload.organization = data.organization;
+  payload.repository = data.repository;
   payload.url = data.url;
   payload.html_url = data.html_url;
   payload.number = data.number;
@@ -236,6 +276,8 @@ github.db.schema.Issues.prototype.getConstraint = function() {
   var pk = new lf.schema.Index('Issues', 'pkIssues', true, ['id']);
   var notNullable = [
     this.id,
+    this.organization,
+    this.repository,
     this.url,
     this.html_url,
     this.number,
@@ -267,6 +309,10 @@ github.db.schema.Issues.prototype.getConstraint = function() {
 github.db.row.IssuesType = function() {
   /** @export @type {string} */
   this.id;
+  /** @export @type {number} */
+  this.organization;
+  /** @export @type {number} */
+  this.repository;
   /** @export @type {string} */
   this.url;
   /** @export @type {string} */
@@ -308,6 +354,10 @@ github.db.row.IssuesType = function() {
 github.db.row.IssuesDbType = function() {
   /** @export @type {string} */
   this.id;
+  /** @export @type {number} */
+  this.organization;
+  /** @export @type {number} */
+  this.repository;
   /** @export @type {string} */
   this.url;
   /** @export @type {string} */
@@ -359,6 +409,8 @@ goog.inherits(github.db.row.Issues, lf.Row);
 github.db.row.Issues.prototype.defaultPayload = function() {
   var payload = new github.db.row.IssuesType();
   payload.id = '';
+  payload.organization = 0;
+  payload.repository = 0;
   payload.url = '';
   payload.html_url = '';
   payload.number = 0;
@@ -381,6 +433,8 @@ github.db.row.Issues.prototype.defaultPayload = function() {
 github.db.row.Issues.prototype.toDbPayload = function() {
   var payload = new github.db.row.IssuesDbType();
   payload.id = this.payload().id;
+  payload.organization = this.payload().organization;
+  payload.repository = this.payload().repository;
   payload.url = this.payload().url;
   payload.html_url = this.payload().html_url;
   payload.number = this.payload().number;
@@ -426,6 +480,38 @@ github.db.row.Issues.prototype.getId = function() {
 */
 github.db.row.Issues.prototype.setId = function(value) {
   this.payload().id = value;
+  return this;
+};
+
+
+/** @return {number} */
+github.db.row.Issues.prototype.getOrganization = function() {
+  return this.payload().organization;
+};
+
+
+/**
+ * @param {number} value
+ * @return {!github.db.row.Issues}
+*/
+github.db.row.Issues.prototype.setOrganization = function(value) {
+  this.payload().organization = value;
+  return this;
+};
+
+
+/** @return {number} */
+github.db.row.Issues.prototype.getRepository = function() {
+  return this.payload().repository;
+};
+
+
+/**
+ * @param {number} value
+ * @return {!github.db.row.Issues}
+*/
+github.db.row.Issues.prototype.setRepository = function(value) {
+  this.payload().repository = value;
   return this;
 };
 
@@ -3085,6 +3171,1555 @@ github.db.row.Commits.prototype.getMessage = function() {
 */
 github.db.row.Commits.prototype.setMessage = function(value) {
   this.payload().message = value;
+  return this;
+};
+
+
+
+/**
+ * @extends {lf.schema.Table.<!github.db.row.OrganizationsType,
+ *     !github.db.row.OrganizationsDbType>}
+ * @constructor
+ */
+github.db.schema.Organizations = function() {
+  var cols = [];
+
+  /** @type {!lf.schema.BaseColumn.<number>} */
+  this.id = new lf.schema.BaseColumn(
+      this, 'id', false, lf.Type.INTEGER);
+  cols.push(this.id);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.login = new lf.schema.BaseColumn(
+      this, 'login', false, lf.Type.STRING);
+  cols.push(this.login);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.url = new lf.schema.BaseColumn(
+      this, 'url', false, lf.Type.STRING);
+  cols.push(this.url);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.avatar_url = new lf.schema.BaseColumn(
+      this, 'avatar_url', false, lf.Type.STRING);
+  cols.push(this.avatar_url);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.description = new lf.schema.BaseColumn(
+      this, 'description', false, lf.Type.STRING);
+  cols.push(this.description);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.name = new lf.schema.BaseColumn(
+      this, 'name', false, lf.Type.STRING);
+  cols.push(this.name);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.company = new lf.schema.BaseColumn(
+      this, 'company', false, lf.Type.STRING);
+  cols.push(this.company);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.blog = new lf.schema.BaseColumn(
+      this, 'blog', false, lf.Type.STRING);
+  cols.push(this.blog);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.location = new lf.schema.BaseColumn(
+      this, 'location', false, lf.Type.STRING);
+  cols.push(this.location);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.email = new lf.schema.BaseColumn(
+      this, 'email', false, lf.Type.STRING);
+  cols.push(this.email);
+
+  /** @type {!lf.schema.BaseColumn.<number>} */
+  this.public_repos = new lf.schema.BaseColumn(
+      this, 'public_repos', false, lf.Type.INTEGER);
+  cols.push(this.public_repos);
+
+  /** @type {!lf.schema.BaseColumn.<number>} */
+  this.public_gists = new lf.schema.BaseColumn(
+      this, 'public_gists', false, lf.Type.INTEGER);
+  cols.push(this.public_gists);
+
+  /** @type {!lf.schema.BaseColumn.<number>} */
+  this.followers = new lf.schema.BaseColumn(
+      this, 'followers', false, lf.Type.INTEGER);
+  cols.push(this.followers);
+
+  /** @type {!lf.schema.BaseColumn.<number>} */
+  this.following = new lf.schema.BaseColumn(
+      this, 'following', false, lf.Type.INTEGER);
+  cols.push(this.following);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.html_url = new lf.schema.BaseColumn(
+      this, 'html_url', false, lf.Type.STRING);
+  cols.push(this.html_url);
+
+  /** @type {!lf.schema.BaseColumn.<!Date>} */
+  this.created_at = new lf.schema.BaseColumn(
+      this, 'created_at', false, lf.Type.DATE_TIME);
+  cols.push(this.created_at);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.type = new lf.schema.BaseColumn(
+      this, 'type', false, lf.Type.STRING);
+  cols.push(this.type);
+
+  var indices = [
+
+  ];
+
+  github.db.schema.Organizations.base(
+      this, 'constructor', 'Organizations', cols, indices, false);
+};
+goog.inherits(github.db.schema.Organizations, lf.schema.Table);
+
+
+/** @override */
+github.db.schema.Organizations.prototype.createRow = function(opt_value) {
+  return new github.db.row.Organizations(lf.Row.getNextId(), opt_value);
+};
+
+
+/** @override */
+github.db.schema.Organizations.prototype.deserializeRow = function(dbRecord) {
+  var data = dbRecord['value'];
+  var payload = new github.db.row.OrganizationsType();
+  payload.id = data.id;
+  payload.login = data.login;
+  payload.url = data.url;
+  payload.avatar_url = data.avatar_url;
+  payload.description = data.description;
+  payload.name = data.name;
+  payload.company = data.company;
+  payload.blog = data.blog;
+  payload.location = data.location;
+  payload.email = data.email;
+  payload.public_repos = data.public_repos;
+  payload.public_gists = data.public_gists;
+  payload.followers = data.followers;
+  payload.following = data.following;
+  payload.html_url = data.html_url;
+  payload.created_at = new Date(data.created_at);
+  payload.type = data.type;
+  return new github.db.row.Organizations(dbRecord['id'], payload);
+};
+
+
+/** @override */
+github.db.schema.Organizations.prototype.getConstraint = function() {
+  var pk = null;
+  var notNullable = [
+    this.id,
+    this.login,
+    this.url,
+    this.name,
+    this.company,
+    this.blog,
+    this.location,
+    this.email,
+    this.public_repos,
+    this.public_gists,
+    this.followers,
+    this.following,
+    this.html_url,
+    this.created_at,
+    this.type
+  ];
+  var foreignKeys = [];
+  var unique = [
+  ];
+  return new lf.schema.Constraint(pk, notNullable, foreignKeys, unique);
+};
+
+
+
+/**
+ * @export
+ * @constructor
+ * @struct
+ * @final
+ */
+github.db.row.OrganizationsType = function() {
+  /** @export @type {number} */
+  this.id;
+  /** @export @type {string} */
+  this.login;
+  /** @export @type {string} */
+  this.url;
+  /** @export @type {?string} */
+  this.avatar_url;
+  /** @export @type {?string} */
+  this.description;
+  /** @export @type {string} */
+  this.name;
+  /** @export @type {string} */
+  this.company;
+  /** @export @type {string} */
+  this.blog;
+  /** @export @type {string} */
+  this.location;
+  /** @export @type {string} */
+  this.email;
+  /** @export @type {number} */
+  this.public_repos;
+  /** @export @type {number} */
+  this.public_gists;
+  /** @export @type {number} */
+  this.followers;
+  /** @export @type {number} */
+  this.following;
+  /** @export @type {string} */
+  this.html_url;
+  /** @export @type {!Date} */
+  this.created_at;
+  /** @export @type {string} */
+  this.type;
+};
+
+
+
+/**
+ * @export
+ * @constructor
+ * @struct
+ * @final
+ */
+github.db.row.OrganizationsDbType = function() {
+  /** @export @type {number} */
+  this.id;
+  /** @export @type {string} */
+  this.login;
+  /** @export @type {string} */
+  this.url;
+  /** @export @type {?string} */
+  this.avatar_url;
+  /** @export @type {?string} */
+  this.description;
+  /** @export @type {string} */
+  this.name;
+  /** @export @type {string} */
+  this.company;
+  /** @export @type {string} */
+  this.blog;
+  /** @export @type {string} */
+  this.location;
+  /** @export @type {string} */
+  this.email;
+  /** @export @type {number} */
+  this.public_repos;
+  /** @export @type {number} */
+  this.public_gists;
+  /** @export @type {number} */
+  this.followers;
+  /** @export @type {number} */
+  this.following;
+  /** @export @type {string} */
+  this.html_url;
+  /** @export @type {number} */
+  this.created_at;
+  /** @export @type {string} */
+  this.type;
+};
+
+
+
+/**
+ * Constructs a new Organizations row.
+ * @constructor
+ * @extends {lf.Row.<!github.db.row.OrganizationsType,
+ *     !github.db.row.OrganizationsDbType>}
+ *
+ * @param {number} rowId The row ID.
+ * @param {!github.db.row.OrganizationsType=} opt_payload
+ */
+github.db.row.Organizations = function(rowId, opt_payload) {
+  github.db.row.Organizations.base(this, 'constructor', rowId, opt_payload);
+};
+goog.inherits(github.db.row.Organizations, lf.Row);
+
+
+/** @override */
+github.db.row.Organizations.prototype.defaultPayload = function() {
+  var payload = new github.db.row.OrganizationsType();
+  payload.id = 0;
+  payload.login = '';
+  payload.url = '';
+  payload.avatar_url = null;
+  payload.description = null;
+  payload.name = '';
+  payload.company = '';
+  payload.blog = '';
+  payload.location = '';
+  payload.email = '';
+  payload.public_repos = 0;
+  payload.public_gists = 0;
+  payload.followers = 0;
+  payload.following = 0;
+  payload.html_url = '';
+  payload.created_at = new Date(0);
+  payload.type = '';
+  return payload;
+};
+
+
+/** @override */
+github.db.row.Organizations.prototype.toDbPayload = function() {
+  var payload = new github.db.row.OrganizationsDbType();
+  payload.id = this.payload().id;
+  payload.login = this.payload().login;
+  payload.url = this.payload().url;
+  payload.avatar_url = this.payload().avatar_url;
+  payload.description = this.payload().description;
+  payload.name = this.payload().name;
+  payload.company = this.payload().company;
+  payload.blog = this.payload().blog;
+  payload.location = this.payload().location;
+  payload.email = this.payload().email;
+  payload.public_repos = this.payload().public_repos;
+  payload.public_gists = this.payload().public_gists;
+  payload.followers = this.payload().followers;
+  payload.following = this.payload().following;
+  payload.html_url = this.payload().html_url;
+  payload.created_at = this.payload().created_at.getTime();
+  payload.type = this.payload().type;
+  return payload;
+};
+
+
+/** @override */
+github.db.row.Organizations.prototype.keyOfIndex = function(indexName) {
+  switch (indexName) {
+    case 'Organizations.#':
+      return this.id();
+    default:
+      break;
+  }
+  return null;
+};
+
+
+/** @return {number} */
+github.db.row.Organizations.prototype.getId = function() {
+  return this.payload().id;
+};
+
+
+/**
+ * @param {number} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setId = function(value) {
+  this.payload().id = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Organizations.prototype.getLogin = function() {
+  return this.payload().login;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setLogin = function(value) {
+  this.payload().login = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Organizations.prototype.getUrl = function() {
+  return this.payload().url;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setUrl = function(value) {
+  this.payload().url = value;
+  return this;
+};
+
+
+/** @return {?string} */
+github.db.row.Organizations.prototype.getAvatar_url = function() {
+  return this.payload().avatar_url;
+};
+
+
+/**
+ * @param {?string} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setAvatar_url = function(value) {
+  this.payload().avatar_url = value;
+  return this;
+};
+
+
+/** @return {?string} */
+github.db.row.Organizations.prototype.getDescription = function() {
+  return this.payload().description;
+};
+
+
+/**
+ * @param {?string} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setDescription = function(value) {
+  this.payload().description = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Organizations.prototype.getName = function() {
+  return this.payload().name;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setName = function(value) {
+  this.payload().name = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Organizations.prototype.getCompany = function() {
+  return this.payload().company;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setCompany = function(value) {
+  this.payload().company = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Organizations.prototype.getBlog = function() {
+  return this.payload().blog;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setBlog = function(value) {
+  this.payload().blog = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Organizations.prototype.getLocation = function() {
+  return this.payload().location;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setLocation = function(value) {
+  this.payload().location = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Organizations.prototype.getEmail = function() {
+  return this.payload().email;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setEmail = function(value) {
+  this.payload().email = value;
+  return this;
+};
+
+
+/** @return {number} */
+github.db.row.Organizations.prototype.getPublic_repos = function() {
+  return this.payload().public_repos;
+};
+
+
+/**
+ * @param {number} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setPublic_repos = function(value) {
+  this.payload().public_repos = value;
+  return this;
+};
+
+
+/** @return {number} */
+github.db.row.Organizations.prototype.getPublic_gists = function() {
+  return this.payload().public_gists;
+};
+
+
+/**
+ * @param {number} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setPublic_gists = function(value) {
+  this.payload().public_gists = value;
+  return this;
+};
+
+
+/** @return {number} */
+github.db.row.Organizations.prototype.getFollowers = function() {
+  return this.payload().followers;
+};
+
+
+/**
+ * @param {number} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setFollowers = function(value) {
+  this.payload().followers = value;
+  return this;
+};
+
+
+/** @return {number} */
+github.db.row.Organizations.prototype.getFollowing = function() {
+  return this.payload().following;
+};
+
+
+/**
+ * @param {number} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setFollowing = function(value) {
+  this.payload().following = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Organizations.prototype.getHtml_url = function() {
+  return this.payload().html_url;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setHtml_url = function(value) {
+  this.payload().html_url = value;
+  return this;
+};
+
+
+/** @return {!Date} */
+github.db.row.Organizations.prototype.getCreated_at = function() {
+  return this.payload().created_at;
+};
+
+
+/**
+ * @param {!Date} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setCreated_at = function(value) {
+  this.payload().created_at = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Organizations.prototype.getType = function() {
+  return this.payload().type;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Organizations}
+*/
+github.db.row.Organizations.prototype.setType = function(value) {
+  this.payload().type = value;
+  return this;
+};
+
+
+
+/**
+ * @extends {lf.schema.Table.<!github.db.row.RepositoriesType,
+ *     !github.db.row.RepositoriesDbType>}
+ * @constructor
+ */
+github.db.schema.Repositories = function() {
+  var cols = [];
+
+  /** @type {!lf.schema.BaseColumn.<number>} */
+  this.id = new lf.schema.BaseColumn(
+      this, 'id', false, lf.Type.INTEGER);
+  cols.push(this.id);
+
+  /** @type {!lf.schema.BaseColumn.<number>} */
+  this.owner = new lf.schema.BaseColumn(
+      this, 'owner', false, lf.Type.INTEGER);
+  cols.push(this.owner);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.name = new lf.schema.BaseColumn(
+      this, 'name', false, lf.Type.STRING);
+  cols.push(this.name);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.full_name = new lf.schema.BaseColumn(
+      this, 'full_name', false, lf.Type.STRING);
+  cols.push(this.full_name);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.description = new lf.schema.BaseColumn(
+      this, 'description', false, lf.Type.STRING);
+  cols.push(this.description);
+
+  /** @type {!lf.schema.BaseColumn.<boolean>} */
+  this.private = new lf.schema.BaseColumn(
+      this, 'private', false, lf.Type.BOOLEAN);
+  cols.push(this.private);
+
+  /** @type {!lf.schema.BaseColumn.<boolean>} */
+  this.fork = new lf.schema.BaseColumn(
+      this, 'fork', false, lf.Type.BOOLEAN);
+  cols.push(this.fork);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.url = new lf.schema.BaseColumn(
+      this, 'url', false, lf.Type.STRING);
+  cols.push(this.url);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.html_url = new lf.schema.BaseColumn(
+      this, 'html_url', false, lf.Type.STRING);
+  cols.push(this.html_url);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.clone_url = new lf.schema.BaseColumn(
+      this, 'clone_url', false, lf.Type.STRING);
+  cols.push(this.clone_url);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.git_url = new lf.schema.BaseColumn(
+      this, 'git_url', false, lf.Type.STRING);
+  cols.push(this.git_url);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.ssh_url = new lf.schema.BaseColumn(
+      this, 'ssh_url', false, lf.Type.STRING);
+  cols.push(this.ssh_url);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.svn_url = new lf.schema.BaseColumn(
+      this, 'svn_url', false, lf.Type.STRING);
+  cols.push(this.svn_url);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.mirror_url = new lf.schema.BaseColumn(
+      this, 'mirror_url', false, lf.Type.STRING);
+  cols.push(this.mirror_url);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.homepage = new lf.schema.BaseColumn(
+      this, 'homepage', false, lf.Type.STRING);
+  cols.push(this.homepage);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.language = new lf.schema.BaseColumn(
+      this, 'language', false, lf.Type.STRING);
+  cols.push(this.language);
+
+  /** @type {!lf.schema.BaseColumn.<number>} */
+  this.forks_count = new lf.schema.BaseColumn(
+      this, 'forks_count', false, lf.Type.INTEGER);
+  cols.push(this.forks_count);
+
+  /** @type {!lf.schema.BaseColumn.<number>} */
+  this.stargazers_count = new lf.schema.BaseColumn(
+      this, 'stargazers_count', false, lf.Type.INTEGER);
+  cols.push(this.stargazers_count);
+
+  /** @type {!lf.schema.BaseColumn.<number>} */
+  this.watchers_count = new lf.schema.BaseColumn(
+      this, 'watchers_count', false, lf.Type.INTEGER);
+  cols.push(this.watchers_count);
+
+  /** @type {!lf.schema.BaseColumn.<number>} */
+  this.size = new lf.schema.BaseColumn(
+      this, 'size', false, lf.Type.INTEGER);
+  cols.push(this.size);
+
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.default_branch = new lf.schema.BaseColumn(
+      this, 'default_branch', false, lf.Type.STRING);
+  cols.push(this.default_branch);
+
+  /** @type {!lf.schema.BaseColumn.<number>} */
+  this.open_issues_count = new lf.schema.BaseColumn(
+      this, 'open_issues_count', false, lf.Type.INTEGER);
+  cols.push(this.open_issues_count);
+
+  /** @type {!lf.schema.BaseColumn.<boolean>} */
+  this.has_issues = new lf.schema.BaseColumn(
+      this, 'has_issues', false, lf.Type.BOOLEAN);
+  cols.push(this.has_issues);
+
+  /** @type {!lf.schema.BaseColumn.<boolean>} */
+  this.has_wiki = new lf.schema.BaseColumn(
+      this, 'has_wiki', false, lf.Type.BOOLEAN);
+  cols.push(this.has_wiki);
+
+  /** @type {!lf.schema.BaseColumn.<boolean>} */
+  this.has_pages = new lf.schema.BaseColumn(
+      this, 'has_pages', false, lf.Type.BOOLEAN);
+  cols.push(this.has_pages);
+
+  /** @type {!lf.schema.BaseColumn.<boolean>} */
+  this.has_downloads = new lf.schema.BaseColumn(
+      this, 'has_downloads', false, lf.Type.BOOLEAN);
+  cols.push(this.has_downloads);
+
+  /** @type {!lf.schema.BaseColumn.<!Date>} */
+  this.pushed_at = new lf.schema.BaseColumn(
+      this, 'pushed_at', false, lf.Type.DATE_TIME);
+  cols.push(this.pushed_at);
+
+  /** @type {!lf.schema.BaseColumn.<!Date>} */
+  this.created_at = new lf.schema.BaseColumn(
+      this, 'created_at', false, lf.Type.DATE_TIME);
+  cols.push(this.created_at);
+
+  /** @type {!lf.schema.BaseColumn.<!Date>} */
+  this.updated_at = new lf.schema.BaseColumn(
+      this, 'updated_at', false, lf.Type.DATE_TIME);
+  cols.push(this.updated_at);
+
+  var indices = [
+
+  ];
+
+  github.db.schema.Repositories.base(
+      this, 'constructor', 'Repositories', cols, indices, false);
+};
+goog.inherits(github.db.schema.Repositories, lf.schema.Table);
+
+
+/** @override */
+github.db.schema.Repositories.prototype.createRow = function(opt_value) {
+  return new github.db.row.Repositories(lf.Row.getNextId(), opt_value);
+};
+
+
+/** @override */
+github.db.schema.Repositories.prototype.deserializeRow = function(dbRecord) {
+  var data = dbRecord['value'];
+  var payload = new github.db.row.RepositoriesType();
+  payload.id = data.id;
+  payload.owner = data.owner;
+  payload.name = data.name;
+  payload.full_name = data.full_name;
+  payload.description = data.description;
+  payload.private = data.private;
+  payload.fork = data.fork;
+  payload.url = data.url;
+  payload.html_url = data.html_url;
+  payload.clone_url = data.clone_url;
+  payload.git_url = data.git_url;
+  payload.ssh_url = data.ssh_url;
+  payload.svn_url = data.svn_url;
+  payload.mirror_url = data.mirror_url;
+  payload.homepage = data.homepage;
+  payload.language = data.language;
+  payload.forks_count = data.forks_count;
+  payload.stargazers_count = data.stargazers_count;
+  payload.watchers_count = data.watchers_count;
+  payload.size = data.size;
+  payload.default_branch = data.default_branch;
+  payload.open_issues_count = data.open_issues_count;
+  payload.has_issues = data.has_issues;
+  payload.has_wiki = data.has_wiki;
+  payload.has_pages = data.has_pages;
+  payload.has_downloads = data.has_downloads;
+  payload.pushed_at = new Date(data.pushed_at);
+  payload.created_at = new Date(data.created_at);
+  payload.updated_at = new Date(data.updated_at);
+  return new github.db.row.Repositories(dbRecord['id'], payload);
+};
+
+
+/** @override */
+github.db.schema.Repositories.prototype.getConstraint = function() {
+  var pk = null;
+  var notNullable = [
+    this.id,
+    this.owner,
+    this.name,
+    this.full_name,
+    this.description,
+    this.private,
+    this.fork,
+    this.url,
+    this.html_url,
+    this.clone_url,
+    this.git_url,
+    this.ssh_url,
+    this.svn_url,
+    this.mirror_url,
+    this.homepage,
+    this.forks_count,
+    this.stargazers_count,
+    this.watchers_count,
+    this.size,
+    this.default_branch,
+    this.open_issues_count,
+    this.has_issues,
+    this.has_wiki,
+    this.has_pages,
+    this.has_downloads,
+    this.pushed_at,
+    this.created_at,
+    this.updated_at
+  ];
+  var foreignKeys = [];
+  var unique = [
+  ];
+  return new lf.schema.Constraint(pk, notNullable, foreignKeys, unique);
+};
+
+
+
+/**
+ * @export
+ * @constructor
+ * @struct
+ * @final
+ */
+github.db.row.RepositoriesType = function() {
+  /** @export @type {number} */
+  this.id;
+  /** @export @type {number} */
+  this.owner;
+  /** @export @type {string} */
+  this.name;
+  /** @export @type {string} */
+  this.full_name;
+  /** @export @type {string} */
+  this.description;
+  /** @export @type {boolean} */
+  this.private;
+  /** @export @type {boolean} */
+  this.fork;
+  /** @export @type {string} */
+  this.url;
+  /** @export @type {string} */
+  this.html_url;
+  /** @export @type {string} */
+  this.clone_url;
+  /** @export @type {string} */
+  this.git_url;
+  /** @export @type {string} */
+  this.ssh_url;
+  /** @export @type {string} */
+  this.svn_url;
+  /** @export @type {string} */
+  this.mirror_url;
+  /** @export @type {string} */
+  this.homepage;
+  /** @export @type {?string} */
+  this.language;
+  /** @export @type {number} */
+  this.forks_count;
+  /** @export @type {number} */
+  this.stargazers_count;
+  /** @export @type {number} */
+  this.watchers_count;
+  /** @export @type {number} */
+  this.size;
+  /** @export @type {string} */
+  this.default_branch;
+  /** @export @type {number} */
+  this.open_issues_count;
+  /** @export @type {boolean} */
+  this.has_issues;
+  /** @export @type {boolean} */
+  this.has_wiki;
+  /** @export @type {boolean} */
+  this.has_pages;
+  /** @export @type {boolean} */
+  this.has_downloads;
+  /** @export @type {!Date} */
+  this.pushed_at;
+  /** @export @type {!Date} */
+  this.created_at;
+  /** @export @type {!Date} */
+  this.updated_at;
+};
+
+
+
+/**
+ * @export
+ * @constructor
+ * @struct
+ * @final
+ */
+github.db.row.RepositoriesDbType = function() {
+  /** @export @type {number} */
+  this.id;
+  /** @export @type {number} */
+  this.owner;
+  /** @export @type {string} */
+  this.name;
+  /** @export @type {string} */
+  this.full_name;
+  /** @export @type {string} */
+  this.description;
+  /** @export @type {boolean} */
+  this.private;
+  /** @export @type {boolean} */
+  this.fork;
+  /** @export @type {string} */
+  this.url;
+  /** @export @type {string} */
+  this.html_url;
+  /** @export @type {string} */
+  this.clone_url;
+  /** @export @type {string} */
+  this.git_url;
+  /** @export @type {string} */
+  this.ssh_url;
+  /** @export @type {string} */
+  this.svn_url;
+  /** @export @type {string} */
+  this.mirror_url;
+  /** @export @type {string} */
+  this.homepage;
+  /** @export @type {?string} */
+  this.language;
+  /** @export @type {number} */
+  this.forks_count;
+  /** @export @type {number} */
+  this.stargazers_count;
+  /** @export @type {number} */
+  this.watchers_count;
+  /** @export @type {number} */
+  this.size;
+  /** @export @type {string} */
+  this.default_branch;
+  /** @export @type {number} */
+  this.open_issues_count;
+  /** @export @type {boolean} */
+  this.has_issues;
+  /** @export @type {boolean} */
+  this.has_wiki;
+  /** @export @type {boolean} */
+  this.has_pages;
+  /** @export @type {boolean} */
+  this.has_downloads;
+  /** @export @type {number} */
+  this.pushed_at;
+  /** @export @type {number} */
+  this.created_at;
+  /** @export @type {number} */
+  this.updated_at;
+};
+
+
+
+/**
+ * Constructs a new Repositories row.
+ * @constructor
+ * @extends {lf.Row.<!github.db.row.RepositoriesType,
+ *     !github.db.row.RepositoriesDbType>}
+ *
+ * @param {number} rowId The row ID.
+ * @param {!github.db.row.RepositoriesType=} opt_payload
+ */
+github.db.row.Repositories = function(rowId, opt_payload) {
+  github.db.row.Repositories.base(this, 'constructor', rowId, opt_payload);
+};
+goog.inherits(github.db.row.Repositories, lf.Row);
+
+
+/** @override */
+github.db.row.Repositories.prototype.defaultPayload = function() {
+  var payload = new github.db.row.RepositoriesType();
+  payload.id = 0;
+  payload.owner = 0;
+  payload.name = '';
+  payload.full_name = '';
+  payload.description = '';
+  payload.private = false;
+  payload.fork = false;
+  payload.url = '';
+  payload.html_url = '';
+  payload.clone_url = '';
+  payload.git_url = '';
+  payload.ssh_url = '';
+  payload.svn_url = '';
+  payload.mirror_url = '';
+  payload.homepage = '';
+  payload.language = null;
+  payload.forks_count = 0;
+  payload.stargazers_count = 0;
+  payload.watchers_count = 0;
+  payload.size = 0;
+  payload.default_branch = '';
+  payload.open_issues_count = 0;
+  payload.has_issues = false;
+  payload.has_wiki = false;
+  payload.has_pages = false;
+  payload.has_downloads = false;
+  payload.pushed_at = new Date(0);
+  payload.created_at = new Date(0);
+  payload.updated_at = new Date(0);
+  return payload;
+};
+
+
+/** @override */
+github.db.row.Repositories.prototype.toDbPayload = function() {
+  var payload = new github.db.row.RepositoriesDbType();
+  payload.id = this.payload().id;
+  payload.owner = this.payload().owner;
+  payload.name = this.payload().name;
+  payload.full_name = this.payload().full_name;
+  payload.description = this.payload().description;
+  payload.private = this.payload().private;
+  payload.fork = this.payload().fork;
+  payload.url = this.payload().url;
+  payload.html_url = this.payload().html_url;
+  payload.clone_url = this.payload().clone_url;
+  payload.git_url = this.payload().git_url;
+  payload.ssh_url = this.payload().ssh_url;
+  payload.svn_url = this.payload().svn_url;
+  payload.mirror_url = this.payload().mirror_url;
+  payload.homepage = this.payload().homepage;
+  payload.language = this.payload().language;
+  payload.forks_count = this.payload().forks_count;
+  payload.stargazers_count = this.payload().stargazers_count;
+  payload.watchers_count = this.payload().watchers_count;
+  payload.size = this.payload().size;
+  payload.default_branch = this.payload().default_branch;
+  payload.open_issues_count = this.payload().open_issues_count;
+  payload.has_issues = this.payload().has_issues;
+  payload.has_wiki = this.payload().has_wiki;
+  payload.has_pages = this.payload().has_pages;
+  payload.has_downloads = this.payload().has_downloads;
+  payload.pushed_at = this.payload().pushed_at.getTime();
+  payload.created_at = this.payload().created_at.getTime();
+  payload.updated_at = this.payload().updated_at.getTime();
+  return payload;
+};
+
+
+/** @override */
+github.db.row.Repositories.prototype.keyOfIndex = function(indexName) {
+  switch (indexName) {
+    case 'Repositories.#':
+      return this.id();
+    default:
+      break;
+  }
+  return null;
+};
+
+
+/** @return {number} */
+github.db.row.Repositories.prototype.getId = function() {
+  return this.payload().id;
+};
+
+
+/**
+ * @param {number} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setId = function(value) {
+  this.payload().id = value;
+  return this;
+};
+
+
+/** @return {number} */
+github.db.row.Repositories.prototype.getOwner = function() {
+  return this.payload().owner;
+};
+
+
+/**
+ * @param {number} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setOwner = function(value) {
+  this.payload().owner = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Repositories.prototype.getName = function() {
+  return this.payload().name;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setName = function(value) {
+  this.payload().name = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Repositories.prototype.getFull_name = function() {
+  return this.payload().full_name;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setFull_name = function(value) {
+  this.payload().full_name = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Repositories.prototype.getDescription = function() {
+  return this.payload().description;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setDescription = function(value) {
+  this.payload().description = value;
+  return this;
+};
+
+
+/** @return {boolean} */
+github.db.row.Repositories.prototype.getPrivate = function() {
+  return this.payload().private;
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setPrivate = function(value) {
+  this.payload().private = value;
+  return this;
+};
+
+
+/** @return {boolean} */
+github.db.row.Repositories.prototype.getFork = function() {
+  return this.payload().fork;
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setFork = function(value) {
+  this.payload().fork = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Repositories.prototype.getUrl = function() {
+  return this.payload().url;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setUrl = function(value) {
+  this.payload().url = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Repositories.prototype.getHtml_url = function() {
+  return this.payload().html_url;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setHtml_url = function(value) {
+  this.payload().html_url = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Repositories.prototype.getClone_url = function() {
+  return this.payload().clone_url;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setClone_url = function(value) {
+  this.payload().clone_url = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Repositories.prototype.getGit_url = function() {
+  return this.payload().git_url;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setGit_url = function(value) {
+  this.payload().git_url = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Repositories.prototype.getSsh_url = function() {
+  return this.payload().ssh_url;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setSsh_url = function(value) {
+  this.payload().ssh_url = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Repositories.prototype.getSvn_url = function() {
+  return this.payload().svn_url;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setSvn_url = function(value) {
+  this.payload().svn_url = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Repositories.prototype.getMirror_url = function() {
+  return this.payload().mirror_url;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setMirror_url = function(value) {
+  this.payload().mirror_url = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Repositories.prototype.getHomepage = function() {
+  return this.payload().homepage;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setHomepage = function(value) {
+  this.payload().homepage = value;
+  return this;
+};
+
+
+/** @return {?string} */
+github.db.row.Repositories.prototype.getLanguage = function() {
+  return this.payload().language;
+};
+
+
+/**
+ * @param {?string} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setLanguage = function(value) {
+  this.payload().language = value;
+  return this;
+};
+
+
+/** @return {number} */
+github.db.row.Repositories.prototype.getForks_count = function() {
+  return this.payload().forks_count;
+};
+
+
+/**
+ * @param {number} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setForks_count = function(value) {
+  this.payload().forks_count = value;
+  return this;
+};
+
+
+/** @return {number} */
+github.db.row.Repositories.prototype.getStargazers_count = function() {
+  return this.payload().stargazers_count;
+};
+
+
+/**
+ * @param {number} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setStargazers_count = function(value) {
+  this.payload().stargazers_count = value;
+  return this;
+};
+
+
+/** @return {number} */
+github.db.row.Repositories.prototype.getWatchers_count = function() {
+  return this.payload().watchers_count;
+};
+
+
+/**
+ * @param {number} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setWatchers_count = function(value) {
+  this.payload().watchers_count = value;
+  return this;
+};
+
+
+/** @return {number} */
+github.db.row.Repositories.prototype.getSize = function() {
+  return this.payload().size;
+};
+
+
+/**
+ * @param {number} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setSize = function(value) {
+  this.payload().size = value;
+  return this;
+};
+
+
+/** @return {string} */
+github.db.row.Repositories.prototype.getDefault_branch = function() {
+  return this.payload().default_branch;
+};
+
+
+/**
+ * @param {string} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setDefault_branch = function(value) {
+  this.payload().default_branch = value;
+  return this;
+};
+
+
+/** @return {number} */
+github.db.row.Repositories.prototype.getOpen_issues_count = function() {
+  return this.payload().open_issues_count;
+};
+
+
+/**
+ * @param {number} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setOpen_issues_count = function(value) {
+  this.payload().open_issues_count = value;
+  return this;
+};
+
+
+/** @return {boolean} */
+github.db.row.Repositories.prototype.getHas_issues = function() {
+  return this.payload().has_issues;
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setHas_issues = function(value) {
+  this.payload().has_issues = value;
+  return this;
+};
+
+
+/** @return {boolean} */
+github.db.row.Repositories.prototype.getHas_wiki = function() {
+  return this.payload().has_wiki;
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setHas_wiki = function(value) {
+  this.payload().has_wiki = value;
+  return this;
+};
+
+
+/** @return {boolean} */
+github.db.row.Repositories.prototype.getHas_pages = function() {
+  return this.payload().has_pages;
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setHas_pages = function(value) {
+  this.payload().has_pages = value;
+  return this;
+};
+
+
+/** @return {boolean} */
+github.db.row.Repositories.prototype.getHas_downloads = function() {
+  return this.payload().has_downloads;
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setHas_downloads = function(value) {
+  this.payload().has_downloads = value;
+  return this;
+};
+
+
+/** @return {!Date} */
+github.db.row.Repositories.prototype.getPushed_at = function() {
+  return this.payload().pushed_at;
+};
+
+
+/**
+ * @param {!Date} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setPushed_at = function(value) {
+  this.payload().pushed_at = value;
+  return this;
+};
+
+
+/** @return {!Date} */
+github.db.row.Repositories.prototype.getCreated_at = function() {
+  return this.payload().created_at;
+};
+
+
+/**
+ * @param {!Date} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setCreated_at = function(value) {
+  this.payload().created_at = value;
+  return this;
+};
+
+
+/** @return {!Date} */
+github.db.row.Repositories.prototype.getUpdated_at = function() {
+  return this.payload().updated_at;
+};
+
+
+/**
+ * @param {!Date} value
+ * @return {!github.db.row.Repositories}
+*/
+github.db.row.Repositories.prototype.setUpdated_at = function(value) {
+  this.payload().updated_at = value;
   return this;
 };
 goog.provide('github.db');

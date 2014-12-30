@@ -3,13 +3,16 @@ angular.module('ghoIssuesService', ['ghoDBService']).
       '$http', 'dbService', 'issueStorageTranslator',
       function($http, dbService, issueStorageTranslator) {
         this.insertOrReplace = function (items) {
+          console.log('insertOrReplace items', items)
           dbService.get().then(function(db) {
             var schema = db.getSchema().getIssues();
             var issuesInsert = items.map(function(issue){
               return schema.createRow(issueStorageTranslator(issue));
             });
             db.insertOrReplace().into(schema).values(issuesInsert).exec().
-              then(console.log, function(e) {
+              then(function(val){
+                console.log(val);
+              }, function(e) {
                 console.error(e);
               });
           });
@@ -24,6 +27,7 @@ angular.module('ghoIssuesService', ['ghoDBService']).
           }
 
           function fetchFromHttp() {
+            // return new Promise(angular.noop)
             return Promise.resolve($http.get(
               'https://api.github.com/repos/' + options.org + '/' + options.repo + '/issues?client_id=' +
               githubCredentials.id +
@@ -33,14 +37,19 @@ angular.module('ghoIssuesService', ['ghoDBService']).
           }
 
           function fetchFromDb(db) {
-            return db.select().from(db.getSchema().getIssues()).exec()
-              .then(function(res) {
-                if (res && !res.length) {
-                  //Will cause Promise.race to wait for $http instead
-                  return new Promise(angular.noop);
-                }
-                return res;
-              })
+            var issues = db.getSchema().getIssues();
+            return db.select().
+              from(issues).
+              where(issues.organization.eq(options.org), issues.repository.eq(options.repo)).
+              exec()
+                .then(function(res) {
+                  console.log('result', res);
+                  if (res && !res.length) {
+                    //Will cause Promise.race to wait for $http instead
+                    return new Promise(angular.noop);
+                  }
+                  return res;
+                });
           }
         };
   }]).
