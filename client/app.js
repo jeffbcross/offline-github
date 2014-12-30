@@ -1,6 +1,6 @@
 var githubCredentials = JSON.parse(localStorage.getItem('github.credentials'));
 
-angular.module('ghIssuesApp', []).
+angular.module('ghIssuesApp', ['ghoIssuesListDirective']).
   config(['$httpProvider', function($httpProvider){
     $httpProvider.useApplyAsync(true);
   }]).
@@ -27,71 +27,76 @@ angular.module('ghIssuesApp', []).
       return promise;
     }
   }]).
-  service('Issues', ['$http', 'dbService', function($http, dbService) {
-    this.fetch = function(options) {
-      if (options.firstWins) {
-        return Promise.race([
-          fetchFromHttp(),
-          dbService.get().then(fetchFromDb)
-        ]);
-      }
+  service('Issues', [
+      '$http', 'dbService', 'issueStorageTranslator',
+      function($http, dbService, issueStorageTranslator) {
+        this.insertOrReplace = function (items) {
+          dbService.get().then(function(db) {
+            var schema = db.getSchema().getIssues();
+            var issuesInsert = items.map(function(issue){
+              return schema.createRow(issueStorageTranslator(issue));
+            });
+            db.insertOrReplace().into(schema).values(issuesInsert).exec().
+              then(console.log, function(e) {
+                console.error(e);
+              });
+          });
+        };
 
-      function fetchFromHttp() {
-        return Promise.resolve($http.get(
-          'https://api.github.com/repos/angular/angular.js/issues?client_id=' +
-          githubCredentials.id +
-          '&client_secret=' +
-          githubCredentials.secret
-        ));
-      }
+        this.fetch = function(options) {
+          if (options.firstWins) {
+            return Promise.race([
+              fetchFromHttp(),
+              dbService.get().then(fetchFromDb)
+            ]);
+          }
 
-      function fetchFromDb(db) {
-        return db.select().from(db.getSchema().getIssues()).exec()
-          .then(function(res) {
-            if (res && !res.length) {
-              //Will cause Promise.race to wait for $http instead
-              return new Promise(angular.noop);
-            }
-            return res;
-          })
-      }
-    };
+          function fetchFromHttp() {
+            return Promise.resolve($http.get(
+              'https://api.github.com/repos/angular/angular.js/issues?client_id=' +
+              githubCredentials.id +
+              '&client_secret=' +
+              githubCredentials.secret
+            ));
+          }
+
+          function fetchFromDb(db) {
+            return db.select().from(db.getSchema().getIssues()).exec()
+              .then(function(res) {
+                if (res && !res.length) {
+                  //Will cause Promise.race to wait for $http instead
+                  return new Promise(angular.noop);
+                }
+                return res;
+              })
+          }
+        };
   }]).
   controller('IssuesList', [
       '$http', '$scope', 'dbService', 'issueStorageTranslator', 'Issues',
       function($http, $scope, dbService, issueStorageTranslator, Issues) {
         Issues.fetch({firstWins: true}).
           then(renderData).
+          then(setDataSource).
           then(cacheData);
 
         function renderData (res) {
-          var issues;
-          if(res && res.data) {
-            $scope.dataSource = '$http';
-            issues = res.data;
-          }
-          else {
-            $scope.dataSource = 'lovefield';
-            issues = res;
-          }
-
+          if (!res) return res;
           $scope.$apply(function() {
-            $scope.issues = issues;
+            $scope.issues = res.data || res;
           });
-          return res && res.data;
+          return res;
         }
 
-        function cacheData(data) {
-          if (data) {
-            dbService.get().then(function(db) {
-              var schema = db.getSchema().getIssues();
-              var issuesInsert = data.map(function(issue){
-                return schema.createRow(issueStorageTranslator(issue));
-              });
-              db.insertOrReplace().into(schema).values(issuesInsert).exec().then(null, function(e) {
-                console.error(e);
-              });
-            });
+        function setDataSource(res) {
+          $scope.dataSource = res && res.data ? '$http' : 'lovefield';
+          return res;
+        }
+
+        function cacheData(res) {
+          if (res && res.data) {
+            Issues.insertOrReplace(res.data);
           }
+          return res;
         }
       }]);
