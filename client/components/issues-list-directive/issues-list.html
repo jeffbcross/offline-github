@@ -6,8 +6,17 @@
   </label>
 
   <ul>
-    <li ng-repeat="issue in issues | filter:filterText | limitTo:25">
+    <li ng-repeat="issue in issues | filter:filterText | page:page:limit | limitTo:limit">
       {{issue.title}}
     </li>
   </ul>
+
+  <nav>
+    Page:
+    <span ng-repeat="i in issues | filter:filterText | pages:limit track by $index">
+      <button ng-disabled="$parent.page == $index" ng-click="$parent.page = $index">
+        {{$index}}
+      </button>
+    </span>
+  </nav>
 </div>

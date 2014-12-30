@@ -48,4 +48,13 @@ describe('IssuesListDirective', function() {
     expect(element.find('li').length).toBe(1);
     expect(element.find('li')[0].innerHTML).toContain('browserDisconnectTolerance');
   });
+
+
+  it('should show the specified zero-indexed page of results', function () {
+    var scope = $rootScope.$new();
+    scope.issues = mockIssues;
+    var element = $compile('<gho-issues-list issues="issues" page="1"></gho-issues-list>')(scope);
+    scope.$digest();
+    expect(element.find('li').length).toBe(5);
+  });
 });
