@@ -3,9 +3,8 @@ angular.module('ghIssuesApp').
       '$scope', '$routeParams', 'Issues',
       function($scope, $routeParams, Issues) {
         Issues.fetch({
-          org: $routeParams.org,
-          firstWins: true,
-          repo: $routeParams.repo
+          organization: $routeParams.org,
+          repository: $routeParams.repo
         }).
           then(renderData).
           then(setDataSource).
@@ -13,9 +12,7 @@ angular.module('ghIssuesApp').
 
         function renderData (res) {
           if (!res) return res;
-          $scope.$apply(function() {
-            $scope.issues = res.data || res;
-          });
+          $scope.issues = res.data || res;
           return res;
         }
 

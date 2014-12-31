@@ -2,6 +2,7 @@ var githubCredentials = JSON.parse(localStorage.getItem('github.credentials'));
 
 angular.module('ghIssuesApp', [
     'ngRoute',
+    'ghoCacheModel',
     'ghoIssuesListDirective',
     'ghoIssuesService'
   ]).

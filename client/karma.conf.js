@@ -19,12 +19,12 @@ module.exports = function(config) {
       'bower_components/angular/angular.js',
       'bower_components/angular-mocks/angular-mocks.js',
       'bower_components/angular-route/angular-route.js',
-      'deps.js',
+      'lovefield.min.js',
+      'db/github_db_gen.js',
       'test/mock-issues.js',
       'components/**/*.js',
       'components/**/*.html',
-      'app.js',
-      'lovefield.min.js'
+      'app.js'
     ],
 
 

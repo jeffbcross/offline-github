@@ -1,9 +1,15 @@
-angular.module('ghoIssuesService', ['ghoDBService']).
+angular.module('ghoIssuesService', ['ghoDBService', 'ghoCacheModel']).
   service('Issues', [
-      '$http', 'dbService', 'issueStorageTranslator',
-      function($http, dbService, issueStorageTranslator) {
+      '$http', 'CacheModel', 'dbService', 'issueStorageTranslator',
+      function($http, CacheModel, dbService, issueStorageTranslator) {
+        var cacheModel = new CacheModel(
+            'Issues',
+            'https://api.github.com/repos/:organization/:repository/issues?client_id=' +
+              githubCredentials.id +
+              '&client_secret=' +
+              githubCredentials.secret);
+
         this.insertOrReplace = function (items) {
-          console.log('insertOrReplace items', items)
           dbService.get().then(function(db) {
             var schema = db.getSchema().getIssues();
             var issuesInsert = items.map(function(issue){
@@ -19,38 +25,7 @@ angular.module('ghoIssuesService', ['ghoDBService']).
         };
 
         this.fetch = function(options) {
-          if (options.firstWins) {
-            return Promise.race([
-              fetchFromHttp(),
-              dbService.get().then(fetchFromDb)
-            ]);
-          }
-
-          function fetchFromHttp() {
-            // return new Promise(angular.noop)
-            return Promise.resolve($http.get(
-              'https://api.github.com/repos/' + options.org + '/' + options.repo + '/issues?client_id=' +
-              githubCredentials.id +
-              '&client_secret=' +
-              githubCredentials.secret
-            ));
-          }
-
-          function fetchFromDb(db) {
-            var issues = db.getSchema().getIssues();
-            return db.select().
-              from(issues).
-              where(issues.organization.eq(options.org), issues.repository.eq(options.repo)).
-              exec()
-                .then(function(res) {
-                  console.log('result', res);
-                  if (res && !res.length) {
-                    //Will cause Promise.race to wait for $http instead
-                    return new Promise(angular.noop);
-                  }
-                  return res;
-                });
-          }
+          return cacheModel.query(options);
         };
   }]).
   factory('issueStorageTranslator', [function(){
