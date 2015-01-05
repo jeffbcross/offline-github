@@ -1,13 +1,10 @@
-angular.module('ghoIssuesService', ['ghoDBService', 'ghoCacheModel']).
+angular.module('ghoIssuesService', ['ghoDBService', 'ghoCacheModel', 'ghoFirebaseAuth']).
   service('Issues', [
-      '$http', 'CacheModel', 'dbService', 'issueStorageTranslator',
-      function($http, CacheModel, dbService, issueStorageTranslator) {
-        var cacheModel = new CacheModel(
-            'Issues',
-            'https://api.github.com/repos/:organization/:repository/issues?client_id=' +
-              githubCredentials.id +
-              '&client_secret=' +
-              githubCredentials.secret);
+      '$http', '$rootScope', 'CacheModel', 'dbService', 'firebaseAuth', 'issueStorageTranslator',
+      function($http, $rootScope, CacheModel, dbService, firebaseAuth, issueStorageTranslator) {
+        var cacheModel;
+
+
 
         this.insertOrReplace = function (items) {
           dbService.get().then(function(db) {
@@ -25,7 +22,15 @@ angular.module('ghoIssuesService', ['ghoDBService', 'ghoCacheModel']).
         };
 
         this.fetch = function(options) {
-          return cacheModel.query(options);
+          return firebaseAuth.githubAuth().then(function(authData) {
+            return new CacheModel(
+              'Issues',
+              'https://api.github.com/repos/:organization/:repository/issues?access_token=' +
+                authData.github.accessToken);
+          }).then(function(cacheModel) {
+            return cacheModel.query(options);
+
+          });
         };
   }]).
   factory('issueStorageTranslator', [function(){

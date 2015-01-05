@@ -11,6 +11,7 @@ angular.module('ghIssuesApp').
           then(cacheData);
 
         function renderData (res) {
+          console.log('renderData', res);
           if (!res) return res;
           $scope.issues = res.data || res;
           return res;

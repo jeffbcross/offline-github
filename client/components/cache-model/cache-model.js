@@ -25,9 +25,11 @@ angular.module('ghoCacheModel', ['ghoDBService']).
           exec().
           then(function(res) {
             if (res && res.length) {
+              console.log('retuning from cache');
               return res;
             }
-            return res;
+
+            return $q.defer().promise;
           });
       });
     };
