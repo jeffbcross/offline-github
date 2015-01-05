@@ -1,0 +1,9 @@
+{
+  "firebase": "gh-offline",
+  "public": ".",
+  "ignore": [
+    "firebase.json",
+    "**/.*",
+    "**/node_modules/**"
+  ]
+}
