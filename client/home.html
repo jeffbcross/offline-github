@@ -1,1 +1,14 @@
-<h1>Welcome to Offline Github!</h1>
+<div class="container">
+  <h1>Welcome to Offline Github!</h1>
+  <ul class="list-group">
+    <li class="list-group-item" ng-repeat="repo in repositories track by repo.id">
+      <a href="/#/{{repo.owner.login}}">
+        <img ng-src="{{repo.owner.avatar_url}}?s=25"
+             alt="{{repo.owner.login}} profile pic" width="25" height="25">
+      </a>
+      <a ng-href="/#/{{repo.owner.login}}/{{repo.name}}/issues">
+        {{repo.owner.login}}/{{repo.name}}
+      </a>
+    </li>
+  </ul>
+</div>

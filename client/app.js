@@ -3,19 +3,19 @@ angular.module('ghIssuesApp', [
     'ghoCacheModel',
     'ghoIssuesListDirective',
     'ghoIssuesService',
-    'ghoFirebaseAuth'
+    'ghoFirebaseAuth',
+    'ghoOrganizationsService',
+    'ghoRepositoriesService'
   ]).
   config(['$httpProvider', '$routeProvider', function($httpProvider, $routeProvider){
     $httpProvider.useApplyAsync(true);
     $routeProvider.
       when('/', {
         templateUrl: 'home.html',
-        controller: function(auth) {
-          console.log('auth info', auth);
-        },
+        controller: 'HomeController',
         resolve: {
           auth: function(firebaseAuth) {
-            return firebaseAuth.githubAuth();
+            return firebaseAuth.getAuth();
           }
         }
       }).
@@ -25,7 +25,7 @@ angular.module('ghIssuesApp', [
         controller: 'LoginController'
       }).
       when('/:org', {
-        template: 'organization'
+        template: 'user or organization profile'
       }).
       when('/:org/:repo', {
         template: 'repo'

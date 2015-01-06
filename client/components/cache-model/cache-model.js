@@ -15,7 +15,7 @@ angular.module('ghoCacheModel', ['ghoDBService']).
 
         return from.
           where(
-            lf.op.and.apply(null, Object.keys(query).
+            lf.op.and.apply(null, Object.keys(query || {}).
               sort().
               map(function(k) {
                 return schema[k].eq(query[k]);
@@ -25,7 +25,6 @@ angular.module('ghoCacheModel', ['ghoDBService']).
           exec().
           then(function(res) {
             if (res && res.length) {
-              console.log('retuning from cache');
               return res;
             }
 

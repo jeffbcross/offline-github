@@ -11,6 +11,7 @@ angular.module('ghIssuesApp').
     };
 
     this.redirectOnSuccess = function redirectOnSuccess() {
+      delete $scope.error;
       $location.url(decodeURIComponent($location.search().redirectTo));
     };
   }]);

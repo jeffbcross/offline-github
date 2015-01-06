@@ -1,4 +1,4 @@
-<html>
+<html ng-app="ghIssuesApp">
 <head>
   <title>Github Issues</title>
   <script src="bower_components/angular/angular.js"></script>
@@ -11,11 +11,18 @@
   <script src="components/db-service/db-service.js"></script>
   <script src="components/cache-model/cache-model.js"></script>
   <script src="components/firebase-auth-service/firebase-auth-service.js"></script>
+  <script src="components/organizations-service/organizations-service.js"></script>
+  <script src="components/repositories-service/repositories-service.js"></script>
   <script src="app.js"></script>
-  <script src="org/repo/issues/issues-list-controller.js"></script>
+  <script src="home-controller.js"></script>
   <script src="login/login-controller.js"></script>
+  <script src="org/repo/issues/issues-list-controller.js"></script>
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
+  <style>
+    [ng-cloak] {display: none}
+  </style>
 </head>
-<body ng-app="ghIssuesApp">
+<body ng-cloak>
   <ng-view></ng-view>
 </body>
 </html>

@@ -1,5 +1,12 @@
-<a ng-click="ctrl.login()">Login with Github</a>
 
-<div class="alert alert-error" ng-show="error">
-  {{error.message}}
+<div class="jumbotron">
+  <div class="container">
+    <h1>Login with Github</h1>
+    <p><a class="btn btn-primary btn-lg" ng-click="ctrl.login()">Login</a></p>
+    <p class="alert alert-danger" ng-show="error">
+      {{error.message}}
+    </p>
+  </div>
 </div>
+
+
