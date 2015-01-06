@@ -75,7 +75,7 @@ github.db.schema.Database.prototype.getName = function() {
 
 /** @override */
 github.db.schema.Database.prototype.getVersion = function() {
-  return 3;
+  return 4;
 };
 
 
@@ -3186,7 +3186,7 @@ github.db.schema.Organizations = function() {
 
   /** @type {!lf.schema.BaseColumn.<number>} */
   this.id = new lf.schema.BaseColumn(
-      this, 'id', false, lf.Type.INTEGER);
+      this, 'id', true, lf.Type.INTEGER);
   cols.push(this.id);
 
   /** @type {!lf.schema.BaseColumn.<string>} */
@@ -3270,7 +3270,7 @@ github.db.schema.Organizations = function() {
   cols.push(this.type);
 
   var indices = [
-
+    new lf.schema.Index('Organizations', 'pkOrganizations', true, ['id'])
   ];
 
   github.db.schema.Organizations.base(
@@ -3312,7 +3312,7 @@ github.db.schema.Organizations.prototype.deserializeRow = function(dbRecord) {
 
 /** @override */
 github.db.schema.Organizations.prototype.getConstraint = function() {
-  var pk = null;
+  var pk = new lf.schema.Index('Organizations', 'pkOrganizations', true, ['id']);
   var notNullable = [
     this.id,
     this.login,
@@ -3494,6 +3494,8 @@ github.db.row.Organizations.prototype.toDbPayload = function() {
 /** @override */
 github.db.row.Organizations.prototype.keyOfIndex = function(indexName) {
   switch (indexName) {
+    case 'Organizations.pkOrganizations':
+      return this.payload().id;
     case 'Organizations.#':
       return this.id();
     default:
@@ -3786,7 +3788,7 @@ github.db.schema.Repositories = function() {
 
   /** @type {!lf.schema.BaseColumn.<number>} */
   this.id = new lf.schema.BaseColumn(
-      this, 'id', false, lf.Type.INTEGER);
+      this, 'id', true, lf.Type.INTEGER);
   cols.push(this.id);
 
   /** @type {!lf.schema.BaseColumn.<number>} */
@@ -3930,7 +3932,7 @@ github.db.schema.Repositories = function() {
   cols.push(this.updated_at);
 
   var indices = [
-
+    new lf.schema.Index('Repositories', 'pkRepositories', true, ['id'])
   ];
 
   github.db.schema.Repositories.base(
@@ -3984,7 +3986,7 @@ github.db.schema.Repositories.prototype.deserializeRow = function(dbRecord) {
 
 /** @override */
 github.db.schema.Repositories.prototype.getConstraint = function() {
-  var pk = null;
+  var pk = new lf.schema.Index('Repositories', 'pkRepositories', true, ['id']);
   var notNullable = [
     this.id,
     this.owner,
@@ -4251,6 +4253,8 @@ github.db.row.Repositories.prototype.toDbPayload = function() {
 /** @override */
 github.db.row.Repositories.prototype.keyOfIndex = function(indexName) {
   switch (indexName) {
+    case 'Repositories.pkRepositories':
+      return this.payload().id;
     case 'Repositories.#':
       return this.id();
     default:

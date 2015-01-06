@@ -1,7 +1,7 @@
 %YAML 1.2
 ---
 name: github
-version: 3
+version: 4
 table:
   Issues:
     column:
@@ -188,6 +188,7 @@ table:
       created_at: datetime
       type: string
     constraint:
+      primaryKey: [ id ]
       nullable: [ avatar_url, description ]
   Repositories:
     column:
@@ -227,6 +228,7 @@ table:
       # }
     constraint:
       nullable: [ language ]
+      primaryKey: [ id ]
       foreignKey:
         fk_ownerId:
           localColumn: owner
