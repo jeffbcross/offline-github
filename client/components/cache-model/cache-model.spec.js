@@ -1,10 +1,10 @@
 describe('CacheModel', function() {
-  var $httpBackend, $rootScope, $q, dbService, CacheModel, mockDB, mockIssues, qAny, queryObj, urlExp;
+  var $httpBackend, $rootScope, $q, dbService, CacheModel, mockDB, mockIssues, mockOrganizations, qAny, queryObj, urlExp;
 
   angular.module('mockConstant', []).constant('USE_MEMORY_DB', true)
-  beforeEach(module('ghoCacheModel','mockConstant','mockIssues'));
+  beforeEach(module('ghoCacheModel','mockConstant','mockIssues','mockOrganizations'));
   beforeEach(function (done) {
-    inject(function(_$httpBackend_, _$rootScope_, _$q_, _$timeout_, _dbService_, _CacheModel_, _mockIssues_, _qAny_) {
+    inject(function(_$httpBackend_, _$rootScope_, _$q_, _$timeout_, _dbService_, _CacheModel_, _mockIssues_, _mockOrganizations_, _qAny_) {
       $httpBackend = _$httpBackend_;
       $rootScope = _$rootScope_;
       $q = _$q_;
@@ -13,18 +13,12 @@ describe('CacheModel', function() {
       CacheModel = _CacheModel_;
       qAny = _qAny_;
       mockIssues = _mockIssues_;
+      mockOrganizations = _mockOrganizations_;
       queryObj = {repository: 'angular.js', owner: 'angular'};
       dbService = _dbService_;
     });
 
-    var issues = mockIssues();
-    dbService.get().then(function(db) {
-      var schema = db.getSchema().getIssues();
-      var issuesInsert = issues.map(function(issue) {
-        return schema.createRow(issueStorageTranslator(issue));
-      });
-      db.insertOrReplace().into(schema).values(issuesInsert).exec().then(done);
-    });
+    populateDatabase().then(done);
 
     function issueStorageTranslator(issue){
       var newIssue = angular.copy(issue);
@@ -33,6 +27,25 @@ describe('CacheModel', function() {
       newIssue.created_at = new Date(issue.created_at);
       newIssue.updated_at = new Date(issue.updated_at);
       return newIssue;
+    }
+
+    function populateDatabase () {
+      return Promise.all(
+        dbService.get().then(function(db) {
+          var schema = db.getSchema().getIssues();
+          var issuesInsert = mockIssues().map(function(issue) {
+            return schema.createRow(issueStorageTranslator(issue));
+          });
+          return db.insertOrReplace().into(schema).values(issuesInsert).exec().then(done);
+        }),
+        dbService.get().then(function(db) {
+          var orgsSchema = db.getSchema().getOrganizations();
+          var orgsInsert = mockOrganizations().map(function(org) {
+            return orgsSchema.createRow(org);
+          });
+          return db.insertOrReplace().into(orgsSchema).values(orgsInsert).exec();
+        })
+      );
     }
   });
 
@@ -76,12 +89,27 @@ describe('CacheModel', function() {
   describe('.dbQuery()', function() {
     it('should load data from the database', function(done) {
       var cacheModel = new CacheModel('Issues', urlExp);
-      var doneSpy = jasmine.createSpy('done');
 
-      cacheModel.dbQuery(queryObj).then(doneSpy).then(function() {
-        $rootScope.$digest();
-        expect(doneSpy).toHaveBeenCalled();
+      cacheModel.dbQuery(queryObj).then(function(results) {
+        expect(results.length).toBe(30);
         done();
+      });
+    });
+
+
+    describe('join', function() {
+      it('should attach foreign objects', function(done) {
+        var cacheModel = new CacheModel('Issues', urlExp);
+        queryObj.innerJoin = {
+          localColumn: 'owner',
+          remoteSchema: 'Organizations',
+          remoteColumn: 'login'
+        }
+
+        cacheModel.dbQuery(queryObj).then(function(results) {
+          expect(results[0].owner.login).toBe('angular');
+          done();
+        })
       });
     });
   });

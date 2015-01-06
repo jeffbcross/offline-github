@@ -16,12 +16,14 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+      'no-deps.js',
       'bower_components/angular/angular.js',
       'bower_components/angular-mocks/angular-mocks.js',
       'bower_components/angular-route/angular-route.js',
       'lovefield.min.js',
       'db/github_db_gen.js',
       'test/mock-issues.js',
+      'test/mock-orgs.js',
       'components/**/*.js',
       'components/**/*.html',
       'app.js'

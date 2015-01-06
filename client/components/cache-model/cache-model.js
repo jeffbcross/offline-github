@@ -1,5 +1,27 @@
 angular.module('ghoCacheModel', ['ghoDBService']).
-  factory('CacheModel', ['$http', '$q', 'dbService', 'urlExpMerger', 'qAny', function($http, $q, dbService, urlExpMerger, qAny) {
+  factory('dbQueryNormalizer', [function(){
+    return function dbQueryNormalizer(schema, query){
+      var normalizedQuery = [];
+      for (var key in query) {
+        if (query.hasOwnProperty(key) && schema[key]) {
+          normalizedQuery.push(schema[key].eq(query[key]))
+        }
+      }
+      return lf.op.and.apply(null, normalizedQuery);
+    };
+  }]).
+  factory('postJoinMap', function() {
+    return function (res, query, localTable) {
+      return res.map(function(record) {
+        var local = record[localTable];
+        local[query.innerJoin.localColumn] = record[query.innerJoin.remoteSchema];
+        return local;
+      });
+    }
+  }).
+  factory('CacheModel',
+    [       '$http', '$q', 'dbService', 'dbQueryNormalizer', 'getTable', 'postJoinMap', 'urlExpMerger', 'qAny',
+    function($http,   $q,   dbService,   dbQueryNormalizer,   getTable,   postJoinMap,   urlExpMerger,   qAny) {
     function CacheModel(localSchemaName, remoteUrlExp){
       this.localSchemaName = localSchemaName;
       this.remoteUrlExp = remoteUrlExp;
@@ -7,24 +29,30 @@ angular.module('ghoCacheModel', ['ghoDBService']).
 
     CacheModel.prototype.dbQuery = function dbQuery(query) {
       var self = this;
+      var startTime = performance.now();
       return dbService.get().then(function(db) {
-        var schema = db.getSchema()['get'+self.localSchemaName]();
-
-        return db.
+        var table = getTable(db.getSchema(), self.localSchemaName);
+        var dbQuery = db.
           select().
-          from(schema).
+          from(table).
           where(
-            lf.op.and(
-              schema.repository.eq(query.repository),
-              schema.owner.eq(query.owner))
-          ).
+            dbQueryNormalizer(table, query)
+          );
+
+        if (query && query.innerJoin) {
+          var joinTable = getTable(db.getSchema(), query.innerJoin.remoteSchema);
+          var remoteColumn = joinTable[query.innerJoin.remoteColumn];
+          var eq = remoteColumn.eq(table[query.innerJoin.localColumn]);
+          dbQuery.innerJoin(joinTable, eq);
+        }
+        return dbQuery.
           exec().
           then(function(res) {
             if (res && res.length) {
+              if (query.innerJoin) return postJoinMap(res, query, self.localSchemaName);
               return res;
             }
-
-            return $q.defer().promise;
+            return $q.reject(res);
           });
       });
     };
