@@ -15,7 +15,7 @@ angular.module('ghIssuesApp', [
         controller: 'HomeController',
         resolve: {
           auth: function(firebaseAuth) {
-            return firebaseAuth.getAuth();
+            return firebaseAuth.getRouteAuth();
           }
         }
       }).
@@ -35,7 +35,7 @@ angular.module('ghIssuesApp', [
         controller: 'IssuesList',
         resolve: {
           auth: function(firebaseAuth) {
-            return firebaseAuth.getAuth();
+            return firebaseAuth.getRouteAuth();
           }
         }
       }).
@@ -45,7 +45,6 @@ angular.module('ghIssuesApp', [
   }]).
   run(['$rootScope', '$route', '$location', '$window', function($rootScope, $route, $location, $window) {
     $rootScope.$on('$loginCheckFailed', function(e) {
-      console.log('loginCheckFailed');
       var redirectPath = $window.encodeURIComponent($location.url());
       $location.url('/login?redirectTo='+redirectPath);
     });

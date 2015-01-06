@@ -1,7 +1,7 @@
 angular.module('ghoFirebaseAuth', []).
   service('firebaseAuth', ['$q', '$rootScope', function($q, $rootScope) {
     var ref = new Firebase("https://gh-offline.firebaseio.com");
-    this.getAuth = function () {
+    this.getRouteAuth = function () {
       var auth = ref.getAuth();
       if (auth) {
         return $q.when(auth)
@@ -10,6 +10,10 @@ angular.module('ghoFirebaseAuth', []).
         return $q.reject(auth);
       }
     };
+
+    this.getAuth = function() {
+      return ref.getAuth();
+    }
 
     this.githubAuth = function() {
       if (ref.getAuth()) return $q.when(ref.getAuth());

@@ -1,13 +1,24 @@
 <div class="container">
-  <h1>Welcome to Offline Github!</h1>
-  <ul class="list-group">
-    <li class="list-group-item" ng-repeat="repo in repositories track by repo.id">
-      <a href="/#/{{repo.owner.login}}">
-        <img ng-src="{{repo.owner.avatar_url}}?s=25"
-             alt="{{repo.owner.login}} profile pic" width="25" height="25">
-      </a>
+  <h1>Repositories You Contribute To</h1>
+  <form>
+    <div class="form-group">
+      <label for="repoFilter">Filter Repositories</label>
+      <input ng-model="repoFilter" type="test" class="form-control" id="repoFilter" placeholder="filter text">
+    </div>
+  </form>
+  <h2 ng-repeat-start="owner in owners | meFirst:loggedInUser track by owner.login">
+    <a href="/#/{{owner.login}}">
+      <img alt="{{owner.login}} profile pic."
+           height="25"
+           ng-src="{{owner.avatar_url}}?s=25"
+           width="25"></a>
+      {{owner.login}} repositories
+  </h2>
+
+  <ul ng-repeat-end="owner in owners" class="list-group">
+    <li class="list-group-item" ng-repeat="repo in repositories | filter:{owner: {login:owner.login}} | filter:repoFilter track by repo.id">
       <a ng-href="/#/{{repo.owner.login}}/{{repo.name}}/issues">
-        {{repo.owner.login}}/{{repo.name}}
+        {{repo.name}}
       </a>
     </li>
   </ul>
