@@ -21,6 +21,9 @@ angular.module('ghoFirebaseAuth', []).
         } else {
           deferred.resolve(authData);
         }
+      },
+      {
+        scope: 'read:org'
       });
 
       return deferred.promise;
