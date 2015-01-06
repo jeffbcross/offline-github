@@ -1,5 +1,5 @@
 angular.module('ghIssuesApp').
-  controller('LoginController', ['$scope', 'firebaseAuth', function($scope, firebaseAuth){
+  controller('LoginController', ['$location', '$scope', 'firebaseAuth', function($location, $scope, firebaseAuth){
     this.login = function() {
       firebaseAuth.
         githubAuth().
@@ -12,6 +12,6 @@ angular.module('ghIssuesApp').
 
     this.redirectOnSuccess = function redirectOnSuccess() {
       delete $scope.error;
-      $location.url(decodeURIComponent($location.search().redirectTo));
+      $location.url(decodeURIComponent($location.search().redirectTo) || '/');
     };
   }]);

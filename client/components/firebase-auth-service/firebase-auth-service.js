@@ -34,6 +34,7 @@ angular.module('ghoFirebaseAuth', []).
     };
 
     this.logOut = function() {
+      console.log('logout');
       ref.unauth();
     };
   }]);

@@ -43,9 +43,14 @@ angular.module('ghIssuesApp', [
         redirectTo: '/login'
       });
   }]).
-  run(['$rootScope', '$route', '$location', '$window', function($rootScope, $route, $location, $window) {
+  run(['$rootScope', '$route', '$location', '$window', 'firebaseAuth', function($rootScope, $route, $location, $window, firebaseAuth) {
     $rootScope.$on('$loginCheckFailed', function(e) {
       var redirectPath = $window.encodeURIComponent($location.url());
       $location.url('/login?redirectTo='+redirectPath);
     });
+
+    $rootScope.logout = function() {
+      console.log('calling logout')
+      firebaseAuth.logOut();
+    }
   }]);
