@@ -1,5 +1,5 @@
 angular.module('ghoCacheModel', ['ghoDBService']).
-  factory('CacheModel', ['$http', '$q', 'dbService', 'urlExpMerger', 'qAny', function($http, $q, dbService, urlExpMerger, qAny){
+  factory('CacheModel', ['$http', '$q', 'dbService', 'urlExpMerger', 'qAny', function($http, $q, dbService, urlExpMerger, qAny) {
     function CacheModel(localSchemaName, remoteUrlExp){
       this.localSchemaName = localSchemaName;
       this.remoteUrlExp = remoteUrlExp;
@@ -8,19 +8,15 @@ angular.module('ghoCacheModel', ['ghoDBService']).
     CacheModel.prototype.dbQuery = function dbQuery(query) {
       var self = this;
       return dbService.get().then(function(db) {
-        var schema;
-        var from = db.
-          select().
-          from(schema = db.getSchema()['get'+self.localSchemaName]());
+        var schema = db.getSchema()['get'+self.localSchemaName]();
 
-        return from.
+        return db.
+          select().
+          from(schema).
           where(
-            lf.op.and.apply(null, Object.keys(query || {}).
-              sort().
-              map(function(k) {
-                return schema[k].eq(query[k]);
-              })
-            )
+            lf.op.and(
+              schema.repository.eq(query.repository),
+              schema.owner.eq(query.owner))
           ).
           exec().
           then(function(res) {

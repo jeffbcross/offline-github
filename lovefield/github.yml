@@ -1,13 +1,13 @@
 %YAML 1.2
 ---
 name: github
-version: 4
+version: 6
 table:
   Issues:
     column:
       id: string
-      organization: integer
-      repository: integer
+      owner: string
+      repository: string
       url: string
       html_url: string
       number: integer
@@ -43,14 +43,10 @@ table:
           localColumn: pull_request
           reference: PullRequests
           remoteColumn: number
-        fk_organizationId:
-          localColumn: organization
-          reference: Organizations
-          remoteColumn: id
-        fk_repositoryId:
+        fk_repositoryName:
           localColumn: repository
           reference: Repositories
-          remoteColumn: id
+          remoteColumn: name
   Users:
     column:
       login: string

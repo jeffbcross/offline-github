@@ -4,6 +4,8 @@ angular.module('mockIssues', []).
       return [
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10608",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10608/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10608/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10608/events",
@@ -55,6 +57,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10602",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10602/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10602/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10602/events",
@@ -106,6 +110,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10601",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10601/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10601/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10601/events",
@@ -157,6 +163,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10600",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10600/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10600/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10600/events",
@@ -198,6 +206,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10597",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10597/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10597/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10597/events",
@@ -276,6 +286,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10596",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10596/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10596/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10596/events",
@@ -364,6 +376,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10594",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10594/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10594/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10594/events",
@@ -453,6 +467,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10592",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10592/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10592/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10592/events",
@@ -504,6 +520,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10590",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10590/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10590/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10590/events",
@@ -545,6 +563,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10587",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10587/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10587/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10587/events",
@@ -596,6 +616,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10585",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10585/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10585/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10585/events",
@@ -647,6 +669,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10581",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10581/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10581/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10581/events",
@@ -698,6 +722,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10577",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10577/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10577/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10577/events",
@@ -749,6 +775,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10572",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10572/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10572/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10572/events",
@@ -790,6 +818,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10567",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10567/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10567/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10567/events",
@@ -841,6 +871,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10565",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10565/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10565/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10565/events",
@@ -957,6 +989,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10560",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10560/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10560/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10560/events",
@@ -998,6 +1032,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10555",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10555/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10555/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10555/events",
@@ -1049,6 +1085,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10553",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10553/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10553/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10553/events",
@@ -1147,6 +1185,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10548",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10548/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10548/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10548/events",
@@ -1198,6 +1238,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10546",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10546/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10546/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10546/events",
@@ -1239,6 +1281,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10545",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10545/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10545/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10545/events",
@@ -1280,6 +1324,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10544",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10544/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10544/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10544/events",
@@ -1411,6 +1457,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10538",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10538/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10538/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10538/events",
@@ -1510,6 +1558,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10536",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10536/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10536/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10536/events",
@@ -1631,6 +1681,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10533",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10533/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10533/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10533/events",
@@ -1672,6 +1724,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10531",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10531/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10531/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10531/events",
@@ -1765,6 +1819,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10530",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10530/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10530/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10530/events",
@@ -1884,6 +1940,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10527",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10527/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10527/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10527/events",
@@ -1977,6 +2035,8 @@ angular.module('mockIssues', []).
         },
         {
           "url": "https://api.github.com/repos/angular/angular.js/issues/10525",
+          "owner":"angular",
+          "repository":"angular.js",
           "labels_url": "https://api.github.com/repos/angular/angular.js/issues/10525/labels{/name}",
           "comments_url": "https://api.github.com/repos/angular/angular.js/issues/10525/comments",
           "events_url": "https://api.github.com/repos/angular/angular.js/issues/10525/events",

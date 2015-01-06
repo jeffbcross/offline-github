@@ -75,7 +75,7 @@ github.db.schema.Database.prototype.getName = function() {
 
 /** @override */
 github.db.schema.Database.prototype.getVersion = function() {
-  return 4;
+  return 6;
 };
 
 
@@ -149,14 +149,14 @@ github.db.schema.Issues = function() {
       this, 'id', true, lf.Type.STRING);
   cols.push(this.id);
 
-  /** @type {!lf.schema.BaseColumn.<number>} */
-  this.organization = new lf.schema.BaseColumn(
-      this, 'organization', false, lf.Type.INTEGER);
-  cols.push(this.organization);
+  /** @type {!lf.schema.BaseColumn.<string>} */
+  this.owner = new lf.schema.BaseColumn(
+      this, 'owner', false, lf.Type.STRING);
+  cols.push(this.owner);
 
-  /** @type {!lf.schema.BaseColumn.<number>} */
+  /** @type {!lf.schema.BaseColumn.<string>} */
   this.repository = new lf.schema.BaseColumn(
-      this, 'repository', false, lf.Type.INTEGER);
+      this, 'repository', false, lf.Type.STRING);
   cols.push(this.repository);
 
   /** @type {!lf.schema.BaseColumn.<string>} */
@@ -250,7 +250,7 @@ github.db.schema.Issues.prototype.deserializeRow = function(dbRecord) {
   var data = dbRecord['value'];
   var payload = new github.db.row.IssuesType();
   payload.id = data.id;
-  payload.organization = data.organization;
+  payload.owner = data.owner;
   payload.repository = data.repository;
   payload.url = data.url;
   payload.html_url = data.html_url;
@@ -276,7 +276,7 @@ github.db.schema.Issues.prototype.getConstraint = function() {
   var pk = new lf.schema.Index('Issues', 'pkIssues', true, ['id']);
   var notNullable = [
     this.id,
-    this.organization,
+    this.owner,
     this.repository,
     this.url,
     this.html_url,
@@ -309,9 +309,9 @@ github.db.schema.Issues.prototype.getConstraint = function() {
 github.db.row.IssuesType = function() {
   /** @export @type {string} */
   this.id;
-  /** @export @type {number} */
-  this.organization;
-  /** @export @type {number} */
+  /** @export @type {string} */
+  this.owner;
+  /** @export @type {string} */
   this.repository;
   /** @export @type {string} */
   this.url;
@@ -354,9 +354,9 @@ github.db.row.IssuesType = function() {
 github.db.row.IssuesDbType = function() {
   /** @export @type {string} */
   this.id;
-  /** @export @type {number} */
-  this.organization;
-  /** @export @type {number} */
+  /** @export @type {string} */
+  this.owner;
+  /** @export @type {string} */
   this.repository;
   /** @export @type {string} */
   this.url;
@@ -409,8 +409,8 @@ goog.inherits(github.db.row.Issues, lf.Row);
 github.db.row.Issues.prototype.defaultPayload = function() {
   var payload = new github.db.row.IssuesType();
   payload.id = '';
-  payload.organization = 0;
-  payload.repository = 0;
+  payload.owner = '';
+  payload.repository = '';
   payload.url = '';
   payload.html_url = '';
   payload.number = 0;
@@ -433,7 +433,7 @@ github.db.row.Issues.prototype.defaultPayload = function() {
 github.db.row.Issues.prototype.toDbPayload = function() {
   var payload = new github.db.row.IssuesDbType();
   payload.id = this.payload().id;
-  payload.organization = this.payload().organization;
+  payload.owner = this.payload().owner;
   payload.repository = this.payload().repository;
   payload.url = this.payload().url;
   payload.html_url = this.payload().html_url;
@@ -484,30 +484,30 @@ github.db.row.Issues.prototype.setId = function(value) {
 };
 
 
-/** @return {number} */
-github.db.row.Issues.prototype.getOrganization = function() {
-  return this.payload().organization;
+/** @return {string} */
+github.db.row.Issues.prototype.getOwner = function() {
+  return this.payload().owner;
 };
 
 
 /**
- * @param {number} value
+ * @param {string} value
  * @return {!github.db.row.Issues}
 */
-github.db.row.Issues.prototype.setOrganization = function(value) {
-  this.payload().organization = value;
+github.db.row.Issues.prototype.setOwner = function(value) {
+  this.payload().owner = value;
   return this;
 };
 
 
-/** @return {number} */
+/** @return {string} */
 github.db.row.Issues.prototype.getRepository = function() {
   return this.payload().repository;
 };
 
 
 /**
- * @param {number} value
+ * @param {string} value
  * @return {!github.db.row.Issues}
 */
 github.db.row.Issues.prototype.setRepository = function(value) {

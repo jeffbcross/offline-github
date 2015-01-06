@@ -1,44 +1,40 @@
 describe('CacheModel', function() {
   var $httpBackend, $rootScope, $q, dbService, CacheModel, mockDB, mockIssues, qAny, queryObj, urlExp;
-  angular.module('fakeDBService', []).service('dbServiceNot', function($q, $timeout) {
-    var deferred = $q.defer();
-    function MockDB () {
-      this.eq = function(input) {
-        return input;
-      };
-      this.getIssues = jasmine.createSpy('getIssues').and.returnValue(this);
-      this.organization = this;
-      this.repository = this;
-      this.getSchema = jasmine.createSpy('getSchema').and.returnValue(this);
-      this.select = jasmine.createSpy('select').and.returnValue(this);
-      this.from = jasmine.createSpy('from').and.returnValue(this);
-      this.where = jasmine.createSpy('where').and.returnValue(this);
-      this.deferred = deferred;
-      this.exec = jasmine.createSpy('exec').and.returnValue(deferred.promise);
-    }
-    mockDB = new MockDB();
 
-    this.get = function() {
-      var deferred = $q.defer();
-      $timeout(function() {
-        deferred.resolve(mockDB);
-      })
-      return deferred.promise;
+  angular.module('mockConstant', []).constant('USE_MEMORY_DB', true)
+  beforeEach(module('ghoCacheModel','mockConstant','mockIssues'));
+  beforeEach(function (done) {
+    inject(function(_$httpBackend_, _$rootScope_, _$q_, _$timeout_, _dbService_, _CacheModel_, _mockIssues_, _qAny_) {
+      $httpBackend = _$httpBackend_;
+      $rootScope = _$rootScope_;
+      $q = _$q_;
+      $timeout = _$timeout_;
+      urlExp = 'https://github.com/repo/:owner/:repository/issues';
+      CacheModel = _CacheModel_;
+      qAny = _qAny_;
+      mockIssues = _mockIssues_;
+      queryObj = {repository: 'angular.js', owner: 'angular'};
+      dbService = _dbService_;
+    });
+
+    var issues = mockIssues();
+    dbService.get().then(function(db) {
+      var schema = db.getSchema().getIssues();
+      var issuesInsert = issues.map(function(issue) {
+        return schema.createRow(issueStorageTranslator(issue));
+      });
+      db.insertOrReplace().into(schema).values(issuesInsert).exec().then(done);
+    });
+
+    function issueStorageTranslator(issue){
+      var newIssue = angular.copy(issue);
+      newIssue.assignee = issue.assignee || -1;
+      newIssue.milestone = issue.milestone || -1;
+      newIssue.created_at = new Date(issue.created_at);
+      newIssue.updated_at = new Date(issue.updated_at);
+      return newIssue;
     }
   });
-  beforeEach(module('ghoCacheModel','mockIssues', 'fakeDBService'));
-  beforeEach(inject(function(_$httpBackend_, _$rootScope_, _$q_, _$timeout_, _dbService_, _CacheModel_, _mockIssues_, _qAny_) {
-    $httpBackend = _$httpBackend_;
-    $rootScope = _$rootScope_;
-    $q = _$q_;
-    $timeout = _$timeout_;
-    urlExp = 'https://github.com/repo/:organization/:repository/issues';
-    CacheModel = _CacheModel_;
-    qAny = _qAny_;
-    mockIssues = _mockIssues_;
-    queryObj = {repository: 'angular.js', organization: 'angular'};
-    dbService = _dbService_;
-  }));
 
   afterEach(function() {
     $httpBackend.verifyNoOutstandingRequest();
@@ -78,32 +74,15 @@ describe('CacheModel', function() {
 
 
   describe('.dbQuery()', function() {
-    it('should load data from the database', function() {
+    it('should load data from the database', function(done) {
       var cacheModel = new CacheModel('Issues', urlExp);
       var doneSpy = jasmine.createSpy('done');
-      var issues = mockIssues();
 
-      cacheModel.dbQuery(queryObj).then(doneSpy);
-      $rootScope.$digest();
-      // expect(doneSpy).toHaveBeenCalled();
-    });
-
-
-    it('should serialize the query', function(done) {
-      jasmine.DEFAULT_TIMEOUT_INTERVAL=100;
-      var cacheModel = new CacheModel('Issues', urlExp);
-      var doneSpy = jasmine.createSpy('done');
-      var issues = mockIssues();
-      cacheModel.dbQuery(queryObj).then(doneSpy);
-      $rootScope.$digest();
-      var detachedExpect = expect;
-      var interval = setInterval(function() {
-        if (doneSpy.calls.count()) {
-          detachedExpect(doneSpy).toHaveBeenCalled();
-          clearInterval(interval);
-          done();
-        }
-      }, 5);
+      cacheModel.dbQuery(queryObj).then(doneSpy).then(function() {
+        $rootScope.$digest();
+        expect(doneSpy).toHaveBeenCalled();
+        done();
+      });
     });
   });
 
@@ -125,7 +104,7 @@ describe('CacheModel', function() {
 
   describe('urlExpMerger', function() {
     it('should merge the provided values into the url', inject(function(urlExpMerger) {
-      expect(urlExpMerger(urlExp, {organization: 'angular', repository: 'angular.js'})).
+      expect(urlExpMerger(urlExp, {owner: 'angular', repository: 'angular.js'})).
           toBe('https://github.com/repo/angular/angular.js/issues');
     }));
   });
