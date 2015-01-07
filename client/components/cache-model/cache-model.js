@@ -49,7 +49,9 @@ angular.module('ghoCacheModel', ['ghoDBService']).
           exec().
           then(function(res) {
             if (res && res.length) {
-              if (query.innerJoin) return postJoinMap(res, query, self.localSchemaName);
+              if (query && query.innerJoin) {
+                return postJoinMap(res, query, self.localSchemaName);
+              }
               return res;
             }
             return $q.reject(res);
@@ -75,7 +77,7 @@ angular.module('ghoCacheModel', ['ghoDBService']).
       var resolved;
       var deferred = $q.defer();
       promises.forEach(function(promise) {
-        promise.then(resolveIfNot);
+        promise.then(resolveIfNot, ignoreRejection);
       });
 
       function resolveIfNot (val) {
@@ -84,7 +86,14 @@ angular.module('ghoCacheModel', ['ghoDBService']).
           return deferred.resolve(val);
         }
       }
-      return deferred.promise;
+
+      function ignoreRejection (e) {
+      }
+
+      return deferred.promise.then(function(val) {
+        return val;
+      }, function(e){
+      });
     };
   }]).
   factory('urlExpMerger', [function(){
