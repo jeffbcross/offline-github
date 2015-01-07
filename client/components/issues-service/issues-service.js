@@ -1,10 +1,19 @@
 angular.module('ghoIssuesService', ['ghoDBService', 'ghoCacheModel', 'ghoFirebaseAuth']).
   service('Issues', [
-      '$http', '$rootScope', 'CacheModel', 'dbService', 'firebaseAuth', 'issueStorageTranslator',
-      function($http, $rootScope, CacheModel, dbService, firebaseAuth, issueStorageTranslator) {
+      'cacheModel',
+      'dbService',
+      'firebaseAuth',
+      'httpSource',
+      'issueStorageTranslator',
+      'lovefieldSource',
+      function(
+          cacheModel,
+          dbService,
+          firebaseAuth,
+          httpSource,
+          issueStorageTranslator,
+          lovefieldSource) {
         var cacheModel;
-
-
 
         this.insertOrReplace = function (items) {
           dbService.get().then(function(db) {
@@ -23,13 +32,14 @@ angular.module('ghoIssuesService', ['ghoDBService', 'ghoCacheModel', 'ghoFirebas
 
         this.fetch = function(options) {
           return firebaseAuth.githubAuth().then(function(authData) {
-            return new CacheModel(
-              'Issues',
-              'https://api.github.com/repos/:organization/:repository/issues?access_token=' +
-                authData.github.accessToken);
-          }).then(function(cacheModel) {
-            return cacheModel.query(options);
-
+            return cacheModel([
+                lovefieldSource('Issues'),
+                httpSource(
+                    'https://api.github.com/repos/:organization/:repository/issues?access_token=' +
+                    authData.github.accessToken)
+            ]);
+          }).then(function(model) {
+            return model.find(options);
           });
         };
   }]).

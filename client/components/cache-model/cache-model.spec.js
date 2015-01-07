@@ -1,20 +1,46 @@
-describe('CacheModel', function() {
-  var $httpBackend, $rootScope, $q, dbService, CacheModel, mockDB, mockIssues, mockOrganizations, qAny, queryObj, urlExp;
+describe('cacheModel', function() {
+  var $httpBackend,
+      $rootScope,
+      $q,
+      dbService,
+      cacheModel,
+      fakeSource,
+      findSpy,
+      httpSource,
+      lovefieldSource,
+      mockDB,
+      mockIssues,
+      mockOrganizations,
+      queryObj,
+      urlExp;
 
   beforeEach(module('ghoCacheModel','mockConstant','mockIssues','mockOrganizations'));
   beforeEach(function (done) {
-    inject(function(_$httpBackend_, _$rootScope_, _$q_, _$timeout_, _dbService_, _CacheModel_, _mockIssues_, _mockOrganizations_, _qAny_) {
+    inject(function(
+        _$httpBackend_,
+        _$rootScope_,
+        _$q_,
+        _$timeout_,
+        _dbService_,
+        _cacheModel_,
+        _httpSource_,
+        _lovefieldSource_,
+        _mockIssues_,
+        _mockOrganizations_) {
       $httpBackend = _$httpBackend_;
       $rootScope = _$rootScope_;
       $q = _$q_;
       $timeout = _$timeout_;
       urlExp = 'https://github.com/repo/:owner/:repository/issues';
-      CacheModel = _CacheModel_;
-      qAny = _qAny_;
+      cacheModel = _cacheModel_;
       mockIssues = _mockIssues_;
       mockOrganizations = _mockOrganizations_;
       queryObj = {repository: 'angular.js', owner: 'angular'};
       dbService = _dbService_;
+      httpSource = _httpSource_;
+      lovefieldSource = _lovefieldSource_;
+      findSpy = jasmine.createSpy('find').and.returnValue($q.defer().promise);
+      fakeSource = function() { return {find: findSpy}};
     });
 
     populateDatabase().then(done);
@@ -28,14 +54,21 @@ describe('CacheModel', function() {
       return newIssue;
     }
 
+    function safeApplyAndReturn (val) {
+      if (!$rootScope.$$phase) {
+        $rootScope.$digest();
+      }
+      return val;
+    }
+
     function populateDatabase () {
       return Promise.all(
-        dbService.get().then(function(db) {
+        [dbService.get().then(function(db) {
           var schema = db.getSchema().getIssues();
           var issuesInsert = mockIssues().map(function(issue) {
             return schema.createRow(issueStorageTranslator(issue));
           });
-          return db.insertOrReplace().into(schema).values(issuesInsert).exec().then(done);
+          return db.insertOrReplace().into(schema).values(issuesInsert).exec();
         }),
         dbService.get().then(function(db) {
           var orgsSchema = db.getSchema().getOrganizations();
@@ -43,8 +76,7 @@ describe('CacheModel', function() {
             return orgsSchema.createRow(org);
           });
           return db.insertOrReplace().into(orgsSchema).values(orgsInsert).exec();
-        })
-      );
+        })]);
     }
   });
 
@@ -54,84 +86,47 @@ describe('CacheModel', function() {
 
 
   it('should instantiate an object with a query method', function() {
-    expect(typeof new CacheModel('Issues', urlExp).query).toBe('function');
+    expect(typeof new cacheModel([fakeSource]).find).toBe('function');
   });
 
 
-  describe('.query()', function() {
-    it('should call httpQuery and dbQuery', function() {
-      var cacheModel = new CacheModel('Issues', urlExp);
-      var httpQuery = spyOn(cacheModel, 'httpQuery').and.returnValue({then: angular.noop});
-      var dbQuery = spyOn(cacheModel, 'dbQuery').and.returnValue({then: angular.noop});
-      var promise = cacheModel.query(queryObj);
+  describe('.find()', function() {
+    it('should query all sources when calling find', function() {
+      var model = new cacheModel([fakeSource()]);
 
-      expect(httpQuery).toHaveBeenCalledWith(queryObj);
-      expect(dbQuery).toHaveBeenCalledWith(queryObj);
+      model.find({id: 53140280});
+
+      expect(findSpy).toHaveBeenCalled();
     });
-  });
 
 
-  describe('.httpQuery()', function() {
-    it('should request data from the server', function() {
-      $httpBackend.whenGET('https://github.com/repo/angular/angular.js/issues').respond(200, mockIssues);
-      var cacheModel = new CacheModel('Issues', urlExp);
-      var responseSpy = jasmine.createSpy('responseSpy');
-      cacheModel.httpQuery(queryObj).then(responseSpy);
-      $httpBackend.flush();
-      $rootScope.$digest();
-      expect(responseSpy).toHaveBeenCalled();
-      expect(responseSpy.calls.argsFor(0)[0].data().length).toBe(30);
-    });
-  });
-
-
-  describe('.dbQuery()', function() {
     it('should load data from the database', function(done) {
-      var cacheModel = new CacheModel('Issues', urlExp);
+      var model = cacheModel([lovefieldSource('Issues')]);
 
-      cacheModel.dbQuery(queryObj).then(function(results) {
+      model.find(queryObj).then(function(results) {
         expect(results.length).toBe(30);
-        done();
+        model.find({id: 53140280}).then(function(results) {
+          expect(results.length).toBe(1);
+          expect(results.shift().id).toBe(53140280);
+          done();
+        });
       });
     });
   });
 
 
-  describe('qAny', function() {
-    var deferred1, deferred2, resolved, rejected;
-    beforeEach(function() {
-      deferred1 = $q.defer();
-      deferred2 = $q.defer();
-      resolved = jasmine.createSpy('resolved');
-      rejected = jasmine.createSpy('rejected');
-      qAny([deferred1.promise, deferred2.promise]).then(resolved,rejected);
-    });
-
-    it('should resolve with the first promise that resolves', function() {
-      deferred1.resolve('first');
-      deferred2.resolve('second');
+  describe('httpSource', function() {
+    it('should request data from the server', function(done) {
+      $httpBackend.whenGET('https://github.com/repo/angular/angular.js/issues').respond(200, mockIssues);
+      var model = new cacheModel([httpSource(urlExp)]);
+      var responseSpy = jasmine.createSpy('responseSpy');
+      model.find(queryObj).then(responseSpy).then(function() {
+        expect(responseSpy).toHaveBeenCalled();
+        expect(responseSpy.calls.argsFor(0)[0].data().length).toBe(30);
+        done();
+      });
+      $httpBackend.flush();
       $rootScope.$digest();
-      expect(resolved).toHaveBeenCalledWith('first');
-      expect(rejected).not.toHaveBeenCalled();
-      expect(resolved.calls.count()).toBe(1);
-    });
-
-
-    it('should ignore rejections if any promise resolves', function() {
-      deferred1.reject('first');
-      deferred2.resolve('second');
-      $rootScope.$digest();
-      expect(resolved).toHaveBeenCalledWith('second');
-      expect(rejected).not.toHaveBeenCalled();
-    });
-
-
-    it('should propagate an ordered list of rejections if all promises fail', function() {
-      deferred2.reject('second');
-      deferred1.reject('first');
-      $rootScope.$digest();
-      expect(resolved).not.toHaveBeenCalled();
-      expect(rejected).toHaveBeenCalledWith(['first','second']);
     });
   });
 

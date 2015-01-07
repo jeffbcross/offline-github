@@ -1,8 +1,8 @@
 angular.module('ghoRepositoriesService', ['ghoDBService', 'ghoCacheModel', 'ghoFirebaseAuth']).
   service('Repositories', [
-      '$http', '$rootScope', 'CacheModel', 'dbService', 'firebaseAuth',
-      function($http, $rootScope, CacheModel, dbService, firebaseAuth) {
-        var cacheModel;
+              'cacheModel', 'dbService', 'firebaseAuth', 'lovefieldSource', 'httpSource',
+      function(cacheModel,   dbService,   firebaseAuth,   lovefieldSource,   httpSource) {
+        var model;
 
         this.insertOrReplace = function (items) {
           console.log('repos.insertOrReplace');
@@ -22,14 +22,14 @@ angular.module('ghoRepositoriesService', ['ghoDBService', 'ghoCacheModel', 'ghoF
 
         this.fetch = function(options) {
           return firebaseAuth.githubAuth().then(function(authData) {
-            console.log('creating CacheModel');
-            return new CacheModel(
-              'Repositories',
-              'https://api.github.com/user/repos?access_token=' +
-                authData.github.accessToken);
-          }).then(function(cacheModel) {
-            console.log('querying CacheModel', options);
-            return cacheModel.query(options);
+            return new cacheModel([
+              lovefieldSource('Repositories'),
+              httpSource('https://api.github.com/user/repos?access_token=' +
+                authData.github.accessToken)
+            ]);
+          }).then(function(model) {
+            console.log('finding repositories');
+            return model.find(options);
           });
         };
   }]);

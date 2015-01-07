@@ -10,76 +10,73 @@ angular.module('ghoCacheModel', ['ghoDBService']).
       return lf.op.and.apply(null, normalizedQuery);
     };
   }]).
-  factory('CacheModel',
-    [       '$http', '$q', 'dbService', 'dbQueryNormalizer', 'getTable', 'urlExpMerger', 'qAny',
-    function($http,   $q,   dbService,   dbQueryNormalizer,   getTable,   urlExpMerger,   qAny) {
-    function CacheModel(localSchemaName, remoteUrlExp){
-      this.localSchemaName = localSchemaName;
-      this.remoteUrlExp = remoteUrlExp;
-    };
+  factory('httpSource', ['$http', 'urlExpMerger', function($http, urlExpMerger) {
+    function HttpSource (urlExp) {
+      this.remoteUrlExp = urlExp;
+    }
 
-    CacheModel.prototype.dbQuery = function dbQuery(query) {
+    HttpSource.prototype.find = function (query) {
       var self = this;
-      var startTime = performance.now();
-      return dbService.get().then(function(db) {
-        var table = getTable(db.getSchema(), self.localSchemaName);
-        var dbQuery = db.
-          select().
-          from(table).
-          where(
-            dbQueryNormalizer(table, query)
-          );
-        return dbQuery.
-          exec().
-          then(function(res) {
-            if (res && res.length) {
-              return res;
-            }
-            return $q.reject(res);
-          });
+      return new Promise(function(resolve, reject) {
+        var resolvedUrl = urlExpMerger(self.remoteUrlExp, query);
+        $http.get(resolvedUrl).then(resolve, reject);
       });
-    };
+    }
 
-    CacheModel.prototype.httpQuery = function httpQuery(query) {
-      return $http.get(urlExpMerger(this.remoteUrlExp, query));
-    };
-
-    CacheModel.prototype.query = function query(query) {
-      return qAny([
-          this.dbQuery(query),
-          this.httpQuery(query)
-      ]);
-    };
-
-    return CacheModel;
+    return function (urlExp) {
+      return new HttpSource(urlExp);
+    }
   }]).
-  factory('qAny', ['$q', function($q){
-    return function qAny(promises){
-      var resolved;
-      var rejectCount = 0;
-      var rejections = [];
-      var deferred = $q.defer();
-      promises.forEach(function(promise, i) {
-        promises[i] = promise.then(resolveIfNot, function(e) {
-          ignoreRejection(e, i);
+  factory('lovefieldSource',
+    [       '$q', 'dbService', 'dbQueryNormalizer', 'getTable',
+    function($q,   dbService,   dbQueryNormalizer,   getTable) {
+      function LovefieldSource(modelName) {
+        this.localSchemaName = modelName;
+      }
+
+      LovefieldSource.prototype.find = function(query) {
+        var self = this;
+        return dbService.get().then(function(db) {
+          var table = getTable(db.getSchema(), self.localSchemaName);
+          var dbQuery = db.
+            select().
+            from(table).
+            where(
+              dbQueryNormalizer(table, query)
+            );
+          return dbQuery.
+            exec().
+            then(function(res) {
+              if (res && res.length) {
+                return res;
+              }
+              return new Promise(angular.noop);
+            });
         });
+      };
+
+      return function lovefieldSource(opts){
+        return new LovefieldSource(opts);
+      };
+  }]).
+  factory('cacheModel', [function() {
+    function CacheModel(sources) {
+      if (!Array.isArray(sources)) {
+        throw new Error('CacheModel cannot be instantiated with a sources array');
+      }
+      this.sources = sources;
+    };
+
+    CacheModel.prototype.find = function(query) {
+      //Cheap algorithm to return the first availabe results
+      var sourceResults = this.sources.map(function(source) {
+        return source.find(query);
       });
+      return Promise.race(sourceResults);
+    };
 
-      function resolveIfNot (val) {
-        if (!resolved) {
-          resolved = true;
-          return deferred.resolve(val);
-        }
-      }
-
-      function ignoreRejection (e, i) {
-        rejections[i] = e;
-        if (++rejectCount === promises.length) {
-          deferred.reject(rejections);
-        }
-      }
-
-      return deferred.promise;
+    return function (sources) {
+      return new CacheModel(sources);
     };
   }]).
   factory('urlExpMerger', [function(){
