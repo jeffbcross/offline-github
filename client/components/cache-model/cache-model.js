@@ -75,9 +75,13 @@ angular.module('ghoCacheModel', ['ghoDBService']).
   factory('qAny', ['$q', function($q){
     return function qAny(promises){
       var resolved;
+      var rejectCount = 0;
+      var rejections = [];
       var deferred = $q.defer();
-      promises.forEach(function(promise) {
-        promise.then(resolveIfNot, ignoreRejection);
+      promises.forEach(function(promise, i) {
+        promises[i] = promise.then(resolveIfNot, function(e) {
+          ignoreRejection(e, i);
+        });
       });
 
       function resolveIfNot (val) {
@@ -87,13 +91,14 @@ angular.module('ghoCacheModel', ['ghoDBService']).
         }
       }
 
-      function ignoreRejection (e) {
+      function ignoreRejection (e, i) {
+        rejections[i] = e;
+        if (++rejectCount === promises.length) {
+          deferred.reject(rejections);
+        }
       }
 
-      return deferred.promise.then(function(val) {
-        return val;
-      }, function(e){
-      });
+      return deferred.promise;
     };
   }]).
   factory('urlExpMerger', [function(){

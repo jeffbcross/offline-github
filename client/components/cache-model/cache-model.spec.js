@@ -115,16 +115,40 @@ describe('CacheModel', function() {
 
 
   describe('qAny', function() {
+    var deferred1, deferred2, resolved, rejected;
+    beforeEach(function() {
+      deferred1 = $q.defer();
+      deferred2 = $q.defer();
+      resolved = jasmine.createSpy('resolved');
+      rejected = jasmine.createSpy('rejected');
+      qAny([deferred1.promise, deferred2.promise]).then(resolved,rejected);
+    });
+
     it('should resolve with the first promise that resolves', function() {
-      var deferred1 = $q.defer();
-      var deferred2 = $q.defer();
-      var spy = jasmine.createSpy('resolved');
-      qAny([deferred1.promise, deferred2.promise]).then(spy);
       deferred1.resolve('first');
       deferred2.resolve('second');
       $rootScope.$digest();
-      expect(spy).toHaveBeenCalledWith('first');
-      expect(spy.calls.count()).toBe(1);
+      expect(resolved).toHaveBeenCalledWith('first');
+      expect(rejected).not.toHaveBeenCalled();
+      expect(resolved.calls.count()).toBe(1);
+    });
+
+
+    it('should ignore rejections if any promise resolves', function() {
+      deferred1.reject('first');
+      deferred2.resolve('second');
+      $rootScope.$digest();
+      expect(resolved).toHaveBeenCalledWith('second');
+      expect(rejected).not.toHaveBeenCalled();
+    });
+
+
+    it('should propagate an ordered list of rejections if all promises fail', function() {
+      deferred2.reject('second');
+      deferred1.reject('first');
+      $rootScope.$digest();
+      expect(resolved).not.toHaveBeenCalled();
+      expect(rejected).toHaveBeenCalledWith(['first','second']);
     });
   });
 
