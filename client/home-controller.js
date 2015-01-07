@@ -1,5 +1,7 @@
 angular.module('ghIssuesApp').
-  controller('HomeController', ['$scope', 'auth', 'Repositories', function($scope, auth, Repositories) {
+  controller('HomeController',
+    [       '$scope', 'auth', 'Repositories',
+    function($scope,   auth,   Repositories) {
         Repositories.fetch().
           then(renderData).
           then(setDataSource).
