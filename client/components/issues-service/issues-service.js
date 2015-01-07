@@ -13,34 +13,26 @@ angular.module('ghoIssuesService', ['ghoDBService', 'ghoCacheModel', 'ghoFirebas
           httpSource,
           issueStorageTranslator,
           lovefieldSource) {
-        var cacheModel;
+        var issuesModel, lovefieldIssues, httpIssues;
 
         this.insertOrReplace = function (items) {
-          dbService.get().then(function(db) {
-            var schema = db.getSchema().getIssues();
-            var issuesInsert = items.map(function(issue){
-              return schema.createRow(issueStorageTranslator(issue));
-            });
-            db.insertOrReplace().into(schema).values(issuesInsert).exec().
-              then(function(val){
-                console.log(val);
-              }, function(e) {
-                console.error(e);
-              });
-          });
+          return issuesModel.save(items.map(issueStorageTranslator), {singleSource: lovefieldIssues});
         };
 
         this.fetch = function(options) {
-          return firebaseAuth.githubAuth().then(function(authData) {
-            return cacheModel([
-                lovefieldSource('Issues'),
-                httpSource(
-                    'https://api.github.com/repos/:organization/:repository/issues?access_token=' +
-                    authData.github.accessToken)
-            ]);
-          }).then(function(model) {
-            return model.find(options);
-          });
+          return firebaseAuth.
+            githubAuth().
+            then(function(authData) {
+              return issuesModel = cacheModel([
+                  lovefieldIssues = lovefieldSource('Issues'),
+                  httpIssues = httpSource(
+                      'https://api.github.com/repos/:organization/:repository/issues?access_token=' +
+                      authData.github.accessToken)
+              ]);
+            }).
+            then(function(model) {
+              return model.find(options);
+            });
         };
   }]).
   factory('issueStorageTranslator', [function(){

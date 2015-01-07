@@ -23,6 +23,15 @@ angular.module('ghoCacheModel', ['ghoDBService']).
       });
     }
 
+    //TODO: Needs real implementation with some thought.
+    HttpSource.prototype.save = function (items, options) {
+      var self = this;
+      return new Promise(function(resolve, reject) {
+        var resolvedUrl = urlExpMerger(self.remoteUrlExp, query);
+        $http.put(resolvedUrl, items).then(resolve, reject);
+      });
+    };
+
     return function (urlExp) {
       return new HttpSource(urlExp);
     }
@@ -55,6 +64,17 @@ angular.module('ghoCacheModel', ['ghoDBService']).
         });
       };
 
+      LovefieldSource.prototype.save = function(items) {
+        var self = this;
+        return dbService.get().then(function(db) {
+            var table = getTable(db.getSchema(), self.localSchemaName);
+            var issuesInsert = items.map(function(item){
+              return table.createRow(item);
+            });
+            return db.insertOrReplace().into(table).values(issuesInsert).exec();
+          });
+      };
+
       return function lovefieldSource(opts){
         return new LovefieldSource(opts);
       };
@@ -73,6 +93,18 @@ angular.module('ghoCacheModel', ['ghoDBService']).
         return source.find(query);
       });
       return Promise.race(sourceResults);
+    };
+
+    CacheModel.prototype.save = function(items, options) {
+      var sourceResults = this.sources.
+        filter(function(source) {
+          if (options && options.singleSource) return source === options.singleSource;
+          return true;
+        }).
+        map(function(source) {
+          return source.save(items);
+        });
+      return Promise.all(sourceResults);
     };
 
     return function (sources) {

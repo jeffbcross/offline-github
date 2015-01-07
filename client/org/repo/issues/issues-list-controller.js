@@ -7,18 +7,11 @@ angular.module('ghIssuesApp').
           repository: $routeParams.repo
         }).
           then(renderData).
-          then(setDataSource).
           then(cacheData);
 
         function renderData (res) {
-          console.log('renderData', res);
           if (!res) return res;
           $scope.issues = res.data || res;
-          return res;
-        }
-
-        function setDataSource(res) {
-          $scope.dataSource = res && res.data ? '$http' : 'lovefield';
           return res;
         }
 

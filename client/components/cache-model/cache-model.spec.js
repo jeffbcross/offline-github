@@ -115,6 +115,70 @@ describe('cacheModel', function() {
   });
 
 
+  describe('.save()', function() {
+    it('should insert records that do not yet exist', function(done) {
+      var model = cacheModel([lovefieldSource('Organizations')]);
+      model.save([{
+        "login": "FakeOrg",
+        "id": 1,
+        "url": "https://api.github.com/orgs/FakeOrg",
+        "repos_url": "https://api.github.com/orgs/FakeOrg/repos",
+        "events_url": "https://api.github.com/orgs/FakeOrg/events",
+        "members_url": "https://api.github.com/orgs/FakeOrg/members{/member}",
+        "public_members_url": "https://api.github.com/orgs/FakeOrg/public_members{/member}",
+        "avatar_url": "https://avatars.githubusercontent.com/u/884285?v=3",
+        "description": null
+      }]).then(done);
+    });
+
+
+    it('should update records that already exist', function(done) {
+      var model = cacheModel([lovefieldSource('Organizations')]);
+      model.save([{
+          "login": "Jasig!",
+          "id": 884285,
+          "url": "https://api.github.com/orgs/Jasig",
+          "repos_url": "https://api.github.com/orgs/Jasig/repos",
+          "events_url": "https://api.github.com/orgs/Jasig/events",
+          "members_url": "https://api.github.com/orgs/Jasig/members{/member}",
+          "public_members_url": "https://api.github.com/orgs/Jasig/public_members{/member}",
+          "avatar_url": "https://avatars.githubusercontent.com/u/884285?v=3",
+          "description": null
+        }]).then(function() {
+          model.find({id: 884285}).then(function(results){
+            expect(results[0].login).toBe('Jasig!');
+            done();
+          });
+        });
+    });
+
+
+    it('should only save for specified source if singleSource provided', function(done) {
+      var lfSource = lovefieldSource('Organizations');
+      var http = httpSource('https://api.github.com/user/orgs');
+      var model = cacheModel([lfSource, http]);
+      var httpSpy = spyOn(http, 'save');
+      var lfSpy = spyOn(lfSource, 'save');
+
+      model.save([{
+          "login": "Jasig!",
+          "id": 884285,
+          "url": "https://api.github.com/orgs/Jasig",
+          "repos_url": "https://api.github.com/orgs/Jasig/repos",
+          "events_url": "https://api.github.com/orgs/Jasig/events",
+          "members_url": "https://api.github.com/orgs/Jasig/members{/member}",
+          "public_members_url": "https://api.github.com/orgs/Jasig/public_members{/member}",
+          "avatar_url": "https://avatars.githubusercontent.com/u/884285?v=3",
+          "description": null
+        }], {singleSource: lfSource}).then(function() {
+          expect(lfSpy).toHaveBeenCalled();
+          expect(httpSpy).not.toHaveBeenCalled();
+          done();
+        });
+    });
+  })
+
+
   describe('httpSource', function() {
     it('should request data from the server', function(done) {
       $httpBackend.whenGET('https://github.com/repo/angular/angular.js/issues').respond(200, mockIssues);

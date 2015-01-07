@@ -2,30 +2,24 @@ angular.module('ghoOrganizationsService', ['ghoDBService', 'ghoCacheModel', 'gho
   service('Organizations', [
       '$http', '$rootScope', 'cacheModel', 'dbService', 'firebaseAuth', 'httpSource', 'lovefieldSource',
       function($http, $rootScope, cacheModel, dbService, firebaseAuth, httpSource, lovefieldSource) {
+        var orgsModel, lovefieldOrgs, httpOrgs;
+
         this.insertOrReplace = function (items) {
-          dbService.get().then(function(db) {
-            var schema = db.getSchema().getOrganizations();
-            var orgsInsert = items.map(function(org){
-              return schema.createRow(org);
-            });
-            db.insertOrReplace().into(schema).values(orgsInsert).exec().
-              then(function(val){
-                console.log(val);
-              }, function(e) {
-                console.error(e);
-              });
-          });
+          return orgsModel.save(items, {singleSource: lovefieldOrgs});
         };
 
         this.fetch = function(options) {
-          return firebaseAuth.githubAuth().then(function(authData) {
-            return cacheModel([
-              lovefieldSource('Organizations'),
-              httpSource('https://api.github.com/user/orgs?per_page=100&access_token=' +
-                authData.github.accessToken)
-            ]);
-          }).then(function(model) {
-            return model.find(options);
-          });
+          return firebaseAuth.
+            githubAuth().
+            then(function(authData) {
+              return orgsModel = cacheModel([
+                lovefieldOrgs = lovefieldSource('Organizations'),
+                httpOrgs = httpSource('https://api.github.com/user/orgs?&access_token=' +
+                  authData.github.accessToken)
+              ]);
+            }).
+            then(function(model) {
+              return model.find(options);
+            });
         };
   }]);
