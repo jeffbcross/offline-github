@@ -1,7 +1,6 @@
 describe('CacheModel', function() {
   var $httpBackend, $rootScope, $q, dbService, CacheModel, mockDB, mockIssues, mockOrganizations, qAny, queryObj, urlExp;
 
-  angular.module('mockConstant', []).constant('USE_MEMORY_DB', true)
   beforeEach(module('ghoCacheModel','mockConstant','mockIssues','mockOrganizations'));
   beforeEach(function (done) {
     inject(function(_$httpBackend_, _$rootScope_, _$q_, _$timeout_, _dbService_, _CacheModel_, _mockIssues_, _mockOrganizations_, _qAny_) {
