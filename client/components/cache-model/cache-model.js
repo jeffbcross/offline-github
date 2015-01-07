@@ -10,18 +10,9 @@ angular.module('ghoCacheModel', ['ghoDBService']).
       return lf.op.and.apply(null, normalizedQuery);
     };
   }]).
-  factory('postJoinMap', function() {
-    return function (res, query, localTable) {
-      return res.map(function(record) {
-        var local = record[localTable];
-        local[query.innerJoin.localColumn] = record[query.innerJoin.remoteSchema];
-        return local;
-      });
-    }
-  }).
   factory('CacheModel',
-    [       '$http', '$q', 'dbService', 'dbQueryNormalizer', 'getTable', 'postJoinMap', 'urlExpMerger', 'qAny',
-    function($http,   $q,   dbService,   dbQueryNormalizer,   getTable,   postJoinMap,   urlExpMerger,   qAny) {
+    [       '$http', '$q', 'dbService', 'dbQueryNormalizer', 'getTable', 'urlExpMerger', 'qAny',
+    function($http,   $q,   dbService,   dbQueryNormalizer,   getTable,   urlExpMerger,   qAny) {
     function CacheModel(localSchemaName, remoteUrlExp){
       this.localSchemaName = localSchemaName;
       this.remoteUrlExp = remoteUrlExp;
@@ -38,20 +29,10 @@ angular.module('ghoCacheModel', ['ghoDBService']).
           where(
             dbQueryNormalizer(table, query)
           );
-
-        if (query && query.innerJoin) {
-          var joinTable = getTable(db.getSchema(), query.innerJoin.remoteSchema);
-          var remoteColumn = joinTable[query.innerJoin.remoteColumn];
-          var eq = remoteColumn.eq(table[query.innerJoin.localColumn]);
-          dbQuery.innerJoin(joinTable, eq);
-        }
         return dbQuery.
           exec().
           then(function(res) {
             if (res && res.length) {
-              if (query && query.innerJoin) {
-                return postJoinMap(res, query, self.localSchemaName);
-              }
               return res;
             }
             return $q.reject(res);

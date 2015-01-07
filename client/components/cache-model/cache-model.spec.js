@@ -94,23 +94,6 @@ describe('CacheModel', function() {
         done();
       });
     });
-
-
-    describe('join', function() {
-      it('should attach foreign objects', function(done) {
-        var cacheModel = new CacheModel('Issues', urlExp);
-        queryObj.innerJoin = {
-          localColumn: 'owner',
-          remoteSchema: 'Organizations',
-          remoteColumn: 'login'
-        }
-
-        cacheModel.dbQuery(queryObj).then(function(results) {
-          expect(results[0].owner.login).toBe('angular');
-          done();
-        })
-      });
-    });
   });
 
 
