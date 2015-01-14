@@ -50,7 +50,6 @@ angular.module('ghIssuesApp', [
     });
 
     $rootScope.logout = function() {
-      console.log('calling logout')
       firebaseAuth.logOut();
-    }
+    };
   }]);

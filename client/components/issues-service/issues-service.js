@@ -23,12 +23,13 @@ angular.module('ghoIssuesService', ['ghoDBService', 'ghoCacheModel', 'ghoFirebas
           return firebaseAuth.
             githubAuth().
             then(function(authData) {
-              return issuesModel = cacheModel([
+              issuesModel = cacheModel([
                   lovefieldIssues = lovefieldSource('Issues'),
                   httpIssues = httpSource(
                       'https://api.github.com/repos/:organization/:repository/issues?access_token=' +
                       authData.github.accessToken)
               ]);
+              return issuesModel;
             }).
             then(function(model) {
               return model.find(options);

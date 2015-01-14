@@ -9,7 +9,7 @@ describe('IssuesListDirective', function() {
     $compile = _$compile_;
     $rootScope = _$rootScope_;
     mockIssues = _mockIssues_();
-  }))
+  }));
 
   it('should have a template', function() {
     var element = $compile('<gho-issues-list></gho-issues-list>')($rootScope);
@@ -19,7 +19,7 @@ describe('IssuesListDirective', function() {
 
 
   it('should create a repeater of issues provided in issues attribute', function() {
-    var scope = $rootScope.$new()
+    var scope = $rootScope.$new();
     scope.issues = mockIssues;
     var element = $compile('<gho-issues-list issues="issues"></gho-issues-list>')(scope);
     scope.$digest();
@@ -29,7 +29,7 @@ describe('IssuesListDirective', function() {
 
 
   it('should limit the repeater to 25 issues', function() {
-    var scope = $rootScope.$new()
+    var scope = $rootScope.$new();
     scope.issues = mockIssues;
     var element = $compile('<gho-issues-list issues="issues"></gho-issues-list>')(scope);
     scope.$digest();
@@ -38,7 +38,7 @@ describe('IssuesListDirective', function() {
 
 
   it('should filter by filter input', function() {
-    var scope = $rootScope.$new()
+    var scope = $rootScope.$new();
     scope.issues = mockIssues;
     var element = $compile('<gho-issues-list issues="issues"></gho-issues-list>')(scope);
     scope.$digest();

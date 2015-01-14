@@ -4,7 +4,7 @@ angular.module('ghoDBService', []).
   factory('getTable', function() {
     return function(schema, name) {
       return schema['get'+name]();
-    }
+    };
   }).
   service('dbService', ['USE_MEMORY_DB', function(USE_MEMORY_DB) {
     var db;
@@ -17,5 +17,5 @@ angular.module('ghoDBService', []).
     this.get = function () {
       if (db) return Promise.resolve(db);
       return promise;
-    }
+    };
   }]);

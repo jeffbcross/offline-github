@@ -4,7 +4,7 @@ angular.module('ghoFirebaseAuth', []).
     this.getRouteAuth = function () {
       var auth = ref.getAuth();
       if (auth) {
-        return $q.when(auth)
+        return $q.when(auth);
       } else {
         $rootScope.$emit('$loginCheckFailed');
         return $q.reject(auth);
@@ -13,7 +13,7 @@ angular.module('ghoFirebaseAuth', []).
 
     this.getAuth = function() {
       return ref.getAuth();
-    }
+    };
 
     this.githubAuth = function() {
       if (ref.getAuth()) return $q.when(ref.getAuth());

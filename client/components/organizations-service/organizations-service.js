@@ -12,11 +12,12 @@ angular.module('ghoOrganizationsService', ['ghoDBService', 'ghoCacheModel', 'gho
           return firebaseAuth.
             githubAuth().
             then(function(authData) {
-              return orgsModel = cacheModel([
+              orgsModel = cacheModel([
                 lovefieldOrgs = lovefieldSource('Organizations'),
                 httpOrgs = httpSource('https://api.github.com/user/orgs?&access_token=' +
                   authData.github.accessToken)
               ]);
+              return orgsModel;
             }).
             then(function(model) {
               return model.find(options);

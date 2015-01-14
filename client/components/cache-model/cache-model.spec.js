@@ -40,7 +40,7 @@ describe('cacheModel', function() {
       httpSource = _httpSource_;
       lovefieldSource = _lovefieldSource_;
       findSpy = jasmine.createSpy('find').and.returnValue($q.defer().promise);
-      fakeSource = function() { return {find: findSpy}};
+      fakeSource = function() { return {find: findSpy};};
     });
 
     populateDatabase().then(done);
@@ -176,7 +176,7 @@ describe('cacheModel', function() {
           done();
         });
     });
-  })
+  });
 
 
   describe('httpSource', function() {

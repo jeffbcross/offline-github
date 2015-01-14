@@ -4,7 +4,7 @@ angular.module('ghoCacheModel', ['ghoDBService']).
       var normalizedQuery = [];
       for (var key in query) {
         if (query.hasOwnProperty(key) && schema[key]) {
-          normalizedQuery.push(schema[key].eq(query[key]))
+          normalizedQuery.push(schema[key].eq(query[key]));
         }
       }
       return lf.op.and.apply(null, normalizedQuery);
@@ -21,7 +21,7 @@ angular.module('ghoCacheModel', ['ghoDBService']).
         var resolvedUrl = urlExpMerger(self.remoteUrlExp, query);
         $http.get(resolvedUrl).then(resolve, reject);
       });
-    }
+    };
 
     //TODO: Needs real implementation with some thought.
     HttpSource.prototype.save = function (items, options) {
@@ -34,7 +34,7 @@ angular.module('ghoCacheModel', ['ghoDBService']).
 
     return function (urlExp) {
       return new HttpSource(urlExp);
-    }
+    };
   }]).
   factory('lovefieldSource',
     [       '$q', 'dbService', 'dbQueryNormalizer', 'getTable',
@@ -85,7 +85,7 @@ angular.module('ghoCacheModel', ['ghoDBService']).
         throw new Error('CacheModel cannot be instantiated with a sources array');
       }
       this.sources = sources;
-    };
+    }
 
     CacheModel.prototype.find = function(query) {
       //Cheap algorithm to return the first availabe results
@@ -114,7 +114,7 @@ angular.module('ghoCacheModel', ['ghoDBService']).
   factory('urlExpMerger', [function(){
     return function urlExpMerger(exp, values){
       var retVal = exp;
-      while (match = /((?:\:)[a-z]+)/g.exec(retVal)) {
+      while ((match = /((?:\:)[a-z]+)/g.exec(retVal))) {
         retVal = retVal.replace(match[0], values[match[0].replace(':','')]);
       }
       return retVal;
