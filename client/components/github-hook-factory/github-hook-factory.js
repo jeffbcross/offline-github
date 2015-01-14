@@ -49,15 +49,23 @@ angular.module('ghoHooks', ['ghoFirebaseAuth']).
         });
      */
     var createHook = function createHook(hookParams) {
+      var deferred = $q.defer();
       $http.post(formatHookUrl(hookParams), {
           name: 'web',
           config: {
             active: true,
-            url: params.payloadUrl,
+            url: hookParams.payloadUrl,
             content_type: 'json'
           },
-          events: params.events
+          events: hookParams.events
+        })
+        .success(function(data) {
+          deferred.resolve(data);
+        })
+        .error(function(data) {
+          deferred.reject(data);
         });
+      return deferred.promise;
     };
 
     // export function for testing
@@ -67,11 +75,13 @@ angular.module('ghoHooks', ['ghoFirebaseAuth']).
   }]).
 
   /*
-    Create a specific Github hook for jeffbcross/offline-github
+    Create a Github hook for an authenticated user. This factory uses Firebase auth to get the username
+    and access token to fill out the request.
 
-    He's basically the boss of the hooks.
+    This is basically the coolest hook.
 
     hookParams
+      repo        - The Github Repository to set the hook on
       payloadUrl  - The URL that will receive and store the payload from GitHub
       events      - A string array of GitHub hook events (https://developer.github.com/webhooks/#events)
 
@@ -79,6 +89,7 @@ angular.module('ghoHooks', ['ghoFirebaseAuth']).
 
     Example:
     var promise = captainHook({
+      repo: 'gh-offline',
       payloadUrl: 'https://gh-offline.firebaseio.com/issues/.json',
       events: ['issue_comment']
     });
@@ -87,13 +98,15 @@ angular.module('ghoHooks', ['ghoFirebaseAuth']).
   factory('captainHook', ['firebaseAuth', 'githubHookFactory', function(firebaseAuth, githubHookFactory) {
 
     return function captainHook(hookParams) {
-      return githubHookFactory({
-        user: 'jeffbcross',
-        repo: 'offline-github',
-        accessToken: firebaseAuth.getAuth().github.accessToken,
+      var authData = firebaseAuth.getAuth();
+      var hookPromise = githubHookFactory({
+        user: authData.github.username,
+        repo: hookParams.repo,
+        accessToken: authData.github.accessToken,
         payloadUrl: hookParams.payloadUrl,
         events: hookParams.events
       });
+      return hookPromise;
     };
 
   }]);
