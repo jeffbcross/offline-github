@@ -30,7 +30,7 @@ gulp.task('webserver', function() {
 
 gulp.task('autotest:client', function() {
   karma.start({
-    configFile: __dirname + '/karma.conf.js',
+    configFile: __dirname + '/client/karma.conf.js',
     singleRun: false
   });
 });
