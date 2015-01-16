@@ -43,7 +43,7 @@ gulp.task('test:client', ['lint'], function() {
 });
 
 gulp.task('generatedb', function(done) {
-  var lovefieldSpac = spawn('lovefield-spac', [
+  var lovefieldSpac = spawn('./node_modules/.bin/lovefield-spac', [
     '--schema',
     'lovefield/github.yml',
     '--namespace',
