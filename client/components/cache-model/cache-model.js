@@ -2,18 +2,6 @@
 
 (function() {
 
-function dbQueryNormalizerFactory(){
-  return function dbQueryNormalizer(schema, query){
-    var normalizedQuery = [];
-    for (var key in query) {
-      if (query.hasOwnProperty(key) && schema[key]) {
-        normalizedQuery.push(schema[key].eq(query[key]));
-      }
-    }
-    return lf.op.and.apply(null, normalizedQuery);
-  };
-}
-
 function httpSourceFactory($http, urlExpMerger) {
   function HttpSource (urlExp) {
     this.remoteUrlExp = urlExp;
@@ -128,8 +116,7 @@ function urlExpMergerFactory() {
   };
 }
 
-angular.module('ghoCacheModel', []).
-  factory('dbQueryNormalizer', [dbQueryNormalizerFactory]).
+angular.module('ghoCacheModel', ['ghoLovefieldQueryFactory']).
   factory('httpSource', ['$http', 'urlExpMerger', httpSourceFactory]).
   factory(
       'lovefieldSource',

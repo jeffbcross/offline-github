@@ -18,7 +18,7 @@ describe('githubSource', function() {
 
   beforeEach(module(
       'ghoCacheModel',
-      'mockConstant',
+      'ghoMockConstant',
       'mockIssues',
       'mockOrganizations',
       'ghoGithubSource'));

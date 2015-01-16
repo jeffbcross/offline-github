@@ -1,7 +1,7 @@
 /* global it:true, describe:true, beforeEach:true, module:true, expect:true,
 inject:true, spyOn:true, jasmine:true, afterEach:true, */
 
-describe('cacheModel', function() {
+xdescribe('cacheModel', function() {
   var $httpBackend,
       $rootScope,
       $q,
