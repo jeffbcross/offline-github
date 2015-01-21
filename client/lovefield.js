@@ -2495,7 +2495,7 @@ goog.tagUnsealableClass = function(ctr) {
  */
 goog.UNSEALABLE_CONSTRUCTOR_PROPERTY_ = 'goog_defineClass_legacy_unsealable';
 
-// Copyright 2014 The Closure Library Authors. All Rights Reserved.
+// Copyright 2015 The Closure Library Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -2598,13 +2598,13 @@ goog.addDependency('datasource/datasource.js', ['goog.ds.BaseDataNode', 'goog.ds
 goog.addDependency('datasource/datasource_test.js', ['goog.ds.JsDataSourceTest'], ['goog.dom.xml', 'goog.ds.DataManager', 'goog.ds.JsDataSource', 'goog.ds.SortedNodeList', 'goog.ds.XmlDataSource', 'goog.testing.jsunit'], false);
 goog.addDependency('datasource/expr.js', ['goog.ds.Expr'], ['goog.ds.BasicNodeList', 'goog.ds.EmptyNodeList', 'goog.string'], false);
 goog.addDependency('datasource/expr_test.js', ['goog.ds.ExprTest'], ['goog.ds.DataManager', 'goog.ds.Expr', 'goog.ds.JsDataSource', 'goog.testing.jsunit'], false);
-goog.addDependency('datasource/fastdatanode.js', ['goog.ds.AbstractFastDataNode', 'goog.ds.FastDataNode', 'goog.ds.FastListNode', 'goog.ds.PrimitiveFastDataNode'], ['goog.ds.DataManager', 'goog.ds.EmptyNodeList', 'goog.string'], false);
+goog.addDependency('datasource/fastdatanode.js', ['goog.ds.AbstractFastDataNode', 'goog.ds.FastDataNode', 'goog.ds.FastListNode', 'goog.ds.PrimitiveFastDataNode'], ['goog.ds.DataManager', 'goog.ds.DataNodeList', 'goog.ds.EmptyNodeList', 'goog.string'], false);
 goog.addDependency('datasource/fastdatanode_test.js', ['goog.ds.FastDataNodeTest'], ['goog.array', 'goog.ds.DataManager', 'goog.ds.Expr', 'goog.ds.FastDataNode', 'goog.testing.jsunit'], false);
-goog.addDependency('datasource/jsdatasource.js', ['goog.ds.JsDataSource', 'goog.ds.JsPropertyDataSource'], ['goog.ds.BaseDataNode', 'goog.ds.BasicNodeList', 'goog.ds.DataManager', 'goog.ds.EmptyNodeList', 'goog.ds.LoadState'], false);
+goog.addDependency('datasource/jsdatasource.js', ['goog.ds.JsDataSource', 'goog.ds.JsPropertyDataSource'], ['goog.ds.BaseDataNode', 'goog.ds.BasicNodeList', 'goog.ds.DataManager', 'goog.ds.DataNode', 'goog.ds.EmptyNodeList', 'goog.ds.LoadState'], false);
 goog.addDependency('datasource/jsondatasource.js', ['goog.ds.JsonDataSource'], ['goog.Uri', 'goog.dom', 'goog.ds.DataManager', 'goog.ds.JsDataSource', 'goog.ds.LoadState', 'goog.ds.logger'], false);
 goog.addDependency('datasource/jsxmlhttpdatasource.js', ['goog.ds.JsXmlHttpDataSource'], ['goog.Uri', 'goog.ds.DataManager', 'goog.ds.FastDataNode', 'goog.ds.LoadState', 'goog.ds.logger', 'goog.events', 'goog.log', 'goog.net.EventType', 'goog.net.XhrIo'], false);
 goog.addDependency('datasource/jsxmlhttpdatasource_test.js', ['goog.ds.JsXmlHttpDataSourceTest'], ['goog.ds.JsXmlHttpDataSource', 'goog.testing.TestQueue', 'goog.testing.jsunit', 'goog.testing.net.XhrIo'], false);
-goog.addDependency('datasource/xmldatasource.js', ['goog.ds.XmlDataSource', 'goog.ds.XmlHttpDataSource'], ['goog.Uri', 'goog.dom.NodeType', 'goog.dom.xml', 'goog.ds.BasicNodeList', 'goog.ds.DataManager', 'goog.ds.LoadState', 'goog.ds.logger', 'goog.net.XhrIo', 'goog.string'], false);
+goog.addDependency('datasource/xmldatasource.js', ['goog.ds.XmlDataSource', 'goog.ds.XmlHttpDataSource'], ['goog.Uri', 'goog.dom.NodeType', 'goog.dom.xml', 'goog.ds.BasicNodeList', 'goog.ds.DataManager', 'goog.ds.DataNode', 'goog.ds.LoadState', 'goog.ds.logger', 'goog.net.XhrIo', 'goog.string'], false);
 goog.addDependency('date/date.js', ['goog.date', 'goog.date.Date', 'goog.date.DateTime', 'goog.date.Interval', 'goog.date.month', 'goog.date.weekDay'], ['goog.asserts', 'goog.date.DateLike', 'goog.i18n.DateTimeSymbols', 'goog.string'], false);
 goog.addDependency('date/date_test.js', ['goog.dateTest'], ['goog.array', 'goog.date', 'goog.date.Date', 'goog.date.DateTime', 'goog.date.Interval', 'goog.date.month', 'goog.date.weekDay', 'goog.i18n.DateTimeSymbols', 'goog.testing.ExpectedFailures', 'goog.testing.jsunit', 'goog.userAgent', 'goog.userAgent.platform', 'goog.userAgent.product', 'goog.userAgent.product.isVersion'], false);
 goog.addDependency('date/datelike.js', ['goog.date.DateLike'], [], false);
@@ -2889,7 +2889,7 @@ goog.addDependency('fs/entry.js', ['goog.fs.DirectoryEntry', 'goog.fs.DirectoryE
 goog.addDependency('fs/entryimpl.js', ['goog.fs.DirectoryEntryImpl', 'goog.fs.EntryImpl', 'goog.fs.FileEntryImpl'], ['goog.array', 'goog.async.Deferred', 'goog.fs.DirectoryEntry', 'goog.fs.Entry', 'goog.fs.Error', 'goog.fs.FileEntry', 'goog.fs.FileWriter', 'goog.functions', 'goog.string'], false);
 goog.addDependency('fs/error.js', ['goog.fs.Error', 'goog.fs.Error.ErrorCode'], ['goog.debug.Error', 'goog.object', 'goog.string'], false);
 goog.addDependency('fs/filereader.js', ['goog.fs.FileReader', 'goog.fs.FileReader.EventType', 'goog.fs.FileReader.ReadyState'], ['goog.async.Deferred', 'goog.events.EventTarget', 'goog.fs.Error', 'goog.fs.ProgressEvent'], false);
-goog.addDependency('fs/filesaver.js', ['goog.fs.FileSaver', 'goog.fs.FileSaver.EventType', 'goog.fs.FileSaver.ProgressEvent', 'goog.fs.FileSaver.ReadyState'], ['goog.events.EventTarget', 'goog.fs.Error', 'goog.fs.ProgressEvent'], false);
+goog.addDependency('fs/filesaver.js', ['goog.fs.FileSaver', 'goog.fs.FileSaver.EventType', 'goog.fs.FileSaver.ReadyState'], ['goog.events.EventTarget', 'goog.fs.Error', 'goog.fs.ProgressEvent'], false);
 goog.addDependency('fs/filesystem.js', ['goog.fs.FileSystem'], [], false);
 goog.addDependency('fs/filesystemimpl.js', ['goog.fs.FileSystemImpl'], ['goog.fs.DirectoryEntryImpl', 'goog.fs.FileSystem'], false);
 goog.addDependency('fs/filewriter.js', ['goog.fs.FileWriter'], ['goog.fs.Error', 'goog.fs.FileSaver'], false);
@@ -2972,8 +2972,8 @@ goog.addDependency('html/flash.js', ['goog.html.flash'], ['goog.asserts', 'goog.
 goog.addDependency('html/flash_test.js', ['goog.html.flashTest'], ['goog.html.SafeHtml', 'goog.html.TrustedResourceUrl', 'goog.html.flash', 'goog.string.Const', 'goog.testing.jsunit'], false);
 goog.addDependency('html/legacyconversions.js', ['goog.html.legacyconversions'], ['goog.html.SafeHtml', 'goog.html.SafeUrl', 'goog.html.TrustedResourceUrl'], false);
 goog.addDependency('html/legacyconversions_test.js', ['goog.html.legacyconversionsTest'], ['goog.html.SafeHtml', 'goog.html.SafeUrl', 'goog.html.TrustedResourceUrl', 'goog.html.legacyconversions', 'goog.testing.PropertyReplacer', 'goog.testing.jsunit'], false);
-goog.addDependency('html/safehtml.js', ['goog.html.SafeHtml'], ['goog.array', 'goog.asserts', 'goog.dom.tags', 'goog.html.SafeStyle', 'goog.html.SafeUrl', 'goog.html.TrustedResourceUrl', 'goog.i18n.bidi.Dir', 'goog.i18n.bidi.DirectionalString', 'goog.object', 'goog.string', 'goog.string.Const', 'goog.string.TypedString'], false);
-goog.addDependency('html/safehtml_test.js', ['goog.html.safeHtmlTest'], ['goog.html.SafeHtml', 'goog.html.SafeStyle', 'goog.html.SafeUrl', 'goog.html.TrustedResourceUrl', 'goog.html.testing', 'goog.i18n.bidi.Dir', 'goog.string.Const', 'goog.testing.jsunit'], false);
+goog.addDependency('html/safehtml.js', ['goog.html.SafeHtml'], ['goog.array', 'goog.asserts', 'goog.dom.tags', 'goog.html.SafeStyle', 'goog.html.SafeStyleSheet', 'goog.html.SafeUrl', 'goog.html.TrustedResourceUrl', 'goog.i18n.bidi.Dir', 'goog.i18n.bidi.DirectionalString', 'goog.object', 'goog.string', 'goog.string.Const', 'goog.string.TypedString'], false);
+goog.addDependency('html/safehtml_test.js', ['goog.html.safeHtmlTest'], ['goog.html.SafeHtml', 'goog.html.SafeStyle', 'goog.html.SafeStyleSheet', 'goog.html.SafeUrl', 'goog.html.TrustedResourceUrl', 'goog.html.testing', 'goog.i18n.bidi.Dir', 'goog.string.Const', 'goog.testing.jsunit'], false);
 goog.addDependency('html/safescript.js', ['goog.html.SafeScript'], ['goog.asserts', 'goog.string.Const', 'goog.string.TypedString'], false);
 goog.addDependency('html/safescript_test.js', ['goog.html.safeScriptTest'], ['goog.html.SafeScript', 'goog.string.Const', 'goog.testing.jsunit'], false);
 goog.addDependency('html/safestyle.js', ['goog.html.SafeStyle'], ['goog.array', 'goog.asserts', 'goog.string', 'goog.string.Const', 'goog.string.TypedString'], false);
@@ -3093,7 +3093,7 @@ goog.addDependency('labs/net/webchannel/wirev8_test.js', ['goog.labs.net.webChan
 goog.addDependency('labs/net/webchanneltransport.js', ['goog.net.WebChannelTransport'], [], false);
 goog.addDependency('labs/net/webchanneltransportfactory.js', ['goog.net.createWebChannelTransport'], ['goog.functions', 'goog.labs.net.webChannel.WebChannelBaseTransport'], false);
 goog.addDependency('labs/net/xhr.js', ['goog.labs.net.xhr', 'goog.labs.net.xhr.Error', 'goog.labs.net.xhr.HttpError', 'goog.labs.net.xhr.Options', 'goog.labs.net.xhr.PostData', 'goog.labs.net.xhr.ResponseType', 'goog.labs.net.xhr.TimeoutError'], ['goog.Promise', 'goog.debug.Error', 'goog.json', 'goog.net.HttpStatus', 'goog.net.XmlHttp', 'goog.string', 'goog.uri.utils', 'goog.userAgent'], false);
-goog.addDependency('labs/net/xhr_test.js', ['goog.labs.net.xhrTest'], ['goog.Promise', 'goog.labs.net.xhr', 'goog.net.XmlHttp', 'goog.testing.MockClock', 'goog.testing.jsunit', 'goog.userAgent'], false);
+goog.addDependency('labs/net/xhr_test.js', ['goog.labs.net.xhrTest'], ['goog.Promise', 'goog.labs.net.xhr', 'goog.net.WrapperXmlHttpFactory', 'goog.net.XmlHttp', 'goog.testing.MockClock', 'goog.testing.jsunit', 'goog.userAgent'], false);
 goog.addDependency('labs/object/object.js', ['goog.labs.object'], [], false);
 goog.addDependency('labs/object/object_test.js', ['goog.labs.objectTest'], ['goog.labs.object', 'goog.testing.jsunit'], false);
 goog.addDependency('labs/pubsub/broadcastpubsub.js', ['goog.labs.pubsub.BroadcastPubSub'], ['goog.Disposable', 'goog.Timer', 'goog.array', 'goog.async.run', 'goog.events.EventHandler', 'goog.events.EventType', 'goog.json', 'goog.log', 'goog.math', 'goog.pubsub.PubSub', 'goog.storage.Storage', 'goog.storage.mechanism.HTML5LocalStorage', 'goog.string', 'goog.userAgent'], false);
@@ -3472,6 +3472,7 @@ goog.addDependency('style/bidi_test.js', ['goog.style.bidiTest'], ['goog.dom', '
 goog.addDependency('style/cursor.js', ['goog.style.cursor'], ['goog.userAgent'], false);
 goog.addDependency('style/cursor_test.js', ['goog.style.cursorTest'], ['goog.style.cursor', 'goog.testing.jsunit', 'goog.userAgent'], false);
 goog.addDependency('style/style.js', ['goog.style'], ['goog.array', 'goog.asserts', 'goog.dom', 'goog.dom.NodeType', 'goog.dom.vendor', 'goog.math.Box', 'goog.math.Coordinate', 'goog.math.Rect', 'goog.math.Size', 'goog.object', 'goog.string', 'goog.userAgent'], false);
+goog.addDependency('style/style_document_scroll_test.js', ['goog.style.style_document_scroll_test'], ['goog.dom', 'goog.style', 'goog.testing.jsunit'], false);
 goog.addDependency('style/style_test.js', ['goog.style_test'], ['goog.array', 'goog.color', 'goog.dom', 'goog.events.BrowserEvent', 'goog.labs.userAgent.util', 'goog.math.Box', 'goog.math.Coordinate', 'goog.math.Rect', 'goog.math.Size', 'goog.object', 'goog.string', 'goog.style', 'goog.testing.ExpectedFailures', 'goog.testing.MockUserAgent', 'goog.testing.asserts', 'goog.testing.jsunit', 'goog.userAgent', 'goog.userAgent.product', 'goog.userAgentTestUtil', 'goog.userAgentTestUtil.UserAgents'], false);
 goog.addDependency('style/style_webkit_scrollbars_test.js', ['goog.style.webkitScrollbarsTest'], ['goog.asserts', 'goog.style', 'goog.styleScrollbarTester', 'goog.testing.ExpectedFailures', 'goog.testing.jsunit', 'goog.userAgent'], false);
 goog.addDependency('style/stylescrollbartester.js', ['goog.styleScrollbarTester'], ['goog.dom', 'goog.style', 'goog.testing.asserts'], false);
@@ -3591,7 +3592,7 @@ goog.addDependency('testing/testcase.js', ['goog.testing.TestCase', 'goog.testin
 goog.addDependency('testing/testcase_test.js', ['goog.testing.TestCaseTest'], ['goog.Promise', 'goog.testing.TestCase', 'goog.testing.jsunit'], false);
 goog.addDependency('testing/testqueue.js', ['goog.testing.TestQueue'], [], false);
 goog.addDependency('testing/testrunner.js', ['goog.testing.TestRunner'], ['goog.testing.TestCase'], false);
-goog.addDependency('testing/ui/rendererasserts.js', ['goog.testing.ui.rendererasserts'], ['goog.testing.asserts'], false);
+goog.addDependency('testing/ui/rendererasserts.js', ['goog.testing.ui.rendererasserts'], ['goog.testing.asserts', 'goog.ui.ControlRenderer'], false);
 goog.addDependency('testing/ui/rendererasserts_test.js', ['goog.testing.ui.rendererassertsTest'], ['goog.testing.asserts', 'goog.testing.jsunit', 'goog.testing.ui.rendererasserts', 'goog.ui.ControlRenderer'], false);
 goog.addDependency('testing/ui/rendererharness.js', ['goog.testing.ui.RendererHarness'], ['goog.Disposable', 'goog.dom.NodeType', 'goog.testing.asserts', 'goog.testing.dom'], false);
 goog.addDependency('testing/ui/style.js', ['goog.testing.ui.style'], ['goog.array', 'goog.asserts', 'goog.dom', 'goog.dom.classlist', 'goog.testing.asserts'], false);
@@ -3756,19 +3757,19 @@ goog.addDependency('ui/labelinput_test.js', ['goog.ui.LabelInputTest'], ['goog.a
 goog.addDependency('ui/linkbuttonrenderer.js', ['goog.ui.LinkButtonRenderer'], ['goog.ui.Button', 'goog.ui.FlatButtonRenderer', 'goog.ui.registry'], false);
 goog.addDependency('ui/media/flashobject.js', ['goog.ui.media.FlashObject', 'goog.ui.media.FlashObject.ScriptAccessLevel', 'goog.ui.media.FlashObject.Wmodes'], ['goog.asserts', 'goog.dom.safe', 'goog.events.Event', 'goog.events.EventHandler', 'goog.events.EventType', 'goog.html.SafeUrl', 'goog.html.TrustedResourceUrl', 'goog.html.flash', 'goog.html.legacyconversions', 'goog.log', 'goog.object', 'goog.string', 'goog.structs.Map', 'goog.style', 'goog.ui.Component', 'goog.userAgent', 'goog.userAgent.flash'], false);
 goog.addDependency('ui/media/flashobject_test.js', ['goog.ui.media.FlashObjectTest'], ['goog.dom', 'goog.dom.DomHelper', 'goog.events', 'goog.events.Event', 'goog.events.EventType', 'goog.html.SafeUrl', 'goog.testing.MockControl', 'goog.testing.events', 'goog.testing.jsunit', 'goog.ui.media.FlashObject', 'goog.userAgent'], false);
-goog.addDependency('ui/media/flickr.js', ['goog.ui.media.FlickrSet', 'goog.ui.media.FlickrSetModel'], ['goog.ui.media.FlashObject', 'goog.ui.media.Media', 'goog.ui.media.MediaModel', 'goog.ui.media.MediaRenderer'], false);
-goog.addDependency('ui/media/flickr_test.js', ['goog.ui.media.FlickrSetTest'], ['goog.dom', 'goog.testing.jsunit', 'goog.ui.media.FlashObject', 'goog.ui.media.FlickrSet', 'goog.ui.media.FlickrSetModel', 'goog.ui.media.Media'], false);
+goog.addDependency('ui/media/flickr.js', ['goog.ui.media.FlickrSet', 'goog.ui.media.FlickrSetModel'], ['goog.html.TrustedResourceUrl', 'goog.string.Const', 'goog.ui.media.FlashObject', 'goog.ui.media.Media', 'goog.ui.media.MediaModel', 'goog.ui.media.MediaRenderer'], false);
+goog.addDependency('ui/media/flickr_test.js', ['goog.ui.media.FlickrSetTest'], ['goog.dom', 'goog.html.testing', 'goog.testing.jsunit', 'goog.ui.media.FlashObject', 'goog.ui.media.FlickrSet', 'goog.ui.media.FlickrSetModel', 'goog.ui.media.Media'], false);
 goog.addDependency('ui/media/googlevideo.js', ['goog.ui.media.GoogleVideo', 'goog.ui.media.GoogleVideoModel'], ['goog.string', 'goog.ui.media.FlashObject', 'goog.ui.media.Media', 'goog.ui.media.MediaModel', 'goog.ui.media.MediaRenderer'], false);
 goog.addDependency('ui/media/googlevideo_test.js', ['goog.ui.media.GoogleVideoTest'], ['goog.dom', 'goog.testing.jsunit', 'goog.ui.media.FlashObject', 'goog.ui.media.GoogleVideo', 'goog.ui.media.GoogleVideoModel', 'goog.ui.media.Media'], false);
 goog.addDependency('ui/media/media.js', ['goog.ui.media.Media', 'goog.ui.media.MediaRenderer'], ['goog.asserts', 'goog.style', 'goog.ui.Component', 'goog.ui.Control', 'goog.ui.ControlRenderer'], false);
 goog.addDependency('ui/media/media_test.js', ['goog.ui.media.MediaTest'], ['goog.dom', 'goog.math.Size', 'goog.testing.jsunit', 'goog.ui.ControlRenderer', 'goog.ui.media.Media', 'goog.ui.media.MediaModel', 'goog.ui.media.MediaRenderer'], false);
-goog.addDependency('ui/media/mediamodel.js', ['goog.ui.media.MediaModel', 'goog.ui.media.MediaModel.Category', 'goog.ui.media.MediaModel.Credit', 'goog.ui.media.MediaModel.Credit.Role', 'goog.ui.media.MediaModel.Credit.Scheme', 'goog.ui.media.MediaModel.Medium', 'goog.ui.media.MediaModel.MimeType', 'goog.ui.media.MediaModel.Player', 'goog.ui.media.MediaModel.SubTitle', 'goog.ui.media.MediaModel.Thumbnail'], ['goog.array'], false);
+goog.addDependency('ui/media/mediamodel.js', ['goog.ui.media.MediaModel', 'goog.ui.media.MediaModel.Category', 'goog.ui.media.MediaModel.Credit', 'goog.ui.media.MediaModel.Credit.Role', 'goog.ui.media.MediaModel.Credit.Scheme', 'goog.ui.media.MediaModel.Medium', 'goog.ui.media.MediaModel.MimeType', 'goog.ui.media.MediaModel.Player', 'goog.ui.media.MediaModel.SubTitle', 'goog.ui.media.MediaModel.Thumbnail'], ['goog.array', 'goog.html.TrustedResourceUrl', 'goog.html.legacyconversions'], false);
 goog.addDependency('ui/media/mediamodel_test.js', ['goog.ui.media.MediaModelTest'], ['goog.testing.jsunit', 'goog.ui.media.MediaModel'], false);
 goog.addDependency('ui/media/mp3.js', ['goog.ui.media.Mp3'], ['goog.string', 'goog.ui.media.FlashObject', 'goog.ui.media.Media', 'goog.ui.media.MediaRenderer'], false);
 goog.addDependency('ui/media/mp3_test.js', ['goog.ui.media.Mp3Test'], ['goog.dom', 'goog.testing.jsunit', 'goog.ui.media.FlashObject', 'goog.ui.media.Media', 'goog.ui.media.MediaModel', 'goog.ui.media.Mp3'], false);
 goog.addDependency('ui/media/photo.js', ['goog.ui.media.Photo'], ['goog.ui.media.Media', 'goog.ui.media.MediaRenderer'], false);
 goog.addDependency('ui/media/photo_test.js', ['goog.ui.media.PhotoTest'], ['goog.dom', 'goog.testing.jsunit', 'goog.ui.media.MediaModel', 'goog.ui.media.Photo'], false);
-goog.addDependency('ui/media/picasa.js', ['goog.ui.media.PicasaAlbum', 'goog.ui.media.PicasaAlbumModel'], ['goog.ui.media.FlashObject', 'goog.ui.media.Media', 'goog.ui.media.MediaModel', 'goog.ui.media.MediaRenderer'], false);
+goog.addDependency('ui/media/picasa.js', ['goog.ui.media.PicasaAlbum', 'goog.ui.media.PicasaAlbumModel'], ['goog.html.TrustedResourceUrl', 'goog.string.Const', 'goog.ui.media.FlashObject', 'goog.ui.media.Media', 'goog.ui.media.MediaModel', 'goog.ui.media.MediaRenderer'], false);
 goog.addDependency('ui/media/picasa_test.js', ['goog.ui.media.PicasaTest'], ['goog.dom', 'goog.testing.jsunit', 'goog.ui.media.FlashObject', 'goog.ui.media.Media', 'goog.ui.media.PicasaAlbum', 'goog.ui.media.PicasaAlbumModel'], false);
 goog.addDependency('ui/media/vimeo.js', ['goog.ui.media.Vimeo', 'goog.ui.media.VimeoModel'], ['goog.string', 'goog.ui.media.FlashObject', 'goog.ui.media.Media', 'goog.ui.media.MediaModel', 'goog.ui.media.MediaRenderer'], false);
 goog.addDependency('ui/media/vimeo_test.js', ['goog.ui.media.VimeoTest'], ['goog.dom', 'goog.testing.jsunit', 'goog.ui.media.FlashObject', 'goog.ui.media.Media', 'goog.ui.media.Vimeo', 'goog.ui.media.VimeoModel'], false);
@@ -5749,7 +5750,7 @@ goog.asserts.doAssertFailure_ =
  * Sets a custom error handler that can be used to customize the behavior of
  * assertion failures, for example by turning all assertion failures into log
  * messages.
- * @param {function(goog.asserts.AssertionError)} errorHandler
+ * @param {function(!goog.asserts.AssertionError)} errorHandler
  */
 goog.asserts.setErrorHandler = function(errorHandler) {
   if (goog.asserts.ENABLE_ASSERTS) {
@@ -6503,7 +6504,7 @@ goog.array.count = function(arr, f, opt_obj) {
  *     for every element. This function takes 3 arguments (the element, the
  *     index and the array) and should return a boolean.
  * @param {S=} opt_obj An optional "this" context for the function.
- * @return {?T} The first array element that passes the test, or null if no
+ * @return {T|null} The first array element that passes the test, or null if no
  *     element is found.
  * @template T,S
  */
@@ -6549,7 +6550,7 @@ goog.array.findIndex = function(arr, f, opt_obj) {
  *     takes 3 arguments (the element, the index and the array) and should
  *     return a boolean.
  * @param {S=} opt_obj An optional "this" context for the function.
- * @return {?T} The last array element that passes the test, or null if no
+ * @return {T|null} The last array element that passes the test, or null if no
  *     element is found.
  * @template T,S
  */
@@ -7288,11 +7289,27 @@ goog.array.compare3 = function(arr1, arr2, opt_compareFn) {
  * @param {VALUE} a The first object to be compared.
  * @param {VALUE} b The second object to be compared.
  * @return {number} A negative number, zero, or a positive number as the first
- *     argument is less than, equal to, or greater than the second.
+ *     argument is less than, equal to, or greater than the second,
+ *     respectively.
  * @template VALUE
  */
 goog.array.defaultCompare = function(a, b) {
   return a > b ? 1 : a < b ? -1 : 0;
+};
+
+
+/**
+ * Compares its two arguments for inverse order, using the built in < and >
+ * operators.
+ * @param {VALUE} a The first object to be compared.
+ * @param {VALUE} b The second object to be compared.
+ * @return {number} A negative number, zero, or a positive number as the first
+ *     argument is greater than, equal to, or less than the second,
+ *     respectively.
+ * @template VALUE
+ */
+goog.array.inverseDefaultCompare = function(a, b) {
+  return -goog.array.defaultCompare(a, b);
 };
 
 
@@ -7607,6 +7624,25 @@ goog.array.shuffle = function(arr, opt_randFn) {
     arr[i] = arr[j];
     arr[j] = tmp;
   }
+};
+
+
+/**
+ * Returns a new array of elements from arr, based on the indexes of elements
+ * provided by index_arr. For example, the result of index copying
+ * ['a', 'b', 'c'] with index_arr [1,0,0,2] is ['b', 'a', 'a', 'c'].
+ *
+ * @param {!Array<T>} arr The array to get a indexed copy from.
+ * @param {!Array<number>} index_arr An array of indexes to get from arr.
+ * @return {!Array<T>} A new array of elements from arr in index_arr order.
+ * @template T
+ */
+goog.array.copyByIndex = function(arr, index_arr) {
+  var result = [];
+  goog.array.forEach(index_arr, function(index) {
+    result.push(arr[index]);
+  });
+  return result;
 };
 
 // Copyright 2006 The Closure Library Authors. All Rights Reserved.
@@ -9843,6 +9879,270 @@ goog.html.SafeStyle.concat = function(var_args) {
       style);
 };
 
+// Copyright 2014 The Closure Library Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview The SafeStyleSheet type and its builders.
+ *
+ * TODO(user): Link to document stating type contract.
+ */
+
+goog.provide('goog.html.SafeStyleSheet');
+
+goog.require('goog.array');
+goog.require('goog.asserts');
+goog.require('goog.string');
+goog.require('goog.string.Const');
+goog.require('goog.string.TypedString');
+
+
+
+/**
+ * A string-like object which represents a CSS style sheet and that carries the
+ * security type contract that its value, as a string, will not cause untrusted
+ * script execution (XSS) when evaluated as CSS in a browser.
+ *
+ * Instances of this type must be created via the factory method
+ * {@code goog.html.SafeStyleSheet.fromConstant} and not by invoking its
+ * constructor. The constructor intentionally takes no parameters and the type
+ * is immutable; hence only a default instance corresponding to the empty string
+ * can be obtained via constructor invocation.
+ *
+ * A SafeStyleSheet's string representation can safely be interpolated as the
+ * content of a style element within HTML. The SafeStyleSheet string should
+ * not be escaped before interpolation.
+ *
+ * Values of this type must be composable, i.e. for any two values
+ * {@code styleSheet1} and {@code styleSheet2} of this type,
+ * {@code goog.html.SafeStyleSheet.unwrap(styleSheet1) +
+ * goog.html.SafeStyleSheet.unwrap(styleSheet2)} must itself be a value that
+ * satisfies the SafeStyleSheet type constraint. This requirement implies that
+ * for any value {@code styleSheet} of this type,
+ * {@code goog.html.SafeStyleSheet.unwrap(styleSheet1)} must end in
+ * "beginning of rule" context.
+
+ * A SafeStyleSheet can be constructed via security-reviewed unchecked
+ * conversions. In this case producers of SafeStyleSheet must ensure themselves
+ * that the SafeStyleSheet does not contain unsafe script. Note in particular
+ * that {@code &lt;} is dangerous, even when inside CSS strings, and so should
+ * always be forbidden or CSS-escaped in user controlled input. For example, if
+ * {@code &lt;/style&gt;&lt;script&gt;evil&lt;/script&gt;"} were interpolated
+ * inside a CSS string, it would break out of the context of the original
+ * style element and {@code evil} would execute. Also note that within an HTML
+ * style (raw text) element, HTML character references, such as
+ * {@code &amp;lt;}, are not allowed. See
+ * http://www.w3.org/TR/html5/scripting-1.html#restrictions-for-contents-of-script-elements
+ * (similar considerations apply to the style element).
+ *
+ * @see goog.html.SafeStyleSheet#fromConstant
+ * @constructor
+ * @final
+ * @struct
+ * @implements {goog.string.TypedString}
+ */
+goog.html.SafeStyleSheet = function() {
+  /**
+   * The contained value of this SafeStyleSheet.  The field has a purposely
+   * ugly name to make (non-compiled) code that attempts to directly access this
+   * field stand out.
+   * @private {string}
+   */
+  this.privateDoNotAccessOrElseSafeStyleSheetWrappedValue_ = '';
+
+  /**
+   * A type marker used to implement additional run-time type checking.
+   * @see goog.html.SafeStyleSheet#unwrap
+   * @const
+   * @private
+   */
+  this.SAFE_SCRIPT_TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_ =
+      goog.html.SafeStyleSheet.TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_;
+};
+
+
+/**
+ * @override
+ * @const
+ */
+goog.html.SafeStyleSheet.prototype.implementsGoogStringTypedString = true;
+
+
+/**
+ * Type marker for the SafeStyleSheet type, used to implement additional
+ * run-time type checking.
+ * @const
+ * @private
+ */
+goog.html.SafeStyleSheet.TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_ = {};
+
+
+/**
+ * Creates a new SafeStyleSheet object by concatenating values.
+ * @param {...(!goog.html.SafeStyleSheet|!Array<!goog.html.SafeStyleSheet>)}
+ *     var_args Values to concatenate.
+ * @return {!goog.html.SafeStyleSheet}
+ */
+goog.html.SafeStyleSheet.concat = function(var_args) {
+  var result = '';
+
+  /**
+   * @param {!goog.html.SafeStyleSheet|!Array<!goog.html.SafeStyleSheet>}
+   *     argument
+   */
+  var addArgument = function(argument) {
+    if (goog.isArray(argument)) {
+      goog.array.forEach(argument, addArgument);
+    } else {
+      result += goog.html.SafeStyleSheet.unwrap(argument);
+    }
+  };
+
+  goog.array.forEach(arguments, addArgument);
+  return goog.html.SafeStyleSheet
+      .createSafeStyleSheetSecurityPrivateDoNotAccessOrElse(result);
+};
+
+
+/**
+ * Creates a SafeStyleSheet object from a compile-time constant string.
+ *
+ * {@code styleSheet} must not have any &lt; characters in it, so that
+ * the syntactic structure of the surrounding HTML is not affected.
+ *
+ * @param {!goog.string.Const} styleSheet A compile-time-constant string from
+ *     which to create a SafeStyleSheet.
+ * @return {!goog.html.SafeStyleSheet} A SafeStyleSheet object initialized to
+ *     {@code styleSheet}.
+ */
+goog.html.SafeStyleSheet.fromConstant = function(styleSheet) {
+  var styleSheetString = goog.string.Const.unwrap(styleSheet);
+  if (styleSheetString.length === 0) {
+    return goog.html.SafeStyleSheet.EMPTY;
+  }
+  // > is a valid character in CSS selectors and there's no strict need to
+  // block it if we already block <.
+  goog.asserts.assert(!goog.string.contains(styleSheetString, '<'),
+      "Forbidden '<' character in style sheet string: " + styleSheetString);
+  return goog.html.SafeStyleSheet.
+      createSafeStyleSheetSecurityPrivateDoNotAccessOrElse(styleSheetString);
+};
+
+
+/**
+ * Returns this SafeStyleSheet's value as a string.
+ *
+ * IMPORTANT: In code where it is security relevant that an object's type is
+ * indeed {@code SafeStyleSheet}, use {@code goog.html.SafeStyleSheet.unwrap}
+ * instead of this method. If in doubt, assume that it's security relevant. In
+ * particular, note that goog.html functions which return a goog.html type do
+ * not guarantee the returned instance is of the right type. For example:
+ *
+ * <pre>
+ * var fakeSafeHtml = new String('fake');
+ * fakeSafeHtml.__proto__ = goog.html.SafeHtml.prototype;
+ * var newSafeHtml = goog.html.SafeHtml.htmlEscape(fakeSafeHtml);
+ * // newSafeHtml is just an alias for fakeSafeHtml, it's passed through by
+ * // goog.html.SafeHtml.htmlEscape() as fakeSafeHtml
+ * // instanceof goog.html.SafeHtml.
+ * </pre>
+ *
+ * @see goog.html.SafeStyleSheet#unwrap
+ * @override
+ */
+goog.html.SafeStyleSheet.prototype.getTypedStringValue = function() {
+  return this.privateDoNotAccessOrElseSafeStyleSheetWrappedValue_;
+};
+
+
+if (goog.DEBUG) {
+  /**
+   * Returns a debug string-representation of this value.
+   *
+   * To obtain the actual string value wrapped in a SafeStyleSheet, use
+   * {@code goog.html.SafeStyleSheet.unwrap}.
+   *
+   * @see goog.html.SafeStyleSheet#unwrap
+   * @override
+   */
+  goog.html.SafeStyleSheet.prototype.toString = function() {
+    return 'SafeStyleSheet{' +
+        this.privateDoNotAccessOrElseSafeStyleSheetWrappedValue_ + '}';
+  };
+}
+
+
+/**
+ * Performs a runtime check that the provided object is indeed a
+ * SafeStyleSheet object, and returns its value.
+ *
+ * @param {!goog.html.SafeStyleSheet} safeStyleSheet The object to extract from.
+ * @return {string} The safeStyleSheet object's contained string, unless
+ *     the run-time type check fails. In that case, {@code unwrap} returns an
+ *     innocuous string, or, if assertions are enabled, throws
+ *     {@code goog.asserts.AssertionError}.
+ */
+goog.html.SafeStyleSheet.unwrap = function(safeStyleSheet) {
+  // Perform additional Run-time type-checking to ensure that
+  // safeStyleSheet is indeed an instance of the expected type.  This
+  // provides some additional protection against security bugs due to
+  // application code that disables type checks.
+  // Specifically, the following checks are performed:
+  // 1. The object is an instance of the expected type.
+  // 2. The object is not an instance of a subclass.
+  // 3. The object carries a type marker for the expected type. "Faking" an
+  // object requires a reference to the type marker, which has names intended
+  // to stand out in code reviews.
+  if (safeStyleSheet instanceof goog.html.SafeStyleSheet &&
+      safeStyleSheet.constructor === goog.html.SafeStyleSheet &&
+      safeStyleSheet.SAFE_SCRIPT_TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_ ===
+          goog.html.SafeStyleSheet.TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_) {
+    return safeStyleSheet.privateDoNotAccessOrElseSafeStyleSheetWrappedValue_;
+  } else {
+    goog.asserts.fail(
+        "expected object of type SafeStyleSheet, got '" + safeStyleSheet +
+        "'");
+    return 'type_error:SafeStyleSheet';
+  }
+};
+
+
+/**
+ * Package-internal utility method to create SafeStyleSheet instances.
+ *
+ * @param {string} styleSheet The string to initialize the SafeStyleSheet
+ *     object with.
+ * @return {!goog.html.SafeStyleSheet} The initialized SafeStyleSheet object.
+ * @package
+ */
+goog.html.SafeStyleSheet.createSafeStyleSheetSecurityPrivateDoNotAccessOrElse =
+    function(styleSheet) {
+  var safeStyleSheet = new goog.html.SafeStyleSheet();
+  safeStyleSheet.privateDoNotAccessOrElseSafeStyleSheetWrappedValue_ =
+      styleSheet;
+  return safeStyleSheet;
+};
+
+
+/**
+ * A SafeStyleSheet instance corresponding to the empty string.
+ * @const {!goog.html.SafeStyleSheet}
+ */
+goog.html.SafeStyleSheet.EMPTY =
+    goog.html.SafeStyleSheet.
+        createSafeStyleSheetSecurityPrivateDoNotAccessOrElse('');
+
 // Copyright 2013 The Closure Library Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -10498,6 +10798,7 @@ goog.require('goog.array');
 goog.require('goog.asserts');
 goog.require('goog.dom.tags');
 goog.require('goog.html.SafeStyle');
+goog.require('goog.html.SafeStyleSheet');
 goog.require('goog.html.SafeUrl');
 goog.require('goog.html.TrustedResourceUrl');
 goog.require('goog.i18n.bidi.Dir');
@@ -10890,6 +11191,40 @@ goog.html.SafeHtml.createIframe = function(
 
 
 /**
+ * Creates a SafeHtml representing a style tag. The type attribute is set
+ * to "text/css".
+ * @param {!goog.html.SafeStyleSheet|!Array<!goog.html.SafeStyleSheet>}
+ *     styleSheet Content to put inside the tag. Array elements are
+ *     concatenated.
+ * @param {!Object<string, goog.html.SafeHtml.AttributeValue_>=}
+ *     opt_attributes Mapping from attribute names to their values. Only
+ *     attribute names consisting of [a-zA-Z0-9-] are allowed. Value of null or
+ *     undefined causes the attribute to be omitted.
+ * @return {!goog.html.SafeHtml} The SafeHtml content with the tag.
+ * @throws {Error} If invalid attribute name or attribute value is provided. If
+ *     opt_attributes contains the type attribute.
+ */
+goog.html.SafeHtml.createStyle = function(styleSheet, opt_attributes) {
+  var fixedAttributes = {'type': 'text/css'};
+  var defaultAttributes = {};
+  var attributes = goog.html.SafeHtml.combineAttributes(
+      fixedAttributes, defaultAttributes, opt_attributes);
+
+  var content = '';
+  styleSheet = goog.array.concat(styleSheet);
+  for (var i = 0; i < styleSheet.length; i++) {
+    content += goog.html.SafeStyleSheet.unwrap(styleSheet[i]);
+  }
+  // Convert to SafeHtml so that it's not HTML-escaped.
+  var htmlContent = goog.html.SafeHtml
+      .createSafeHtmlSecurityPrivateDoNotAccessOrElse(
+          content, goog.i18n.bidi.Dir.NEUTRAL);
+  return goog.html.SafeHtml.createSafeHtmlTagSecurityPrivateDoNotAccessOrElse(
+      'style', attributes, htmlContent);
+};
+
+
+/**
  * @param {string} tagName The tag name.
  * @param {string} name The attribute name.
  * @param {!goog.html.SafeHtml.AttributeValue_} value The attribute value.
@@ -11015,8 +11350,8 @@ goog.html.SafeHtml.concat = function(var_args) {
  * Creates a new SafeHtml object with known directionality by concatenating the
  * values.
  * @param {!goog.i18n.bidi.Dir} dir Directionality.
- * @param {...!goog.html.SafeHtml.TextOrHtml_|
- *     !Array<!goog.html.SafeHtml.TextOrHtml_>} var_args Elements of array
+ * @param {...(!goog.html.SafeHtml.TextOrHtml_|
+ *     !Array<!goog.html.SafeHtml.TextOrHtml_>)} var_args Elements of array
  *     arguments would be processed recursively.
  * @return {!goog.html.SafeHtml}
  */
@@ -11386,270 +11721,6 @@ goog.html.SafeScript.createSafeScriptSecurityPrivateDoNotAccessOrElse =
  */
 goog.html.SafeScript.EMPTY =
     goog.html.SafeScript.createSafeScriptSecurityPrivateDoNotAccessOrElse('');
-
-// Copyright 2014 The Closure Library Authors. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-/**
- * @fileoverview The SafeStyleSheet type and its builders.
- *
- * TODO(user): Link to document stating type contract.
- */
-
-goog.provide('goog.html.SafeStyleSheet');
-
-goog.require('goog.array');
-goog.require('goog.asserts');
-goog.require('goog.string');
-goog.require('goog.string.Const');
-goog.require('goog.string.TypedString');
-
-
-
-/**
- * A string-like object which represents a CSS style sheet and that carries the
- * security type contract that its value, as a string, will not cause untrusted
- * script execution (XSS) when evaluated as CSS in a browser.
- *
- * Instances of this type must be created via the factory method
- * {@code goog.html.SafeStyleSheet.fromConstant} and not by invoking its
- * constructor. The constructor intentionally takes no parameters and the type
- * is immutable; hence only a default instance corresponding to the empty string
- * can be obtained via constructor invocation.
- *
- * A SafeStyleSheet's string representation can safely be interpolated as the
- * content of a style element within HTML. The SafeStyleSheet string should
- * not be escaped before interpolation.
- *
- * Values of this type must be composable, i.e. for any two values
- * {@code styleSheet1} and {@code styleSheet2} of this type,
- * {@code goog.html.SafeStyleSheet.unwrap(styleSheet1) +
- * goog.html.SafeStyleSheet.unwrap(styleSheet2)} must itself be a value that
- * satisfies the SafeStyleSheet type constraint. This requirement implies that
- * for any value {@code styleSheet} of this type,
- * {@code goog.html.SafeStyleSheet.unwrap(styleSheet1)} must end in
- * "beginning of rule" context.
-
- * A SafeStyleSheet can be constructed via security-reviewed unchecked
- * conversions. In this case producers of SafeStyleSheet must ensure themselves
- * that the SafeStyleSheet does not contain unsafe script. Note in particular
- * that {@code &lt;} is dangerous, even when inside CSS strings, and so should
- * always be forbidden or CSS-escaped in user controlled input. For example, if
- * {@code &lt;/style&gt;&lt;script&gt;evil&lt;/script&gt;"} were interpolated
- * inside a CSS string, it would break out of the context of the original
- * style element and {@code evil} would execute. Also note that within an HTML
- * style (raw text) element, HTML character references, such as
- * {@code &amp;lt;}, are not allowed. See
- * http://www.w3.org/TR/html5/scripting-1.html#restrictions-for-contents-of-script-elements
- * (similar considerations apply to the style element).
- *
- * @see goog.html.SafeStyleSheet#fromConstant
- * @constructor
- * @final
- * @struct
- * @implements {goog.string.TypedString}
- */
-goog.html.SafeStyleSheet = function() {
-  /**
-   * The contained value of this SafeStyleSheet.  The field has a purposely
-   * ugly name to make (non-compiled) code that attempts to directly access this
-   * field stand out.
-   * @private {string}
-   */
-  this.privateDoNotAccessOrElseSafeStyleSheetWrappedValue_ = '';
-
-  /**
-   * A type marker used to implement additional run-time type checking.
-   * @see goog.html.SafeStyleSheet#unwrap
-   * @const
-   * @private
-   */
-  this.SAFE_SCRIPT_TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_ =
-      goog.html.SafeStyleSheet.TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_;
-};
-
-
-/**
- * @override
- * @const
- */
-goog.html.SafeStyleSheet.prototype.implementsGoogStringTypedString = true;
-
-
-/**
- * Type marker for the SafeStyleSheet type, used to implement additional
- * run-time type checking.
- * @const
- * @private
- */
-goog.html.SafeStyleSheet.TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_ = {};
-
-
-/**
- * Creates a new SafeStyleSheet object by concatenating values.
- * @param {...(!goog.html.SafeStyleSheet|!Array<!goog.html.SafeStyleSheet>)}
- *     var_args Values to concatenate.
- * @return {!goog.html.SafeStyleSheet}
- */
-goog.html.SafeStyleSheet.concat = function(var_args) {
-  var result = '';
-
-  /**
-   * @param {!goog.html.SafeStyleSheet|!Array<!goog.html.SafeStyleSheet>}
-   *     argument
-   */
-  var addArgument = function(argument) {
-    if (goog.isArray(argument)) {
-      goog.array.forEach(argument, addArgument);
-    } else {
-      result += goog.html.SafeStyleSheet.unwrap(argument);
-    }
-  };
-
-  goog.array.forEach(arguments, addArgument);
-  return goog.html.SafeStyleSheet
-      .createSafeStyleSheetSecurityPrivateDoNotAccessOrElse(result);
-};
-
-
-/**
- * Creates a SafeStyleSheet object from a compile-time constant string.
- *
- * {@code styleSheet} must not have any &lt; characters in it, so that
- * the syntactic structure of the surrounding HTML is not affected.
- *
- * @param {!goog.string.Const} styleSheet A compile-time-constant string from
- *     which to create a SafeStyleSheet.
- * @return {!goog.html.SafeStyleSheet} A SafeStyleSheet object initialized to
- *     {@code styleSheet}.
- */
-goog.html.SafeStyleSheet.fromConstant = function(styleSheet) {
-  var styleSheetString = goog.string.Const.unwrap(styleSheet);
-  if (styleSheetString.length === 0) {
-    return goog.html.SafeStyleSheet.EMPTY;
-  }
-  // > is a valid character in CSS selectors and there's no strict need to
-  // block it if we already block <.
-  goog.asserts.assert(!goog.string.contains(styleSheetString, '<'),
-      "Forbidden '<' character in style sheet string: " + styleSheetString);
-  return goog.html.SafeStyleSheet.
-      createSafeStyleSheetSecurityPrivateDoNotAccessOrElse(styleSheetString);
-};
-
-
-/**
- * Returns this SafeStyleSheet's value as a string.
- *
- * IMPORTANT: In code where it is security relevant that an object's type is
- * indeed {@code SafeStyleSheet}, use {@code goog.html.SafeStyleSheet.unwrap}
- * instead of this method. If in doubt, assume that it's security relevant. In
- * particular, note that goog.html functions which return a goog.html type do
- * not guarantee the returned instance is of the right type. For example:
- *
- * <pre>
- * var fakeSafeHtml = new String('fake');
- * fakeSafeHtml.__proto__ = goog.html.SafeHtml.prototype;
- * var newSafeHtml = goog.html.SafeHtml.htmlEscape(fakeSafeHtml);
- * // newSafeHtml is just an alias for fakeSafeHtml, it's passed through by
- * // goog.html.SafeHtml.htmlEscape() as fakeSafeHtml
- * // instanceof goog.html.SafeHtml.
- * </pre>
- *
- * @see goog.html.SafeStyleSheet#unwrap
- * @override
- */
-goog.html.SafeStyleSheet.prototype.getTypedStringValue = function() {
-  return this.privateDoNotAccessOrElseSafeStyleSheetWrappedValue_;
-};
-
-
-if (goog.DEBUG) {
-  /**
-   * Returns a debug string-representation of this value.
-   *
-   * To obtain the actual string value wrapped in a SafeStyleSheet, use
-   * {@code goog.html.SafeStyleSheet.unwrap}.
-   *
-   * @see goog.html.SafeStyleSheet#unwrap
-   * @override
-   */
-  goog.html.SafeStyleSheet.prototype.toString = function() {
-    return 'SafeStyleSheet{' +
-        this.privateDoNotAccessOrElseSafeStyleSheetWrappedValue_ + '}';
-  };
-}
-
-
-/**
- * Performs a runtime check that the provided object is indeed a
- * SafeStyleSheet object, and returns its value.
- *
- * @param {!goog.html.SafeStyleSheet} safeStyleSheet The object to extract from.
- * @return {string} The safeStyleSheet object's contained string, unless
- *     the run-time type check fails. In that case, {@code unwrap} returns an
- *     innocuous string, or, if assertions are enabled, throws
- *     {@code goog.asserts.AssertionError}.
- */
-goog.html.SafeStyleSheet.unwrap = function(safeStyleSheet) {
-  // Perform additional Run-time type-checking to ensure that
-  // safeStyleSheet is indeed an instance of the expected type.  This
-  // provides some additional protection against security bugs due to
-  // application code that disables type checks.
-  // Specifically, the following checks are performed:
-  // 1. The object is an instance of the expected type.
-  // 2. The object is not an instance of a subclass.
-  // 3. The object carries a type marker for the expected type. "Faking" an
-  // object requires a reference to the type marker, which has names intended
-  // to stand out in code reviews.
-  if (safeStyleSheet instanceof goog.html.SafeStyleSheet &&
-      safeStyleSheet.constructor === goog.html.SafeStyleSheet &&
-      safeStyleSheet.SAFE_SCRIPT_TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_ ===
-          goog.html.SafeStyleSheet.TYPE_MARKER_GOOG_HTML_SECURITY_PRIVATE_) {
-    return safeStyleSheet.privateDoNotAccessOrElseSafeStyleSheetWrappedValue_;
-  } else {
-    goog.asserts.fail(
-        "expected object of type SafeStyleSheet, got '" + safeStyleSheet +
-        "'");
-    return 'type_error:SafeStyleSheet';
-  }
-};
-
-
-/**
- * Package-internal utility method to create SafeStyleSheet instances.
- *
- * @param {string} styleSheet The string to initialize the SafeStyleSheet
- *     object with.
- * @return {!goog.html.SafeStyleSheet} The initialized SafeStyleSheet object.
- * @package
- */
-goog.html.SafeStyleSheet.createSafeStyleSheetSecurityPrivateDoNotAccessOrElse =
-    function(styleSheet) {
-  var safeStyleSheet = new goog.html.SafeStyleSheet();
-  safeStyleSheet.privateDoNotAccessOrElseSafeStyleSheetWrappedValue_ =
-      styleSheet;
-  return safeStyleSheet;
-};
-
-
-/**
- * A SafeStyleSheet instance corresponding to the empty string.
- * @const {!goog.html.SafeStyleSheet}
- */
-goog.html.SafeStyleSheet.EMPTY =
-    goog.html.SafeStyleSheet.
-        createSafeStyleSheetSecurityPrivateDoNotAccessOrElse('');
 
 // Copyright 2013 The Closure Library Authors. All Rights Reserved.
 //
@@ -12069,7 +12140,7 @@ goog.functions.nth = function(n) {
  * and replaces it with a new one.
  * @param {Function} f A function.
  * @param {T} retValue A new return value.
- * @return {function(...[?]):T} A new function.
+ * @return {function(...?):T} A new function.
  * @template T
  */
 goog.functions.withReturnValue = function(f, retValue) {
@@ -12098,9 +12169,9 @@ goog.functions.equalTo = function(value, opt_useLooseComparison) {
 /**
  * Creates the composition of the functions passed in.
  * For example, (goog.functions.compose(f, g))(a) is equivalent to f(g(a)).
- * @param {function(...[?]):T} fn The final function.
+ * @param {function(...?):T} fn The final function.
  * @param {...Function} var_args A list of functions.
- * @return {function(...[?]):T} The composition of all inputs.
+ * @return {function(...?):T} The composition of all inputs.
  * @template T
  */
 goog.functions.compose = function(fn, var_args) {
@@ -12146,7 +12217,7 @@ goog.functions.sequence = function(var_args) {
  * short-circuited as soon as a function returns false.
  * For example, (goog.functions.and(f, g))(x) is equivalent to f(x) && g(x).
  * @param {...Function} var_args A list of functions.
- * @return {function(...[?]):boolean} A function that ANDs its component
+ * @return {function(...?):boolean} A function that ANDs its component
  *      functions.
  */
 goog.functions.and = function(var_args) {
@@ -12169,7 +12240,7 @@ goog.functions.and = function(var_args) {
  * short-circuited as soon as a function returns true.
  * For example, (goog.functions.or(f, g))(x) is equivalent to f(x) || g(x).
  * @param {...Function} var_args A list of functions.
- * @return {function(...[?]):boolean} A function that ORs its component
+ * @return {function(...?):boolean} A function that ORs its component
  *    functions.
  */
 goog.functions.or = function(var_args) {
@@ -12190,7 +12261,7 @@ goog.functions.or = function(var_args) {
  * Creates a function that returns the Boolean opposite of a provided function.
  * For example, (goog.functions.not(f))(x) is equivalent to !f(x).
  * @param {!Function} f The original function.
- * @return {function(...[?]):boolean} A function that delegates to f and returns
+ * @return {function(...?):boolean} A function that delegates to f and returns
  * opposite.
  */
 goog.functions.not = function(f) {
@@ -12215,9 +12286,9 @@ goog.functions.not = function(f) {
  */
 goog.functions.create = function(constructor, var_args) {
   /**
- * @constructor
- * @final
- */
+   * @constructor
+   * @final
+   */
   var temp = function() {};
   temp.prototype = constructor.prototype;
 
@@ -13601,7 +13672,7 @@ goog.iter.compress = function(iterable, selectors) {
  * Implements the {@code goog.iter.groupBy} iterator.
  * @param {!goog.iter.Iterator<VALUE>|!goog.iter.Iterable} iterable The
  *     iterable to group.
- * @param {function(...[VALUE]): KEY=} opt_keyFunc  Optional function for
+ * @param {function(...VALUE): KEY=} opt_keyFunc  Optional function for
  *     determining the key value for each group in the {@code iterable}. Default
  *     is the identity function.
  * @constructor
@@ -13621,7 +13692,7 @@ goog.iter.GroupByIterator_ = function(iterable, opt_keyFunc) {
    * A function for determining the key value for each element in the iterable.
    * If no function is provided, the identity function is used and returns the
    * element unchanged.
-   * @type {function(...[VALUE]): KEY}
+   * @type {function(...VALUE): KEY}
    */
   this.keyFunc = opt_keyFunc || goog.functions.identity;
 
@@ -13691,7 +13762,7 @@ goog.iter.GroupByIterator_.prototype.groupItems_ = function(targetKey) {
  * @see http://docs.python.org/2/library/itertools.html#itertools.groupby
  * @param {!goog.iter.Iterator<VALUE>|!goog.iter.Iterable} iterable The
  *     iterable to group.
- * @param {function(...[VALUE]): KEY=} opt_keyFunc  Optional function for
+ * @param {function(...VALUE): KEY=} opt_keyFunc  Optional function for
  *     determining the key value for each group in the {@code iterable}. Default
  *     is the identity function.
  * @return {!goog.iter.Iterator<!Array<?>>} A new iterator that returns
@@ -13713,7 +13784,7 @@ goog.iter.groupBy = function(iterable, opt_keyFunc) {
  *
  * @param {!goog.iter.Iterable<!goog.iter.Iterable>} iterable The iterable of
  *     iterables to iterate over.
- * @param {function(this:THIS,...[*]):RESULT} f The function to call for every
+ * @param {function(this:THIS,...*):RESULT} f The function to call for every
  *     element.  This function takes N+2 arguments, where N represents the
  *     number of items from the next element of the iterable. The two
  *     additional arguments passed to the function are undefined and the
@@ -14609,7 +14680,7 @@ goog.structs.isEmpty = function(col) {
     return col.isEmpty();
   }
 
-  // We do not use goog.string.isEmpty because here we treat the string as
+  // We do not use goog.string.isEmptyOrWhitespace because here we treat the string as
   // collection and as such even whitespace matters
 
   if (goog.isArrayLike(col) || goog.isString(col)) {
@@ -19196,7 +19267,7 @@ goog.Thenable.IMPLEMENTED_BY_PROP = '$goog_Thenable';
  * Exports a 'then' method on the constructor prototype, so that the objects
  * also implement the extern {@see goog.Thenable} interface for interop with
  * other Promise implementations.
- * @param {function(new:goog.Thenable,...[?])} ctor The class constructor. The
+ * @param {function(new:goog.Thenable,...?)} ctor The class constructor. The
  *     corresponding class must have already implemented the interface.
  */
 goog.Thenable.addImplementation = function(ctor) {
@@ -22322,8 +22393,35 @@ lf.backstore.IndexedDB.prototype.onUpgradeNeeded_ = function(onUpgrade, ev) {
   var tx = ev.target.transaction;
   var rawDb = new lf.backstore.IndexedDBRawBackStore(
       ev.oldVersion, db, tx, this.bundleMode_);
+  this.removeIndexTables_(db, tx);
   this.createTables_(db, tx);
   return onUpgrade(rawDb);
+};
+
+
+/**
+ * Removes Lovefield-created index tables.
+ * @param {!IDBDatabase} db
+ * @param {!IDBTransaction} tx The IndexedDB upgrade transaction from
+ *     IDBOpenDBRequest.
+ * @private
+ */
+lf.backstore.IndexedDB.prototype.removeIndexTables_ = function(db, tx) {
+  var storeNames = [];
+  for (var i = 0; i < db.objectStoreNames.length; ++i) {
+    var name = db.objectStoreNames.item(i);
+    // Remove all persisted indices.
+    if (name.indexOf('.') != -1) {
+      storeNames.push(name);
+    }
+  }
+  storeNames.forEach(function(store) {
+    try {
+      db.deleteObjectStore(store);
+    } catch (e) {
+      // Ignore the error.
+    }
+  });
 };
 
 
@@ -22476,8 +22574,9 @@ lf.backstore.IndexedDB.prototype.scanRowId_ = function(opt_tx) {
       req.onsuccess = function(ev) {
         var cursor = ev.target.result;
         if (cursor) {
+          // Since the cursor is traversed in the reverse direction, only the
+          // first record needs to be examined to determine the max row ID.
           maxRowId = Math.max(maxRowId, extractRowId(cursor));
-          cursor.continue();
         }
         resolve(maxRowId);
       };
@@ -23825,6 +23924,81 @@ lf.cache.Journal.prototype.checkScope_ = function(tableSchema) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+goog.provide('lf.index');
+
+
+/**
+ * Java's String.hashCode method.
+ *
+ * for each character c in string
+ *   hash = hash * 31 + c
+ *
+ * @param {string} value
+ * @return {number}
+ */
+lf.index.hashCode = function(value) {
+  var hash = 0;
+  for (var i = 0; i < value.length; ++i) {
+    hash = ((hash << 5) - hash) + value.charCodeAt(i);
+    hash = hash & hash;  // Convert to 32-bit integer.
+  }
+  return hash;
+};
+
+
+/**
+ * Compute hash key for an array.
+ * @param {!Array.<Object>} values
+ * @return {string}
+ */
+lf.index.hashArray = function(values) {
+  var keys = values.map(function(value) {
+    return goog.isDefAndNotNull(value) ?
+        lf.index.hashCode(value.toString()).toString(32) : '';
+  });
+
+  return keys.join('_');
+};
+
+
+/**
+ * Slice result array by limit and skip.
+ * @param {!Array.<number>} source
+ * @param {number=} opt_limit
+ * @param {number=} opt_skip
+ * @return {!Array.<number>}
+ */
+lf.index.slice = function(source, opt_limit, opt_skip) {
+  var array = source;
+  if (array.length && (goog.isDef(opt_limit) || goog.isDef(opt_skip))) {
+    var limit = goog.isDef(opt_limit) ? opt_limit : array.length;
+    if (limit == 0) {
+      return [];
+    }
+    limit = Math.min(array.length, limit);
+    var skip = opt_skip || 0;
+    skip = Math.min(array.length, skip);
+    array = array.slice(skip, skip + limit);
+  }
+  return array;
+};
+
+/**
+ * @license
+ * Copyright 2014 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 goog.provide('lf.index.Index');
 
 goog.forwardDeclare('lf.Row');
@@ -23897,6 +24071,8 @@ lf.index.Index.prototype.cost;
  * Retrieves all data within the range. Returns empty array if not found.
  * @param {!lf.index.KeyRange=} opt_keyRange The key range to search for. If not
  *     provided, all rowIds in this index will be returned.
+ * @param {number=} opt_limit Max number of rows to return
+ * @param {number=} opt_skip Skip first N rows
  * @return {!Array.<number>}
  */
 lf.index.Index.prototype.getRange;
@@ -23949,6 +24125,7 @@ goog.provide('lf.index.BTree');
 goog.require('goog.array');
 goog.require('lf.Exception');
 goog.require('lf.Row');
+goog.require('lf.index');
 goog.require('lf.index.Index');
 
 
@@ -24030,7 +24207,8 @@ lf.index.BTree.prototype.cost = function(opt_keyRange) {
 
 
 /** @override */
-lf.index.BTree.prototype.getRange = function(opt_keyRange) {
+lf.index.BTree.prototype.getRange = function(
+    opt_keyRange, opt_limit, opt_skip) {
   var start = null;
   if (opt_keyRange) {
     if (!goog.isNull(opt_keyRange.from)) {
@@ -24042,7 +24220,7 @@ lf.index.BTree.prototype.getRange = function(opt_keyRange) {
     start = this.root_.getLeftMostNode();
   }
 
-  return start.getRange(opt_keyRange);
+  return lf.index.slice(start.getRange(opt_keyRange), opt_limit, opt_skip);
 };
 
 
@@ -25055,6 +25233,7 @@ goog.provide('lf.index.RowId');
 goog.require('goog.structs.Set');
 goog.require('lf.Exception');
 goog.require('lf.Row');
+goog.require('lf.index');
 goog.require('lf.index.Index');
 goog.require('lf.index.KeyRange');
 
@@ -25128,7 +25307,8 @@ lf.index.RowId.prototype.cost = function(opt_keyRange) {
 
 
 /** @override */
-lf.index.RowId.prototype.getRange = function(opt_keyRange) {
+lf.index.RowId.prototype.getRange = function(
+    opt_keyRange, opt_limit, opt_skip) {
   var keyRange = opt_keyRange || lf.index.KeyRange.all();
 
   if ((goog.isDefAndNotNull(keyRange.from) &&
@@ -25136,7 +25316,10 @@ lf.index.RowId.prototype.getRange = function(opt_keyRange) {
       (goog.isDefAndNotNull(keyRange.to) && typeof(keyRange.to) != 'number')) {
     throw new lf.Exception(lf.Exception.Type.DATA, 'Row id must be numbers');
   }
-  return this.rows_.getValues().filter(keyRange.getComparator());
+  return lf.index.slice(
+      this.rows_.getValues().filter(keyRange.getComparator()),
+      opt_limit,
+      opt_skip);
 };
 
 
@@ -25403,6 +25586,7 @@ goog.provide('lf.index.AATree');
 
 goog.require('goog.asserts');
 goog.require('lf.Exception');
+goog.require('lf.index');
 goog.require('lf.index.Index');
 goog.require('lf.index.KeyRange');
 
@@ -25690,7 +25874,8 @@ lf.index.AATree.prototype.traverse_ = function(node, keyRange, results) {
 
 
 /** @override */
-lf.index.AATree.prototype.getRange = function(opt_keyRange) {
+lf.index.AATree.prototype.getRange = function(
+    opt_keyRange, opt_limit, opt_skip) {
   var keyRange = null;
 
   if (!goog.isDefAndNotNull(opt_keyRange)) {
@@ -25708,7 +25893,7 @@ lf.index.AATree.prototype.getRange = function(opt_keyRange) {
 
   var results = [];
   this.traverse_(this.root_, keyRange, results);
-  return results;
+  return lf.index.slice(results, opt_limit, opt_skip);
 };
 
 
@@ -25762,58 +25947,6 @@ lf.index.AATree.prototype.toString = function() {
     result = result + buffer[i].join('') + '\n';
   }
   return result;
-};
-
-/**
- * @license
- * Copyright 2014 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-goog.provide('lf.index');
-
-
-/**
- * Java's String.hashCode method.
- *
- * for each character c in string
- *   hash = hash * 31 + c
- *
- * @param {string} value
- * @return {number}
- */
-lf.index.hashCode = function(value) {
-  var hash = 0;
-  for (var i = 0; i < value.length; ++i) {
-    hash = ((hash << 5) - hash) + value.charCodeAt(i);
-    hash = hash & hash;  // Convert to 32-bit integer.
-  }
-  return hash;
-};
-
-
-/**
- * Compute hash key for an array.
- * @param {!Array.<Object>} values
- * @return {string}
- */
-lf.index.hashArray = function(values) {
-  var keys = values.map(function(value) {
-    return goog.isDefAndNotNull(value) ?
-        lf.index.hashCode(value.toString()).toString(32) : '';
-  });
-
-  return keys.join('_');
 };
 
 /**
@@ -25896,6 +26029,7 @@ goog.provide('lf.index.Map');
 goog.require('goog.asserts');
 goog.require('goog.structs.Map');
 goog.require('goog.structs.Set');
+goog.require('lf.index');
 goog.require('lf.index.Index');
 goog.require('lf.index.KeyRange');
 
@@ -25971,7 +26105,7 @@ lf.index.Map.prototype.cost = function(opt_keyRange) {
 
 
 /** @override */
-lf.index.Map.prototype.getRange = function(opt_keyRange) {
+lf.index.Map.prototype.getRange = function(opt_keyRange, opt_limit, opt_skip) {
   var results = [];
 
   var keyRange = opt_keyRange || lf.index.KeyRange.all();
@@ -25983,7 +26117,7 @@ lf.index.Map.prototype.getRange = function(opt_keyRange) {
     }
   }, this);
 
-  return results;
+  return lf.index.slice(results, opt_limit, opt_skip);
 };
 
 
@@ -26550,6 +26684,7 @@ lf.tree.getLeafNodes = function(node) {
  * Removes a node from a tree. It takes care of re-parenting the children of the
  * removed node with its parent (if any).
  * @param {!goog.structs.TreeNode} node The node to be removed.
+ * @return {goog.structs.TreeNode}
  */
 lf.tree.removeNode = function(node) {
   var parentNode = node.getParent();
@@ -26566,6 +26701,7 @@ lf.tree.removeNode = function(node) {
           parentNode.addChildAt(child, originalIndex + index);
         }
       });
+  return parentNode;
 };
 
 
@@ -28293,7 +28429,8 @@ lf.Type = {
   DATE_TIME: 2,
   INTEGER: 3,
   NUMBER: 4,
-  STRING: 5
+  STRING: 5,
+  OBJECT: 6
 };
 
 /**
@@ -29170,9 +29307,6 @@ lf.query.SelectContext = function() {
   /** @type {!lf.Predicate} */
   this.where;
 
-  /** @type {!lf.query.SelectContext.InnerJoin_} */
-  this.innerJoin;
-
   /** @type {number} */
   this.limit;
 
@@ -29192,15 +29326,6 @@ lf.query.SelectContext = function() {
    */
   this.currentVersion = 0;
 };
-
-
-/**
- * @typedef {{
- *     table: !lf.schema.Table,
- *     predicate: !lf.Predicate}}
- * @private
- */
-lf.query.SelectContext.InnerJoin_;
 
 
 /**
@@ -30456,15 +30581,19 @@ lf.proc.TableAccessByRowIdStep.prototype.exec = function(journal) {
  *
  * @param {!lf.schema.Index} index
  * @param {!Array.<!lf.index.KeyRange>} keyRanges
+ * @param {!lf.Order} order The order in which results will be returned.
  */
-lf.proc.IndexRangeScanStep = function(index, keyRanges) {
+lf.proc.IndexRangeScanStep = function(index, keyRanges, order) {
   lf.proc.IndexRangeScanStep.base(this, 'constructor');
 
-  /** @private {!lf.schema.Index} */
-  this.index_ = index;
+  /** @type {!lf.schema.Index} */
+  this.index = index;
 
   /** @private {!Array.<!lf.index.KeyRange>} */
   this.keyRanges_ = keyRanges;
+
+  /** @type {!lf.Order} */
+  this.order = order;
 };
 goog.inherits(lf.proc.IndexRangeScanStep, lf.proc.PhysicalQueryPlanNode);
 
@@ -30472,20 +30601,25 @@ goog.inherits(lf.proc.IndexRangeScanStep, lf.proc.PhysicalQueryPlanNode);
 /** @override */
 lf.proc.IndexRangeScanStep.prototype.toString = function() {
   return 'index_range_scan(' +
-      this.index_.getNormalizedName() + ', ' +
-      this.keyRanges_.toString() + ')';
+      this.index.getNormalizedName() + ', ' +
+      this.keyRanges_.toString() + ', ' +
+      (this.order == lf.Order.ASC ? 'ASC' : 'DESC') + ')';
 };
 
 
 /** @override */
 lf.proc.IndexRangeScanStep.prototype.exec = function(journal) {
-  var rowIds = journal.getIndexRange(this.index_, this.keyRanges_);
+  var rowIds = journal.getIndexRange(this.index, this.keyRanges_);
+  if (this.order == lf.Order.DESC) {
+    rowIds.reverse();
+  }
+
   var rows = rowIds.map(function(rowId) {
     return new lf.Row(rowId, {});
   }, this);
 
   return goog.Promise.resolve(lf.proc.Relation.fromRows(
-      rows, [this.index_.tableName]));
+      rows, [this.index.tableName]));
 };
 
 
@@ -30961,6 +31095,38 @@ lf.proc.UserQueryTask.prototype.scheduleObserverTask_ = function() {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+goog.provide('lf.query.DeleteContext');
+
+
+
+/**
+ * Internal representation of a DELETE query.
+ * @constructor
+ */
+lf.query.DeleteContext = function() {
+  /** @type {!lf.schema.Table} */
+  this.from;
+
+  /** @type {!lf.Predicate} */
+  this.where;
+};
+
+/**
+ * @license
+ * Copyright 2014 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 goog.provide('lf.query.InsertContext');
 
 
@@ -30996,11 +31162,67 @@ lf.query.InsertContext = function() {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+goog.provide('lf.query.UpdateContext');
+goog.provide('lf.query.UpdateContext.Set');
+
+
+
+/**
+ * Internal representation of an UPDATE query.
+ * @constructor
+ */
+lf.query.UpdateContext = function() {
+  /** @type {!lf.schema.Table} */
+  this.table;
+
+  /** @type {!Array.<!lf.query.UpdateContext.Set>} */
+  this.set;
+
+  /** @type {!lf.Predicate} */
+  this.where;
+};
+
+
+/**
+ * @typedef {{
+ *     binding: number,
+ *     column: !lf.schema.Column,
+ *     value: *}}
+ */
+lf.query.UpdateContext.Set;
+
+/**
+ * @license
+ * Copyright 2014 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 goog.provide('lf.query.toSql');
 
+goog.require('lf.Binder');
+goog.require('lf.Exception');
+goog.require('lf.Order');
 goog.require('lf.Row');
 goog.require('lf.Type');
+goog.require('lf.eval.Type');
+goog.require('lf.pred.CombinedPredicate');
+goog.require('lf.pred.JoinPredicate');
+goog.require('lf.pred.Operator');
+goog.require('lf.pred.ValuePredicate');
+goog.require('lf.query.DeleteContext');
 goog.require('lf.query.InsertContext');
+goog.require('lf.query.SelectContext');
+goog.require('lf.query.UpdateContext');
 
 
 /**
@@ -31052,6 +31274,239 @@ lf.query.insertToSql_ = function(query) {
 
 
 /**
+ * @param {!lf.eval.Type} op
+ * @return {string}
+ * @private
+ */
+lf.query.evaluatorToSql_ = function(op) {
+  switch (op) {
+    case lf.eval.Type.BETWEEN:
+      return 'BETWEEN';
+    case lf.eval.Type.EQ:
+      return '=';
+    case lf.eval.Type.GTE:
+      return '>=';
+    case lf.eval.Type.GT:
+      return '>';
+    case lf.eval.Type.IN:
+      return 'IN';
+    case lf.eval.Type.LTE:
+      return '<=';
+    case lf.eval.Type.LT:
+      return '<';
+    case lf.eval.Type.MATCH:
+      return 'LIKE';
+    case lf.eval.Type.NEQ:
+      return '<>';
+    default:
+      return 'UNKNOWN';
+  }
+};
+
+
+/**
+ * @param {!lf.Binder|Array|ArrayBuffer|Date|boolean|null|number|string} value
+ * @param {!lf.eval.Type} op
+ * @param {!lf.Type} type
+ * @return {string}
+ * @private
+ */
+lf.query.valueToSql_ = function(value, op, type) {
+  if (value instanceof lf.Binder) {
+    return '?' + value.getIndex().toString();
+  } else if (op == lf.eval.Type.MATCH) {
+    return '\'' + value.toString() + '\'';
+  } else if (op == lf.eval.Type.IN) {
+    var array = /** @type {Array} */ (value);
+    var vals = array.map(function(e) {
+      return lf.query.escapeSqlValue_(type, e);
+    });
+    return '(' + vals.join(', ') + ')';
+  } else if (op == lf.eval.Type.BETWEEN) {
+    return lf.query.escapeSqlValue_(type, value[0]) +
+        ' AND ' +
+        lf.query.escapeSqlValue_(type, value[1]);
+  }
+
+  return lf.query.escapeSqlValue_(
+      type,
+      /** @type {ArrayBuffer|Date|boolean|null|number|string} */
+      (value)).toString();
+};
+
+
+/**
+ * @param {!lf.pred.ValuePredicate} pred
+ * @return {string}
+ * @private
+ */
+lf.query.valuePredicateToSql_ = function(pred) {
+  return [
+    pred.column.getNormalizedName(),
+    lf.query.evaluatorToSql_(pred.evaluatorType),
+    lf.query.valueToSql_(pred.value, pred.evaluatorType, pred.column.getType())
+  ].join(' ');
+};
+
+
+/**
+ * @param {!lf.pred.CombinedPredicate} pred
+ * @return {string}
+ * @private
+ */
+lf.query.combinedPredicateToSql_ = function(pred) {
+  var children = pred.getChildren().map(function(childNode) {
+    return '(' + lf.query.parseSearchCondition_(
+        /** @type {!lf.Predicate} */ (childNode)) + ')';
+  });
+  var joinToken = (pred.operator == lf.pred.Operator.AND) ? ' AND ' : ' OR ';
+  return children.join(joinToken);
+};
+
+
+/**
+ * @param {!lf.pred.JoinPredicate} pred
+ * @return {string}
+ * @private
+ */
+lf.query.joinPredicateToSql_ = function(pred) {
+  return [
+    pred.leftColumn.getNormalizedName(),
+    lf.query.evaluatorToSql_(pred.evaluatorType),
+    pred.rightColumn.getNormalizedName()
+  ].join(' ');
+};
+
+
+/**
+ * @param {!lf.Predicate} pred
+ * @return {string}
+ * @private
+ */
+lf.query.parseSearchCondition_ = function(pred) {
+  if (pred instanceof lf.pred.ValuePredicate) {
+    return lf.query.valuePredicateToSql_(pred);
+  } else if (pred instanceof lf.pred.CombinedPredicate) {
+    return lf.query.combinedPredicateToSql_(pred);
+  } else if (pred instanceof lf.pred.JoinPredicate) {
+    return lf.query.joinPredicateToSql_(pred);
+  }
+
+  throw new lf.Exception(lf.Exception.Type.NOT_SUPPORTED,
+      'toSql does not support predicate type: ' + typeof(pred));
+};
+
+
+/**
+ * @param {!lf.Predicate} pred
+ * @return {string}
+ * @private
+ */
+lf.query.predicateToSql_ = function(pred) {
+  var whereClause = lf.query.parseSearchCondition_(pred);
+  if (whereClause) {
+    return ' WHERE ' + whereClause;
+  }
+  return '';
+};
+
+
+/**
+ * @param {!lf.query.DeleteContext} query
+ * @return {string}
+ * @private
+ */
+lf.query.deleteToSql_ = function(query) {
+  var sql = 'DELETE FROM ' + query.from.getName();
+  if (query.where) {
+    sql += lf.query.predicateToSql_(query.where);
+  }
+  sql += ';';
+  return sql;
+};
+
+
+/**
+ * @param {!lf.query.UpdateContext} query
+ * @return {string}
+ * @private
+ */
+lf.query.updateToSql_ = function(query) {
+  var sql = 'UPDATE ' + query.table.getName() + ' SET ';
+  sql += query.set.map(function(set) {
+    var setter = set.column.getNormalizedName() + ' = ';
+    if (set.binding != -1) {
+      return setter + '?' + set.binding.toString();
+    }
+    return setter + lf.query.escapeSqlValue_(
+        set.column.getType(),
+        /** @type {ArrayBuffer|Date|boolean|null|number|string} */
+        (set.value)).toString();
+  }).join(', ');
+  if (query.where) {
+    sql += lf.query.predicateToSql_(query.where);
+  }
+  sql += ';';
+  return sql;
+};
+
+
+/**
+ * @param {!lf.query.SelectContext} query
+ * @return {string}
+ * @private
+ */
+lf.query.selectToSql_ = function(query) {
+  var colList = '*';
+  if (query.columns.length) {
+    colList = query.columns.map(function(col) {
+      if (col.getAlias()) {
+        return col.getNormalizedName() + ' AS ' + col.getAlias();
+      } else {
+        return col.getNormalizedName();
+      }
+    }).join(', ');
+  }
+
+  var fromList = query.from.map(function(table) {
+    if (table.getEffectiveName() != table.getName()) {
+      return table.getName() + ' AS ' + table.getEffectiveName();
+    } else {
+      return table.getName();
+    }
+  }).join(', ');
+
+  var sql = 'SELECT ' + colList + ' FROM ' + fromList;
+  if (query.where) {
+    sql += lf.query.predicateToSql_(query.where);
+  }
+
+  if (query.orderBy) {
+    var orderBy = query.orderBy.map(function(order) {
+      return order.column.getNormalizedName() +
+          ((order.order == lf.Order.DESC) ? ' DESC' : ' ASC');
+    }).join(', ');
+    sql += ' ORDER BY ' + orderBy;
+  }
+
+  if (query.groupBy) {
+    sql += ' GROUP BY ' + query.groupBy.getNormalizedName();
+  }
+
+  if (query.limit) {
+    sql += ' LIMIT ' + query.limit.toString();
+  }
+
+  if (query.skip) {
+    sql += ' SKIP ' + query.skip.toString();
+  }
+
+  sql += ';';
+  return sql;
+};
+
+
+/**
  * @param {!lf.query.BaseBuilder} builder
  * @return {string}
  */
@@ -31061,7 +31516,20 @@ lf.query.toSql = function(builder) {
     return lf.query.insertToSql_(query);
   }
 
-  return 'Not implemented';
+  if (query instanceof lf.query.DeleteContext) {
+    return lf.query.deleteToSql_(query);
+  }
+
+  if (query instanceof lf.query.UpdateContext) {
+    return lf.query.updateToSql_(query);
+  }
+
+  if (query instanceof lf.query.SelectContext) {
+    return lf.query.selectToSql_(query);
+  }
+
+  throw new lf.Exception(lf.Exception.Type.NOT_SUPPORTED,
+      'toSql not implemented for ' + typeof(query));
 };
 
 /**
@@ -31198,38 +31666,6 @@ lf.query.BaseBuilder.bindValuesInSearchCondition = function(context, values) {
       }
     });
   }
-};
-
-/**
- * @license
- * Copyright 2014 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-goog.provide('lf.query.DeleteContext');
-
-
-
-/**
- * Internal representation of a DELETE query.
- * @constructor
- */
-lf.query.DeleteContext = function() {
-  /** @type {!lf.schema.Table} */
-  this.from;
-
-  /** @type {!lf.Predicate} */
-  this.where;
 };
 
 /**
@@ -31789,13 +32225,13 @@ goog.require('lf.fn.AggregatedColumn');
  * @enum {string}
  */
 lf.fn.Type = {
-  AVG: 'avg',
-  COUNT: 'count',
-  DISTINCT: 'distinct',
-  MAX: 'max',
-  MIN: 'min',
-  STDDEV: 'stddev',
-  SUM: 'sum'
+  AVG: 'AVG',
+  COUNT: 'COUNT',
+  DISTINCT: 'DISTINCT',
+  MAX: 'MAX',
+  MIN: 'MIN',
+  STDDEV: 'STDDEV',
+  SUM: 'SUM'
 };
 
 
@@ -31884,6 +32320,76 @@ lf.fn.sum = function(col) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+goog.provide('lf.op');
+
+goog.require('lf.pred.CombinedPredicate');
+goog.require('lf.pred.Operator');
+
+
+/**
+ * @export
+ * @param {...!lf.Predicate} var_args
+ * @return {!lf.Predicate}
+ */
+lf.op.and = function(var_args) {
+  var args = Array.prototype.slice.call(arguments);
+  return lf.op.createPredicate_(lf.pred.Operator.AND, args);
+};
+
+
+/**
+ * @export
+ * @param {...!lf.Predicate} var_args
+ * @return {!lf.Predicate}
+ */
+lf.op.or = function(var_args) {
+  var args = Array.prototype.slice.call(arguments);
+  return lf.op.createPredicate_(lf.pred.Operator.OR, args);
+};
+
+
+/**
+ * @param {!lf.pred.Operator} operator
+ * @param {!Array<!lf.pred.PredicateNode>} predicates
+ * @return {!lf.Predicate}
+ * @private
+ */
+lf.op.createPredicate_ = function(operator, predicates) {
+  var condition = new lf.pred.CombinedPredicate(operator);
+
+  predicates.forEach(function(predicate) {
+    condition.addChild(predicate);
+  });
+  return condition;
+};
+
+
+/**
+ * @export
+ * @param {!lf.Predicate} operand
+ * @return {!lf.Predicate}
+ */
+lf.op.not = function(operand) {
+  operand.setComplement(true);
+  return operand;
+};
+
+/**
+ * @license
+ * Copyright 2014 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 goog.provide('lf.query.SelectBuilder');
 
 goog.require('lf.Exception');
@@ -31891,6 +32397,7 @@ goog.require('lf.Order');
 goog.require('lf.Type');
 goog.require('lf.fn.AggregatedColumn');
 goog.require('lf.fn.Type');
+goog.require('lf.op');
 goog.require('lf.query.BaseBuilder');
 goog.require('lf.query.Select');
 goog.require('lf.query.SelectContext');
@@ -31908,6 +32415,18 @@ goog.require('lf.query.SelectContext');
  */
 lf.query.SelectBuilder = function(global, columns) {
   lf.query.SelectBuilder.base(this, 'constructor', global);
+
+  /**
+   * Tracks whether where() has been called.
+   * @private {boolean}
+   */
+  this.whereAlreadyCalled_ = false;
+
+  /**
+   * Tracks whether from() has been called.
+   * @private {boolean}
+   */
+  this.fromAlreadyCalled_ = false;
 
   this.query = new lf.query.SelectContext();
   this.query.columns = columns;
@@ -32083,8 +32602,19 @@ lf.query.SelectBuilder.prototype.assertGreaterThanZero_ = function(
 
 /** @override */
 lf.query.SelectBuilder.prototype.from = function(var_args) {
-  this.assertNotAlreadyCalled_(this.query.from, 'from');
-  this.query.from = Array.prototype.slice.call(arguments);
+  if (this.fromAlreadyCalled_) {
+    throw new lf.Exception(
+        lf.Exception.Type.SYNTAX, 'from() has already been called.');
+  }
+  this.fromAlreadyCalled_ = true;
+
+  if (!goog.isDefAndNotNull(this.query.from)) {
+    this.query.from = [];
+  }
+
+  this.query.from.push.apply(
+      this.query.from,
+      Array.prototype.slice.call(arguments));
 
   return this;
 };
@@ -32092,21 +32622,40 @@ lf.query.SelectBuilder.prototype.from = function(var_args) {
 
 /** @override */
 lf.query.SelectBuilder.prototype.where = function(predicate) {
-  this.assertNotAlreadyCalled_(this.query.where, 'where');
-  this.query.where = predicate;
+  if (this.whereAlreadyCalled_) {
+    throw new lf.Exception(
+        lf.Exception.Type.SYNTAX, 'where() has already been called.');
+  }
+  this.whereAlreadyCalled_ = true;
 
+  this.augmentWhereClause_(predicate);
   return this;
+};
+
+
+/**
+ * Augments the where clause by ANDing it with the given predicate.
+ * @param {!lf.Predicate} predicate
+ * @private
+ */
+lf.query.SelectBuilder.prototype.augmentWhereClause_ = function(predicate) {
+  if (goog.isDefAndNotNull(this.query.where)) {
+    var newPredicate = lf.op.and(predicate, this.query.where);
+    this.query.where = newPredicate;
+  } else {
+    this.query.where = predicate;
+  }
 };
 
 
 /** @override */
 lf.query.SelectBuilder.prototype.innerJoin = function(table, predicate) {
-  this.assertNotAlreadyCalled_(this.query.innerJoin, 'innerJoin');
+  if (!goog.isDefAndNotNull(this.query.from)) {
+    this.query.from = [];
+  }
+  this.query.from.push(table);
 
-  this.query.innerJoin = {
-    table: table,
-    predicate: predicate
-  };
+  this.augmentWhereClause_(predicate);
 
   return this;
 };
@@ -32195,51 +32744,6 @@ lf.query.SelectBuilder.prototype.bind = function(values) {
   this.query.currentVersion++;
   return this;
 };
-
-/**
- * @license
- * Copyright 2014 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-goog.provide('lf.query.UpdateContext');
-goog.provide('lf.query.UpdateContext.Set');
-
-
-
-/**
- * Internal representation of an UPDATE query.
- * @constructor
- */
-lf.query.UpdateContext = function() {
-  /** @type {!lf.schema.Table} */
-  this.table;
-
-  /** @type {!Array.<!lf.query.UpdateContext.Set>} */
-  this.set;
-
-  /** @type {!lf.Predicate} */
-  this.where;
-};
-
-
-/**
- * @typedef {{
- *     binding: number,
- *     column: !lf.schema.Column,
- *     value: *}}
- */
-lf.query.UpdateContext.Set;
 
 /**
  * @license
@@ -32964,7 +33468,6 @@ goog.require('lf.proc.BaseLogicalPlanGenerator');
 goog.require('lf.proc.CrossProductNode');
 goog.require('lf.proc.CrossProductPass');
 goog.require('lf.proc.ImplicitJoinsPass');
-goog.require('lf.proc.JoinNode');
 goog.require('lf.proc.LimitNode');
 goog.require('lf.proc.LogicalPlanRewriter');
 goog.require('lf.proc.OrderByNode');
@@ -32988,9 +33491,6 @@ lf.proc.SelectLogicalPlanGenerator = function(query) {
 
   /** @private {Array.<!lf.proc.LogicalQueryPlanNode>} */
   this.tableAccessNodes_ = null;
-
-  /** @private {lf.proc.LogicalQueryPlanNode} */
-  this.joinNode_ = null;
 
   /** @private {lf.proc.LogicalQueryPlanNode} */
   this.crossProductNode_ = null;
@@ -33043,7 +33543,6 @@ lf.proc.SelectLogicalPlanGenerator.prototype.generateInternal = function() {
 lf.proc.SelectLogicalPlanGenerator.prototype.generateNodes_ = function() {
   this.generateTableAcessNodes_();
   this.generateCrossProductNode_();
-  this.generateJoinNode_();
   this.generateSelectNode_();
   this.generateOrderByNode_();
   this.generateSkipNode_();
@@ -33057,39 +33556,22 @@ lf.proc.SelectLogicalPlanGenerator.prototype.generateNodes_ = function() {
  * @private
  */
 lf.proc.SelectLogicalPlanGenerator.prototype.connectNodes_ = function() {
-  var tableAccessParentNode = this.joinNode_ || this.crossProductNode_ || null;
+  var parentOrder = [
+    this.projectNode_, this.limitNode_, this.skipNode_, this.orderByNode_,
+    this.selectNode_, this.crossProductNode_
+  ];
 
-  if (!goog.isNull(tableAccessParentNode)) {
-    this.tableAccessNodes_.forEach(function(tableAccessNode) {
-      tableAccessParentNode.addChild(tableAccessNode);
-    });
-  }
-
-  if (!goog.isNull(this.selectNode_)) {
-    this.selectNode_.addChild(
-        !goog.isNull(tableAccessParentNode) ?
-            tableAccessParentNode : this.tableAccessNodes_[0]);
-  }
-
-  var parentNodeSoFar =
-      this.selectNode_ || tableAccessParentNode || this.tableAccessNodes_[0];
-
-  /**
-   * Sets the specified node as the parent of the entire tree.
-   * @param {?lf.proc.LogicalQueryPlanNode} node The node to set as a parent, if
-   *     not null.
-   */
-  var setAsParent = function(node) {
-    if (!goog.isNull(node)) {
-      node.addChild(parentNodeSoFar);
-      parentNodeSoFar = node;
+  var lastExistingParentIndex = 0;
+  for (var i = 1; i < parentOrder.length; i++) {
+    if (!goog.isNull(parentOrder[i])) {
+      parentOrder[lastExistingParentIndex].addChild(parentOrder[i]);
+      lastExistingParentIndex = i;
     }
-  };
+  }
 
-  setAsParent(this.orderByNode_);
-  setAsParent(this.skipNode_);
-  setAsParent(this.limitNode_);
-  setAsParent(this.projectNode_);
+  this.tableAccessNodes_.forEach(function(tableAccessNode) {
+    parentOrder[lastExistingParentIndex].addChild(tableAccessNode);
+  });
 };
 
 
@@ -33099,20 +33581,6 @@ lf.proc.SelectLogicalPlanGenerator.prototype.generateTableAcessNodes_ =
   this.tableAccessNodes_ = this.query.from.map(function(table) {
     return new lf.proc.TableAccessNode(table);
   }, this);
-
-  if (this.query.innerJoin) {
-    // TODO(dpapad): Assert that from has exactly one table.
-    this.tableAccessNodes_.push(
-        new lf.proc.TableAccessNode(this.query.innerJoin.table));
-  }
-};
-
-
-/** @private */
-lf.proc.SelectLogicalPlanGenerator.prototype.generateJoinNode_ = function() {
-  if (this.query.innerJoin) {
-    this.joinNode_ = new lf.proc.JoinNode(this.query.innerJoin.predicate);
-  }
 };
 
 
@@ -33245,6 +33713,7 @@ goog.provide('lf.proc.IndexRangeScanPass');
 
 goog.require('goog.array');
 goog.require('goog.asserts');
+goog.require('lf.Order');
 goog.require('lf.pred.ValuePredicate');
 goog.require('lf.proc.IndexRangeScanStep');
 goog.require('lf.proc.RewritePass');
@@ -33464,7 +33933,7 @@ lf.proc.IndexRangeScanPass.replaceWithIndexRangeScanStep_ = function(
   }
 
   var indexRangeScanStep = new lf.proc.IndexRangeScanStep(
-      columnIndex, predicate.toKeyRange());
+      columnIndex, predicate.toKeyRange(), lf.Order.ASC);
   var tableAccessByRowIdStep = new lf.proc.TableAccessByRowIdStep(
       tableAccessFullStep.table);
   tableAccessByRowIdStep.addChild(indexRangeScanStep);
@@ -33718,6 +34187,199 @@ lf.proc.LimitStep.prototype.exec = function(journal) {
         return relation;
       }, this));
 
+};
+
+/**
+ * @license
+ * Copyright 2014 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+goog.provide('lf.proc.OrderByIndexPass');
+
+goog.require('goog.asserts');
+goog.require('lf.index.KeyRange');
+goog.require('lf.proc.IndexRangeScanStep');
+goog.require('lf.proc.OrderByStep');
+goog.require('lf.proc.RewritePass');
+goog.require('lf.proc.TableAccessByRowIdStep');
+goog.require('lf.proc.TableAccessFullStep');
+goog.require('lf.tree');
+
+
+
+/**
+ * The OrderByIndexPass is responsible for modifying a tree that has a
+ * OrderByStep node to an equivalent tree that leverages indices to perform
+ * sorting.
+ *
+ * @constructor
+ * @struct
+ * @extends {lf.proc.RewritePass.<!lf.proc.PhysicalQueryPlanNode>}
+ */
+lf.proc.OrderByIndexPass = function() {
+  lf.proc.OrderByIndexPass.base(this, 'constructor');
+};
+goog.inherits(lf.proc.OrderByIndexPass, lf.proc.RewritePass);
+
+
+/** @override */
+lf.proc.OrderByIndexPass.prototype.rewrite = function(rootNode) {
+  this.rootNode = rootNode;
+  this.traverse_(this.rootNode);
+  return this.rootNode;
+};
+
+
+/**
+ * Traverses each node of the tree starting at the given node, rewriting the
+ * tree if possible.
+ * @param {!lf.proc.PhysicalQueryPlanNode} rootNode The root node of the
+ *     sub-tree to be traversed.
+ * @private
+ */
+lf.proc.OrderByIndexPass.prototype.traverse_ = function(rootNode) {
+  var newRootNode = rootNode;
+  // TODO(dpapad): Currently only OrderByStep that sort by a single column are
+  // considered. Once multi-column indices are implemented (b/17486563), this
+  // needs to be updated such that it can optimize cases where sorting is
+  // performed by multiple columns, and a multi-column index exists for those
+  // columns.
+  if (rootNode instanceof lf.proc.OrderByStep &&
+      rootNode.orderBy.length == 1 &&
+      rootNode.orderBy[0].column.getIndices().length != 0) {
+    newRootNode = this.applyTableAccessFullOptimization_(rootNode);
+    if (newRootNode == rootNode) {
+      newRootNode = this.applyIndexRangeScanStepOptimization_(rootNode);
+    }
+  }
+
+  newRootNode.getChildren().forEach(
+      function(child) {
+        this.traverse_(
+            /** @type {!lf.proc.PhysicalQueryPlanNode} */ (child));
+      }, this);
+};
+
+
+/**
+ * Attempts to replace the OrderByStep with a new IndexRangeScanStep.
+ * @param {!lf.proc.OrderByStep} orderByStep
+ * @return {!lf.proc.PhysicalQueryPlanNode}
+ * @private
+ */
+lf.proc.OrderByIndexPass.prototype.applyTableAccessFullOptimization_ =
+    function(orderByStep) {
+  var rootNode = orderByStep;
+
+  var tableAccessFullStep = lf.proc.OrderByIndexPass.findTableAccessFullStep_(
+      /** @type {!lf.proc.PhysicalQueryPlanNode} */ (
+          orderByStep.getChildAt(0)));
+  if (!goog.isNull(tableAccessFullStep)) {
+    var orderBy = orderByStep.orderBy[0];
+    var columnIndex = orderBy.column.getIndices()[0];
+    var indexRangeScanStep = new lf.proc.IndexRangeScanStep(
+        columnIndex, [lf.index.KeyRange.all()], orderBy.order);
+    var tableAccessByRowIdStep = new lf.proc.TableAccessByRowIdStep(
+        tableAccessFullStep.table);
+    tableAccessByRowIdStep.addChild(indexRangeScanStep);
+
+    lf.tree.removeNode(orderByStep);
+    rootNode = /** @type {!lf.proc.PhysicalQueryPlanNode} */ (
+        lf.tree.replaceNodeWithChain(
+            tableAccessFullStep,
+            tableAccessByRowIdStep, indexRangeScanStep));
+  }
+
+  return rootNode;
+};
+
+
+/**
+ * Attempts to replace the OrderByStep with an existing IndexRangeScanStep.
+ * @param {!lf.proc.OrderByStep} orderByStep
+ * @return {!lf.proc.PhysicalQueryPlanNode}
+ * @private
+ */
+lf.proc.OrderByIndexPass.prototype.applyIndexRangeScanStepOptimization_ =
+    function(orderByStep) {
+  var rootNode = orderByStep;
+  var indexRangeScanStep = lf.proc.OrderByIndexPass.findIndexRangeScanStep_(
+      orderByStep.orderBy[0],
+      /** @type {!lf.proc.PhysicalQueryPlanNode} */ (
+          orderByStep.getChildAt(0)));
+  if (!goog.isNull(indexRangeScanStep)) {
+    indexRangeScanStep.order = orderByStep.orderBy[0].order;
+    rootNode = /** @type {!lf.proc.PhysicalQueryPlanNode} */ (
+        lf.tree.removeNode(orderByStep));
+  }
+
+  return rootNode;
+};
+
+
+/**
+ * Finds any existing IndexRangeScanStep that can be used to produce the
+ * requested ordering instead of the OrderByStep.
+ * @param {!lf.query.SelectContext.OrderBy} orderBy
+ * @param {!lf.proc.PhysicalQueryPlanNode} currentNode
+ * @return {lf.proc.IndexRangeScanStep}
+ * @private
+ */
+lf.proc.OrderByIndexPass.findIndexRangeScanStep_ = function(
+    orderBy, currentNode) {
+  if (currentNode instanceof lf.proc.IndexRangeScanStep &&
+      currentNode.index.columnNames[0] == orderBy.column.getName()) {
+    return currentNode;
+  }
+
+  // CrossProductStep and JoinStep nodes have more than one child, and mess up
+  // the ordering of results. Therefore if such nodes exist this optimization
+  // can not be applied.
+  if (currentNode.getChildCount() != 1) {
+    return null;
+  }
+
+  return lf.proc.OrderByIndexPass.findIndexRangeScanStep_(
+      orderBy,
+      /** @type {!lf.proc.PhysicalQueryPlanNode} */ (
+          currentNode.getChildAt(0)));
+};
+
+
+/**
+ * Finds any existing TableAccessFullStep that can converted to an
+ * IndexRangeScanStep instead of using an explicit OrderByStep.
+ * @param {!lf.proc.PhysicalQueryPlanNode} currentNode
+ * @return {lf.proc.TableAccessFullStep}
+ * @private
+ */
+lf.proc.OrderByIndexPass.findTableAccessFullStep_ = function(
+    currentNode) {
+  if (currentNode instanceof lf.proc.TableAccessFullStep) {
+    return currentNode;
+  }
+
+  // CrossProductStep and JoinStep nodes have more than one child, and mess up
+  // the ordering of results. Therefore if such nodes exist this optimization
+  // can not be applied.
+  if (currentNode.getChildCount() != 1) {
+    return null;
+  }
+
+  return lf.proc.OrderByIndexPass.findTableAccessFullStep_(
+      /** @type {!lf.proc.PhysicalQueryPlanNode} */ (
+          currentNode.getChildAt(0)));
 };
 
 /**
@@ -34362,6 +35024,7 @@ goog.require('lf.proc.JoinNode');
 goog.require('lf.proc.JoinStep');
 goog.require('lf.proc.LimitNode');
 goog.require('lf.proc.LimitStep');
+goog.require('lf.proc.OrderByIndexPass');
 goog.require('lf.proc.OrderByNode');
 goog.require('lf.proc.OrderByStep');
 goog.require('lf.proc.PhysicalPlanRewriter');
@@ -34403,13 +35066,19 @@ lf.proc.PhysicalPlanFactory.prototype.create = function(
     return this.createPlan_(logicalQueryPlanRoot);
   }
 
+  if (logicalQueryPlanRoot instanceof lf.proc.ProjectNode) {
+    return this.createPlan_(
+        logicalQueryPlanRoot, [
+          new lf.proc.IndexRangeScanPass(this.global_),
+          new lf.proc.OrderByIndexPass()
+        ]);
+  }
+
   if ((logicalQueryPlanRoot instanceof lf.proc.DeleteNode) ||
-      (logicalQueryPlanRoot instanceof lf.proc.ProjectNode) ||
       (logicalQueryPlanRoot instanceof lf.proc.UpdateNode)) {
     return this.createPlan_(
         logicalQueryPlanRoot, [new lf.proc.IndexRangeScanPass(this.global_)]);
   }
-
 
   // Should never get here since all cases are handled above.
   goog.asserts.fail('Unknown query type.');
@@ -35983,72 +36652,3 @@ lf.Global.prototype.isRegistered = function(serviceId) {
   return this.services_.containsKey(serviceId.toString());
 };
 
-/**
- * @license
- * Copyright 2014 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-goog.provide('lf.op');
-
-goog.require('lf.pred.CombinedPredicate');
-goog.require('lf.pred.Operator');
-
-
-/**
- * @export
- * @param {...!lf.Predicate} var_args
- * @return {!lf.Predicate}
- */
-lf.op.and = function(var_args) {
-  var args = Array.prototype.slice.call(arguments);
-  return lf.op.createPredicate_(lf.pred.Operator.AND, args);
-};
-
-
-/**
- * @export
- * @param {...!lf.Predicate} var_args
- * @return {!lf.Predicate}
- */
-lf.op.or = function(var_args) {
-  var args = Array.prototype.slice.call(arguments);
-  return lf.op.createPredicate_(lf.pred.Operator.OR, args);
-};
-
-
-/**
- * @param {!lf.pred.Operator} operator
- * @param {!Array<!lf.pred.PredicateNode>} predicates
- * @return {!lf.Predicate}
- * @private
- */
-lf.op.createPredicate_ = function(operator, predicates) {
-  var condition = new lf.pred.CombinedPredicate(operator);
-
-  predicates.forEach(function(predicate) {
-    condition.addChild(predicate);
-  });
-  return condition;
-};
-
-
-/**
- * @export
- * @param {!lf.Predicate} operand
- * @return {!lf.Predicate}
- */
-lf.op.not = function(operand) {
-  operand.setComplement(true);
-  return operand;
-};

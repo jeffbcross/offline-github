@@ -1,8 +1,9 @@
+var fs = require('fs');
 var gulp = require('gulp');
+var jshint = require('gulp-jshint');
 var karma = require('karma').server;
 var spawn = require('child_process').spawn;
 var webserver = require('gulp-webserver');
-var jshint = require('gulp-jshint');
 
 gulp.task('lint', function() {
   return gulp.src([
@@ -66,6 +67,12 @@ gulp.task('generatedb', function(done) {
     console.log('child process exited with code ' + code);
     done()
   });
+});
+
+gulp.task('copylovefieldlib', function() {
+  return fs.
+    createReadStream('node_modules/lovefield/dist/lovefield.js').
+    pipe(fs.createWriteStream('client/lovefield.js'));
 });
 
 gulp.task('default', ['generatedb', 'webserver']);
