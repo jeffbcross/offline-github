@@ -1,6 +1,6 @@
 (function() {
 
-function IssuesListController ($http, $scope, $routeParams, db,
+function IssuesListController ($http, $location, $scope, $routeParams, db,
     issuesCacheUpdater, lovefieldQueryBuilder, mockIssues, firebaseAuth) {
   var ITEMS_PER_PAGE = 30;
   var observeQuery;
@@ -9,6 +9,7 @@ function IssuesListController ($http, $scope, $routeParams, db,
     repository: $routeParams.repo,
     organization: $routeParams.org
   });
+  var page = $routeParams.page || 0;
 
   $scope.issues = [];
   $scope.$on('$locationChangeStart', updateQueryAndSubscription);
@@ -22,6 +23,15 @@ function IssuesListController ($http, $scope, $routeParams, db,
     });
 
   $scope.$on('$destroy', unobserve);
+
+  $scope.getPage = function() {
+    return page;
+  };
+
+  $scope.setPage = function(num) {
+    page = num;
+    $location.search('page', page);
+  }
 
 
   function updateQueryAndSubscription(page,state,search) {
@@ -170,18 +180,13 @@ function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
 
   function insertData(res) {
     var issuesInsert = res.data.map(function(issue) {
-      if (issue.id === 55113588) {
-        console.log('here is the offender', issue);
-      }
       return table.createRow(issueStorageTranslator(issue));
     });
-    console.log('start insertOrReplace');
     db.insertOrReplace().into(table).values(issuesInsert).exec().then(function() {
       console.log('done inserting');
     }, function(e) {
       console.log('problem inserting', e.stack);
     });
-    console.log('end insertOrReplace');
     return res;
   }
 
@@ -233,8 +238,8 @@ angular.module('ghIssuesApp').
           issuesCacheUpdaterFactory]).
   controller(
       'IssuesListController',
-      ['$http', '$scope', '$routeParams', 'db', 'issuesCacheUpdater',
-          'lovefieldQueryBuilder', 'mockIssues', 'firebaseAuth',
-          IssuesListController]);
+      ['$http', '$location', '$scope', '$routeParams', 'db',
+          'issuesCacheUpdater', 'lovefieldQueryBuilder', 'mockIssues',
+          'firebaseAuth', IssuesListController]);
 
 }());

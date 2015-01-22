@@ -1,5 +1,23 @@
 <div class="container">
   <div class="col-lg-12">
-    <gho-issues-list pages="pages" issues="issues" error="error"></gho-issues-list>
+    <div>
+      <h2>Issues List</h2>
+      <div class="alert alert-warning" ng-show="error">{{error}}</div>
+
+      <ul>
+        <li ng-repeat="issue in issues track by issue.id">
+          {{issue.title}}
+        </li>
+      </ul>
+
+      <nav>
+        Page:
+        <span ng-repeat="i in pages track by $index">
+          <button ng-disabled="getPage() == $index" ng-click="setPage($index)">
+            {{$index}}
+          </button>
+        </span>
+      </nav>
+    </div>
   </div>
 </div>
