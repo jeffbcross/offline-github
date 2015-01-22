@@ -25,19 +25,27 @@ describe('LocalModelCollection', function() {
 
 
     //It's using Array.observe semantics. Need to think about how we want to expose this to the user.
-    it('should notify the observable when the Lovefield data changes for the specified query',
+    fit('should notify the observable when the Lovefield data changes for the specified query',
         function(done) {
       var time = (new Date).getTime();
       var successSpy = jasmine.createSpy('success');
       var errorSpy = jasmine.createSpy('error');
       var doneSpy = jasmine.createSpy('done');
       setTimeout(function() {
-        //dump(successSpy.calls.argsFor(0)[0])
+        dump(successSpy.calls.count())
+        dump(errorSpy.calls.count())
+        dump(doneSpy.calls.count())
+        var changes = successSpy.calls.argsFor(0)[0].length;
+        expect(changes).toBe(2);
         expect(successSpy.calls.count()).toBe(1);
+        subject.dispose();
         done();
       }, 100);
 
-      Issues.subscribe({id: time}).subscribe(successSpy, errorSpy, doneSpy);
+      var subject = Issues.subscribe({id: time});
+      subject.subscribe(successSpy, function(e) {
+        dump(e.message);
+      }, doneSpy);
 
       var table = db.getSchema().getIssues();
       var issue1 = angular.copy(mockIssues()[29]);
@@ -53,7 +61,7 @@ describe('LocalModelCollection', function() {
         insertOrReplace().
         into(table).
         values(rows).
-        exec().then(console.log.bind(console), function(e) {
+        exec().then(null, function(e) {
           console.error(e.stack);
         })
     });

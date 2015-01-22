@@ -7,6 +7,7 @@ function LocalModelCollectionFactory(lovefieldQueryBuilder, getTable) {
   }
 
   Collection.prototype.subscribe = function(query) {
+    var self = this;
     var schema = getTable(this._db.getSchema(), this._name);
     var predicate = lovefieldQueryBuilder(query || {});
 
@@ -15,13 +16,18 @@ function LocalModelCollectionFactory(lovefieldQueryBuilder, getTable) {
       from(schema).
       where(predicate);
 
-    var observer =  Rx.Observable.fromCallback(this._db.observe.bind(this._db));
-    return observer(observeQuery);
+    return Rx.Observable.fromCallback(this._db.observe.bind(this._db))(observeQuery);
   };
 
   return function(name, db) {
     return new Collection(name, db);
   };
+
+
+  function trimChanges(lastLength, list) {
+    // dump('trimChanges', lastLength, list.length);
+    return list.slice(lastLength);
+  }
 }
 
 

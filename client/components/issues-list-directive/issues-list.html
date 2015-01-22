@@ -1,12 +1,13 @@
 <div>
   <h2>Issues List</h2>
+  <div class="alert alert-warning" ng-show="error">{{error}}</div>
   <label for="filterText">
     Filter Issues
     <input name="filterText" ng-model="filterText" placeholder="filter issues">
   </label>
 
   <ul>
-    <li ng-repeat="issue in issues | filter:filterText | page:page:limit | limitTo:limit">
+    <li ng-repeat="issue in issues | filter:filterText | page:page:limit | limitTo:limit track by issue.id">
       {{issue.title}}
     </li>
   </ul>

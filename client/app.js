@@ -50,12 +50,11 @@ function run($rootScope, $route, $location, $window, firebaseAuth) {
 
 angular.module('ghIssuesApp', [
     'ngRoute',
-    'ghoCacheModel',
-    'ghoIssuesListDirective',
-    'ghoIssuesService',
     'ghoFirebaseAuth',
-    'ghoOrganizationsService',
-    'ghoRepositoriesService'
+    'ghoIssuesListDirective',
+    'ghoLovefieldQueryFactory',
+    'mockIssues'
+
   ]).
   config(['$httpProvider', '$routeProvider', config]).
   run(['$rootScope', '$route', '$location', '$window', 'firebaseAuth', run]);

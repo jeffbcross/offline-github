@@ -6,6 +6,7 @@ function ghoIssuesListDirective() {
     templateUrl: 'components/issues-list-directive/issues-list.html',
     scope: {
       issues: '=',
+      error: '=',
       page: '@',
       limit: '@'
     },

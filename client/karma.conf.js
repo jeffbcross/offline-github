@@ -22,7 +22,7 @@ module.exports = function(config) {
       'bower_components/angular-route/angular-route.js',
       'bower_components/rxjs/dist/rx.all.js',
       'test/helper-modules.js',
-      'lovefield.min.js',
+      'lovefield.js',
       'db/github_db_gen.js',
       'test/mock-issues.js',
       'test/mock-orgs.js',
