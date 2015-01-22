@@ -3,6 +3,7 @@
 function IssuesListController ($http, $location, $scope, $routeParams, db,
     issuesCacheUpdater, lovefieldQueryBuilder, mockIssues, firebaseAuth) {
   var ITEMS_PER_PAGE = 30;
+  var COUNT_PROPERTY_NAME = 'COUNT(id)';
   var observeQuery;
   var table = db.getSchema().getIssues();
   var predicate = lovefieldQueryBuilder({
@@ -15,8 +16,9 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
   $scope.$on('$locationChangeStart', updateQueryAndSubscription);
 
   getAndRenderIssues(db).
+    then(renderData).
     then(countPages).
-    then(updateCount).
+    then(renderPageCount).
     then(subscribeToIssues).
     then(function() {
       issuesCacheUpdater(db);
@@ -55,31 +57,32 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
       then(subscribeToIssues);
   }
 
-  function getStandardQuery() {
+  function getBaseQuery() {
+    return Promise.resolve(db.
+      select(table.number, table.id, table.comments, table.title).
+      from(table).
+      limit(ITEMS_PER_PAGE));
+  }
+
+  function paginate(query) {
     var pageNum = 0;
 
     if(angular.isDefined($routeParams.page)) {
       pageNum = parseInt($routeParams.page, 10);
     }
 
-    //Get initial value
-
-    var query = db.
-      select(table.number, table.id, table.comments, table.title).
-      from(table).
-      limit(ITEMS_PER_PAGE);
-
     if(pageNum) {
       //Skip throws if passed a zero
-      query = query.
-        skip(pageNum * ITEMS_PER_PAGE);
+      query.skip(pageNum * ITEMS_PER_PAGE);
     }
 
-    query.
+    return query;
+  }
+
+  function orderAndPredicate(query) {
+    return query.
       orderBy(table.number, lf.Order.DESC).
       where(predicate);
-
-    return query;
   }
 
   function getCountQuery() {
@@ -98,23 +101,16 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
   }
 
   function countPages() {
-    return getCountQuery().
-      exec();
-  }
-
-  function updateCount(count) {
-    var pages = Math.ceil(count[0]['COUNT(id)'] / ITEMS_PER_PAGE);
-    $scope.$apply(function(){
-      $scope.pages=new Array(pages);
-    });
+    return getCountQuery().exec();
   }
 
   function getAndRenderIssues() {
-    getStandardQuery().
-      exec().
-      then(renderData);
-
-    return Promise.resolve(db);
+    return getBaseQuery().
+      then(paginate).
+      then(orderAndPredicate).
+      then(function(q) {
+        return q.exec();
+      });
   }
 
   function subscribeToIssues() {
@@ -128,14 +124,6 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
     db.observe(observeQuery, updateData);
   }
 
-  function insertFakeData(db) {
-    var issuesInsert = mockIssues().map(function(issue) {
-      return table.createRow(issueStorageTranslator(issue));
-    });
-    db.insertOrReplace().into(table).values(issuesInsert).exec();
-    return db;
-  }
-
   function showError() {
     $scope.error = 'Could not update issues from server';
   }
@@ -143,20 +131,25 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
   function renderData(issues) {
     $scope.$apply(function() {
       $scope.issues = issues;
-    })
+    });
+  }
+
+  function renderPageCount(count) {
+    var pages = Math.ceil(count[0][COUNT_PROPERTY_NAME] / ITEMS_PER_PAGE);
+    $scope.$apply(function(){
+      $scope.pages=new Array(pages);
+    });
   }
 
   //TODO: eventually utilize observer changes if API can provide what we need
   function updateData () {
-    getStandardQuery().exec().then(function(issues){
-      console.log('updating issues', issues);
-      $scope.$apply(function() {
-        $scope.issues = issues;
-      });
-    });
-
-    countPages();
-    updateCount();
+    getBaseQuery().
+      then(paginate).
+      then(orderAndPredicate).
+      exec().
+      then(renderData).
+      then(countPages).
+      then(renderPageCount);
   }
 }
 
