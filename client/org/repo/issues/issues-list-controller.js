@@ -51,7 +51,7 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
     //Get initial value
 
     var query = db.
-      select(table.number, table.id, table.title).
+      select(table.number, table.id, table.comments, table.title).
       from(table).
       limit(ITEMS_PER_PAGE);
 
@@ -61,7 +61,9 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
         skip(pageNum * ITEMS_PER_PAGE);
     }
 
-    query.where(predicate);
+    query.
+      orderBy(table.number, lf.Order.DESC).
+      where(predicate);
 
     return query;
   }
@@ -102,7 +104,11 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
   }
 
   function subscribeToIssues() {
-    observeQuery = db.select().from(table).where(predicate)
+    observeQuery = db.select(
+        table.number,
+        table.id,
+        table.comments,
+        table.title).from(table).where(predicate)
 
     //Stay abreast of further updates
     db.observe(observeQuery, updateData);
@@ -144,32 +150,28 @@ function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
   var db;
   var table;
   var updatedAt
+  var totalAdded = 0;
   return function(_db_) {
     console.log('starting cache fetch');
     db = _db_;
     table = db.getSchema().getIssues();
-    updateIssuesCache(buildUpdateUrl(), true);
+    updateIssuesCache(buildUpdateUrl());
   }
 
-  function updateIssuesCache (url, firstTime) {
+  function updateIssuesCache (url) {
     $http.get(url).
       then(insertData).
       then(function(res) {
-        console.log('got response', res.headers());
+        console.log('got response', res);
         var nextPage = getNextPageUrl(res);
-        if (firstTime && res.data && res.data.length) {
+        if (res.data && res.data.length) {
           updatedAt = res.data[0].updated_at;
+          localStorage.setItem(localKeyBuilder($routeParams.org, $routeParams.repo), updatedAt)
           console.log('set updatedAt', updatedAt);
         }
 
         if (nextPage) {
           updateIssuesCache(nextPage);
-        } else if (updatedAt) {
-          //All done fetching, let's make a note of it.
-          console.log('saving timestamp to localStorage');
-          localStorage.setItem(localKeyBuilder($routeParams.org, $routeParams.repo), updatedAt)
-        } else {
-          console.log('No updated at timestamp :(')
         }
       });
   }
@@ -179,15 +181,19 @@ function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
   }
 
   function insertData(res) {
+    totalAdded += (res && res.data && res.data.length) || 0;
+    console.log('adding more data', totalAdded);
+    console.log('res', res);
     var issuesInsert = res.data.map(function(issue) {
       return table.createRow(issueStorageTranslator(issue));
     });
-    db.insertOrReplace().into(table).values(issuesInsert).exec().then(function() {
+    console.log('issuesInsert', issuesInsert)
+    return db.insertOrReplace().into(table).values(issuesInsert).exec().then(function() {
       console.log('done inserting');
+      return res;
     }, function(e) {
-      console.log('problem inserting', e.stack);
+      console.log('problem inserting', e.message);
     });
-    return res;
   }
 
   function buildUpdateUrl() {
@@ -203,6 +209,7 @@ function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
       'per_page=100&'+
       'state=all&'+
       'sort=updated&'+
+      'direction=asc&'+
       (lastUpdated?'since='+lastUpdated+'&':'')+
       'access_token='+
       firebaseAuth.getAuth().github.accessToken;
@@ -212,6 +219,7 @@ function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
     /*jshint camelcase: false */
     var newIssue = angular.copy(issue);
     newIssue.assignee = issue.assignee || -1;
+    newIssue.body = issue.body || '';
     newIssue.milestone = issue.milestone || -1;
     newIssue.created_at = new Date(issue.created_at);
     newIssue.updated_at = new Date(issue.updated_at);
@@ -220,7 +228,7 @@ function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
   };
 
   function getNextPageUrl (res) {
-    var linkHeader = res.headers('link')
+    var linkHeader = res && res.headers('link')
     if (!linkHeader) return undefined;
     var firstLinkTuple = linkHeader.
       split(', ')[0].
