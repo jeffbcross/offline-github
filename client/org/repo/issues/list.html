@@ -4,17 +4,37 @@
       <h2>Issues List</h2>
       <div class="alert alert-warning" ng-show="error">{{error}}</div>
 
+      <h3>
+        Page {{getPage()}} of {{pages.length}}
+      </h3>
+
+      <nav>
+        <ul class="pager">
+          <li class="previous" ng-class="{'disabled':getPage() == 0}">
+            <a ng-click="prevPage()">
+              Previous
+            </a>
+          </li>
+          <li class="next" ng-class="{'disabled':getPage() == pages.length - 1}">
+            <a ng-click="nextPage()">
+              Next
+            </a>
+          </li>
+        </ul>
+      </nav>
       <table class="table">
         <thead>
-          <th>
-            number
-          </th>
-          <th>
-            title
-          </th>
-          <th>
-            comments
-          </th>
+          <tr>
+            <th>
+              number
+            </th>
+            <th>
+              title
+            </th>
+            <th>
+              comments
+            </th>
+          </tr>
         </thead>
         <tbody>
           <tr ng-repeat="issue in issues track by issue.id">
@@ -30,15 +50,6 @@
           </tr>
         </tbody>
       </table>
-
-      <nav>
-        Page:
-        <span ng-repeat="i in pages track by $index">
-          <button ng-disabled="getPage() == $index" ng-click="setPage($index)">
-            {{$index}}
-          </button>
-        </span>
-      </nav>
     </div>
   </div>
 </div>

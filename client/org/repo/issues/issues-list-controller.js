@@ -9,7 +9,7 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
     repository: $routeParams.repo,
     organization: $routeParams.org
   });
-  var page = $routeParams.page || 0;
+  var page = parseInt($routeParams.page, 10) || 0;
 
   $scope.issues = [];
   $scope.$on('$locationChangeStart', updateQueryAndSubscription);
@@ -24,11 +24,25 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
 
   $scope.$on('$destroy', unobserve);
 
+  $scope.prevPage = function() {
+    if (page > 0) {
+      setPage(page-1);
+    }
+  };
+
+  $scope.nextPage = function() {
+    if ($scope.pages && page < $scope.pages.length) {
+      setPage(page+1);
+    } else if ($scope.pages && page > $scope.pages.length - 1) {
+      setPage($scope.pages.length - 1);
+    }
+  };
+
   $scope.getPage = function() {
     return page;
   };
 
-  $scope.setPage = function(num) {
+  function setPage(num) {
     page = num;
     $location.search('page', page);
   }
