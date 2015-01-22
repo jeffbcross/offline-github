@@ -1,18 +1,31 @@
 (function() {
 
-function ghoIssuesListDirective() {
+function ghoIssuesListDirective($location, $routeParams) {
   return {
     restrict: 'E',
     templateUrl: 'components/issues-list-directive/issues-list.html',
     scope: {
       issues: '=',
       error: '=',
-      page: '@',
+      pages: '=',
       limit: '@'
     },
     link: function(scope) {
-      scope.limit = scope.limit || 25;
-      scope.page = scope.page || 0;
+      var page = $routeParams.page || 0;
+      scope.$watch('page', function(newVal, oldVal) {
+        if (typeof oldVal === 'undefined' || newVal === oldVal) {
+          return;
+        }
+      });
+
+      scope.getPage = function() {
+        return page;
+      };
+
+      scope.setPage = function(num) {
+        page = num;
+        $location.search('page', page);
+      }
     }
   };
 }
@@ -36,7 +49,8 @@ function pagesFilter() {
 }
 
 angular.module('ghoIssuesListDirective', []).
-  directive('ghoIssuesList', [ghoIssuesListDirective]).
+  directive('ghoIssuesList', ['$location', '$routeParams',
+      ghoIssuesListDirective]).
   filter('page', [pageFilter]).
   filter('pages', [pagesFilter]);
 

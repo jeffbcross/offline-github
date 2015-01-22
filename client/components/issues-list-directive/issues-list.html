@@ -1,21 +1,17 @@
 <div>
   <h2>Issues List</h2>
   <div class="alert alert-warning" ng-show="error">{{error}}</div>
-  <label for="filterText">
-    Filter Issues
-    <input name="filterText" ng-model="filterText" placeholder="filter issues">
-  </label>
 
   <ul>
-    <li ng-repeat="issue in issues | filter:filterText | page:page:limit | limitTo:limit track by issue.id">
+    <li ng-repeat="issue in issues track by issue.id">
       {{issue.title}}
     </li>
   </ul>
 
   <nav>
     Page:
-    <span ng-repeat="i in issues | filter:filterText | pages:limit track by $index">
-      <button ng-disabled="$parent.page == $index" ng-click="$parent.page = $index">
+    <span ng-repeat="i in pages track by $index">
+      <button ng-disabled="getPage() == $index" ng-click="setPage($index)">
         {{$index}}
       </button>
     </span>

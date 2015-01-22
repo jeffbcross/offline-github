@@ -1,19 +1,89 @@
-(function(){
+(function() {
 
-function IssuesListController ($http, $scope, $routeParams,
+function IssuesListController ($http, $scope, $routeParams, db,
     lovefieldQueryBuilder, mockIssues, firebaseAuth) {
+  var ITEMS_PER_PAGE = 30;
+  var observeQuery;
   $scope.issues = [];
+  var queryStartTime = performance.now();
 
-  github.db.getInstance().
-    // then(getIssues).
-    // then(renderData).
-    then(subscribeToIssues);
-    // then(insertFakeData);
-    // then(updateIssues);
+  $scope.$on('$locationChangeStart', updateQueryAndSubscription);
+
+  getAndRenderIssues(db).
+    then(countPages).
+    then(subscribeToIssues);//.
+    // then(buildUpdateUrl);//.
+    // then(updateIssuesCache);
 
   $scope.$on('$destroy', function() {
-    console.log('TODO! add unobserver');
+
   });
+
+  function updateQueryAndSubscription(page,state,search) {
+    unobserve().
+      then(getAndRenderIssues).
+      then(countPages).
+      then(subscribeToIssues);
+  }
+
+  function unobserve () {
+    if (observeQuery) {
+      db.unobserve(observeQuery, updateData);
+      observeQuery = null;
+    }
+    return Promise.resolve(db);
+  }
+
+  function countPages(db) {
+    var table = db.getSchema().getIssues();
+    var predicate = lovefieldQueryBuilder({
+      repository: $routeParams.repo,
+      organization: $routeParams.org
+    });
+    var query = db.
+      select(lf.fn.count(table.id)).
+      from(table).
+      where(predicate).
+      exec().
+      then(function(count) {
+        var pages = Math.ceil(count[0]['COUNT(id)'] / ITEMS_PER_PAGE);
+        $scope.$apply(function(){
+          $scope.pages=new Array(pages);
+        });
+      });
+
+    return db;
+  }
+
+  function getAndRenderIssues(db) {
+    console.log('time to get instance', performance.now() - queryStartTime);
+    var table = db.getSchema().getIssues();
+    var predicate = lovefieldQueryBuilder({
+      repository: $routeParams.repo,
+      organization: $routeParams.org
+    });
+    var pageNum = angular.isDefined($routeParams.page) ? parseInt($routeParams.page, 10) : 0;
+
+    //Get initial value
+
+    var query = db.
+      select().
+      from(table).
+      limit(ITEMS_PER_PAGE);
+
+    if(pageNum) {
+      //Skip throws if passed a zero
+      query = query.
+        skip(pageNum * ITEMS_PER_PAGE);
+    }
+    console.log('time to begin first query: ', performance.now() - queryStartTime);
+    query.
+      where(predicate).
+      exec().
+      then(renderData);
+
+    return Promise.resolve(db);
+  }
 
   function subscribeToIssues(db) {
     var table = db.getSchema().getIssues();
@@ -21,11 +91,10 @@ function IssuesListController ($http, $scope, $routeParams,
       repository: $routeParams.repo,
       organization: $routeParams.org
     });
+    observeQuery = db.select().from(table).where(predicate)
 
-    //Get initial value
-    db.select().from(table).where(predicate).exec().then(renderData);
-    db.observe(db.select().from(table).where(predicate), updateData);
-    console.log('done observing')
+    //Stay abreast of further updates
+    db.observe(observeQuery, updateData);
     return db;
   }
 
@@ -38,45 +107,64 @@ function IssuesListController ($http, $scope, $routeParams,
     return db;
   }
 
-  function updateIssues() {
-    $http.get(
-        'https://api.github.com/repos/'+
-        $routeParams.org+
-        '/'+
-        $routeParams.repo+
-        '/issues?access_token='+
-        firebaseAuth.getAuth().github.accessToken).
+  function buildUpdateUrl() {
+    return 'https://api.github.com/repos/'+
+      $routeParams.org+
+      '/'+
+      $routeParams.repo+
+      '/issues?'+
+      'per_page=100&'+
+      'state=all&'+
+      'access_token='+
+      firebaseAuth.getAuth().github.accessToken;
+  }
+
+  function updateIssuesCache(url) {
+    $http.get(url).
       then(insertData).
+      then(function(res) {
+        var nextPage = getNextPageUrl(res);
+        if (nextPage) updateIssuesCache(nextPage);
+      }).
       then(null, showError);
   }
 
   function insertData(res) {
-    github.db.getInstance().then(function(db) {
-      var table = db.getSchema().getIssues();
-      var issuesInsert = res.data.map(function(issue) {
-        return table.createRow(issueStorageTranslator(issue));
-      });
-      db.insertOrReplace().into(table).values(issuesInsert).exec();
-      return db;
+    var table = db.getSchema().getIssues();
+    var issuesInsert = res.data.map(function(issue) {
+      return table.createRow(issueStorageTranslator(issue));
     });
+    db.insertOrReplace().into(table).values(issuesInsert).exec();
+
+    return res;
+  }
+
+  function getNextPageUrl (res) {
+    var linkHeader = res.headers('link')
+    if (!linkHeader) return undefined;
+    var firstLinkTuple = linkHeader.
+      split(', ')[0].
+      split('; rel=');
+    if (firstLinkTuple[1].replace(/"/g,'') === 'next') {
+      return firstLinkTuple[0].replace(/[<>]*/g, '');
+    }
   }
 
   function showError() {
-    console.log('show error');
     $scope.error = 'Could not update issues from server';
   }
 
   function renderData(issues) {
+    console.log('total query time: ', performance.now() - queryStartTime)
     $scope.$apply(function() {
       $scope.issues = issues;
     })
+    console.log('total query plus render time: ', performance.now() - queryStartTime)
   }
 
   function updateData (changes) {
-    console.log('renderData', changes);
     $scope.$apply(function() {
       $scope.issues = changes[0].object;
-      console.log('renderData', $scope.issues);
     })
   }
 
@@ -95,7 +183,7 @@ function IssuesListController ($http, $scope, $routeParams,
 angular.module('ghIssuesApp').
   controller(
       'IssuesListController',
-      ['$http', '$scope', '$routeParams', 'lovefieldQueryBuilder', 'mockIssues',
-          'firebaseAuth', IssuesListController]);
+      ['$http', '$scope', '$routeParams', 'db', 'lovefieldQueryBuilder',
+          'mockIssues', 'firebaseAuth', IssuesListController]);
 
 }());

@@ -1,4 +1,5 @@
 (function(){
+var db;
 
 function config($httpProvider, $routeProvider){
   $httpProvider.useApplyAsync(true);
@@ -29,12 +30,24 @@ function config($httpProvider, $routeProvider){
       resolve: {
         auth: function(firebaseAuth) {
           return firebaseAuth.getRouteAuth();
+        },
+        db: function() {
+          return getDB();
         }
-      }
+      },
+      reloadOnSearch: false
     }).
     otherwise({
       redirectTo: '/login'
     });
+}
+
+function getDB() {
+  if (db) return db;
+  return github.db.getInstance().then(function(_db){
+    db = _db;
+    return db;
+  });
 }
 
 function run($rootScope, $route, $location, $window, firebaseAuth) {
