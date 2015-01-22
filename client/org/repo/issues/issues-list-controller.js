@@ -4,9 +4,10 @@ function IssuesListController ($http, $scope, $routeParams, db,
     lovefieldQueryBuilder, mockIssues, firebaseAuth) {
   var ITEMS_PER_PAGE = 30;
   var observeQuery;
-  $scope.issues = [];
   var queryStartTime = performance.now();
+  var table = db.getSchema().getIssues();
 
+  $scope.issues = [];
   $scope.$on('$locationChangeStart', updateQueryAndSubscription);
 
   getAndRenderIssues(db).
@@ -15,9 +16,8 @@ function IssuesListController ($http, $scope, $routeParams, db,
     // then(buildUpdateUrl);//.
     // then(updateIssuesCache);
 
-  $scope.$on('$destroy', function() {
+  $scope.$on('$destroy', unobserve);
 
-  });
 
   function updateQueryAndSubscription(page,state,search) {
     unobserve().
@@ -26,38 +26,7 @@ function IssuesListController ($http, $scope, $routeParams, db,
       then(subscribeToIssues);
   }
 
-  function unobserve () {
-    if (observeQuery) {
-      db.unobserve(observeQuery, updateData);
-      observeQuery = null;
-    }
-    return Promise.resolve(db);
-  }
-
-  function countPages(db) {
-    var table = db.getSchema().getIssues();
-    var predicate = lovefieldQueryBuilder({
-      repository: $routeParams.repo,
-      organization: $routeParams.org
-    });
-    var query = db.
-      select(lf.fn.count(table.id)).
-      from(table).
-      where(predicate).
-      exec().
-      then(function(count) {
-        var pages = Math.ceil(count[0]['COUNT(id)'] / ITEMS_PER_PAGE);
-        $scope.$apply(function(){
-          $scope.pages=new Array(pages);
-        });
-      });
-
-    return db;
-  }
-
-  function getAndRenderIssues(db) {
-    console.log('time to get instance', performance.now() - queryStartTime);
-    var table = db.getSchema().getIssues();
+  function getStandardQuery() {
     var predicate = lovefieldQueryBuilder({
       repository: $routeParams.repo,
       organization: $routeParams.org
@@ -76,9 +45,46 @@ function IssuesListController ($http, $scope, $routeParams, db,
       query = query.
         skip(pageNum * ITEMS_PER_PAGE);
     }
-    console.log('time to begin first query: ', performance.now() - queryStartTime);
-    query.
-      where(predicate).
+
+    query.where(predicate);
+
+    return query;
+  }
+
+  function getCountQuery() {
+    var predicate = lovefieldQueryBuilder({
+      repository: $routeParams.repo,
+      organization: $routeParams.org
+    });
+    return db.
+      select(lf.fn.count(table.id)).
+      from(table).
+      where(predicate);
+  }
+
+  function unobserve () {
+    if (observeQuery) {
+      db.unobserve(observeQuery, updateData);
+      observeQuery = null;
+    }
+    return Promise.resolve(db);
+  }
+
+  function countPages(db) {
+    getCountQuery().
+      exec().
+      then(function(count) {
+        var pages = Math.ceil(count[0]['COUNT(id)'] / ITEMS_PER_PAGE);
+        $scope.$apply(function(){
+          $scope.pages=new Array(pages);
+        });
+      });
+
+    return db;
+  }
+
+  function getAndRenderIssues(db) {
+    getStandardQuery().
       exec().
       then(renderData);
 
@@ -86,7 +92,6 @@ function IssuesListController ($http, $scope, $routeParams, db,
   }
 
   function subscribeToIssues(db) {
-    var table = db.getSchema().getIssues();
     var predicate = lovefieldQueryBuilder({
       repository: $routeParams.repo,
       organization: $routeParams.org
@@ -99,7 +104,6 @@ function IssuesListController ($http, $scope, $routeParams, db,
   }
 
   function insertFakeData(db) {
-    var table = db.getSchema().getIssues();
     var issuesInsert = mockIssues().map(function(issue) {
       return table.createRow(issueStorageTranslator(issue));
     });
@@ -130,7 +134,6 @@ function IssuesListController ($http, $scope, $routeParams, db,
   }
 
   function insertData(res) {
-    var table = db.getSchema().getIssues();
     var issuesInsert = res.data.map(function(issue) {
       return table.createRow(issueStorageTranslator(issue));
     });
@@ -155,13 +158,13 @@ function IssuesListController ($http, $scope, $routeParams, db,
   }
 
   function renderData(issues) {
-    console.log('total query time: ', performance.now() - queryStartTime)
     $scope.$apply(function() {
       $scope.issues = issues;
     })
     console.log('total query plus render time: ', performance.now() - queryStartTime)
   }
 
+  //TODO: make this more efficient
   function updateData (changes) {
     $scope.$apply(function() {
       $scope.issues = changes[0].object;
