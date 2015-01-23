@@ -145,7 +145,7 @@ goog.exportPath_ = function(name, opt_object, opt_objectToExportTo) {
 
 
 /**
- * Defines a named value. In uncompiled mode, the value is retreived from
+ * Defines a named value. In uncompiled mode, the value is retrieved from
  * CLOSURE_DEFINES or CLOSURE_UNCOMPILED_DEFINES if the object is defined and
  * has the property specified, and otherwise used the defined defaultValue.
  * When compiled the default can be overridden using the compiler
@@ -179,7 +179,7 @@ goog.define = function(name, defaultValue) {
  * because they are generally used for debugging purposes and it is difficult
  * for the JSCompiler to statically determine whether they are used.
  */
-goog.DEBUG = true;
+goog.define('goog.DEBUG', true);
 
 
 /**
@@ -296,7 +296,7 @@ goog.constructNamespace_ = function(name, opt_obj) {
 
 /**
  * Module identifier validation regexp.
- * Note: This is a conservative check, it is very possible to be more lienent,
+ * Note: This is a conservative check, it is very possible to be more lenient,
  *   the primary exclusion here is "/" and "\" and a leading ".", these
  *   restrictions are intended to leave the door open for using goog.require
  *   with relative file paths rather than module identifiers.
@@ -785,8 +785,8 @@ goog.instantiatedSingletons_ = [];
 /**
  * @define {boolean} Whether to load goog.modules using {@code eval} when using
  * the debug loader.  This provides a better debugging experience as the
- * source is unmodified and can be edited using Chrome Workspaces or
- * similiar.  However in some environments the use of {@code eval} is banned
+ * source is unmodified and can be edited using Chrome Workspaces or similar.
+ * However in some environments the use of {@code eval} is banned
  * so we provide an alternative.
  */
 goog.define('goog.LOAD_MODULE_USING_EVAL', true);
@@ -960,7 +960,7 @@ if (goog.DEPENDENCIES_ENABLED) {
     }
   };
 
-  // On IE9 and ealier, it is necessary to handle
+  // On IE9 and earlier, it is necessary to handle
   // deferred module loads. In later browsers, the
   // code to be evaluated is simply inserted as a script
   // block in the correct order. To eval deferred
@@ -1626,12 +1626,12 @@ goog.getUid = function(obj) {
 
 
 /**
- * Whether the given object is alreay assigned a unique ID.
+ * Whether the given object is already assigned a unique ID.
  *
  * This does not modify the object.
  *
  * @param {!Object} obj The object to check.
- * @return {boolean} Whether there an assigned unique id for the object.
+ * @return {boolean} Whether there is an assigned unique id for the object.
  */
 goog.hasUid = function(obj) {
   return !!obj[goog.UID_PROPERTY_];
@@ -2328,7 +2328,7 @@ if (!COMPILED) {
  *
  * @param {Function} superClass The superclass, Object or null.
  * @param {goog.defineClass.ClassDescriptor} def
- *     An object literal describing the
+ *     An object literal describing
  *     the class.  It may have the following properties:
  *     "constructor": the constructor function
  *     "statics": an object literal containing methods to add to the constructor
@@ -2447,7 +2447,7 @@ goog.defineClass.OBJECT_PROTOTYPE_FIELDS_ = [
 // TODO(johnlenz): share this function with the goog.object
 /**
  * @param {!Object} target The object to add properties to.
- * @param {!Object} source The object to copy properites from.
+ * @param {!Object} source The object to copy properties from.
  * @private
  */
 goog.defineClass.applyProperties_ = function(target, source) {
@@ -2537,7 +2537,7 @@ goog.addDependency('async/conditionaldelay.js', ['goog.async.ConditionalDelay'],
 goog.addDependency('async/conditionaldelay_test.js', ['goog.async.ConditionalDelayTest'], ['goog.async.ConditionalDelay', 'goog.testing.MockClock', 'goog.testing.jsunit'], false);
 goog.addDependency('async/delay.js', ['goog.Delay', 'goog.async.Delay'], ['goog.Disposable', 'goog.Timer'], false);
 goog.addDependency('async/delay_test.js', ['goog.async.DelayTest'], ['goog.async.Delay', 'goog.testing.MockClock', 'goog.testing.jsunit'], false);
-goog.addDependency('async/nexttick.js', ['goog.async.nextTick', 'goog.async.throwException'], ['goog.debug.entryPointRegistry', 'goog.functions', 'goog.labs.userAgent.browser'], false);
+goog.addDependency('async/nexttick.js', ['goog.async.nextTick', 'goog.async.throwException'], ['goog.debug.entryPointRegistry', 'goog.functions', 'goog.labs.userAgent.browser', 'goog.labs.userAgent.engine'], false);
 goog.addDependency('async/nexttick_test.js', ['goog.async.nextTickTest'], ['goog.async.nextTick', 'goog.debug.ErrorHandler', 'goog.debug.entryPointRegistry', 'goog.dom', 'goog.labs.userAgent.browser', 'goog.testing.AsyncTestCase', 'goog.testing.MockClock', 'goog.testing.PropertyReplacer', 'goog.testing.jsunit'], false);
 goog.addDependency('async/run.js', ['goog.async.run'], ['goog.async.nextTick', 'goog.async.throwException', 'goog.testing.watchers'], false);
 goog.addDependency('async/run_test.js', ['goog.async.runTest'], ['goog.async.run', 'goog.testing.MockClock', 'goog.testing.jsunit', 'goog.testing.recordFunction'], false);
@@ -2894,7 +2894,7 @@ goog.addDependency('fs/filesystem.js', ['goog.fs.FileSystem'], [], false);
 goog.addDependency('fs/filesystemimpl.js', ['goog.fs.FileSystemImpl'], ['goog.fs.DirectoryEntryImpl', 'goog.fs.FileSystem'], false);
 goog.addDependency('fs/filewriter.js', ['goog.fs.FileWriter'], ['goog.fs.Error', 'goog.fs.FileSaver'], false);
 goog.addDependency('fs/fs.js', ['goog.fs'], ['goog.array', 'goog.async.Deferred', 'goog.fs.Error', 'goog.fs.FileReader', 'goog.fs.FileSystemImpl', 'goog.userAgent'], false);
-goog.addDependency('fs/fs_test.js', ['goog.fsTest'], ['goog.array', 'goog.async.Deferred', 'goog.async.DeferredList', 'goog.dom', 'goog.events', 'goog.fs', 'goog.fs.DirectoryEntry', 'goog.fs.Error', 'goog.fs.FileReader', 'goog.fs.FileSaver', 'goog.string', 'goog.testing.AsyncTestCase', 'goog.testing.PropertyReplacer', 'goog.testing.jsunit'], false);
+goog.addDependency('fs/fs_test.js', ['goog.fsTest'], ['goog.Promise', 'goog.array', 'goog.dom', 'goog.events', 'goog.fs', 'goog.fs.DirectoryEntry', 'goog.fs.Error', 'goog.fs.FileReader', 'goog.fs.FileSaver', 'goog.string', 'goog.testing.PropertyReplacer', 'goog.testing.jsunit'], false);
 goog.addDependency('fs/progressevent.js', ['goog.fs.ProgressEvent'], ['goog.events.Event'], false);
 goog.addDependency('functions/functions.js', ['goog.functions'], [], false);
 goog.addDependency('functions/functions_test.js', ['goog.functionsTest'], ['goog.functions', 'goog.testing.PropertyReplacer', 'goog.testing.jsunit', 'goog.testing.recordFunction'], false);
@@ -2929,7 +2929,7 @@ goog.addDependency('fx/transition.js', ['goog.fx.Transition', 'goog.fx.Transitio
 goog.addDependency('fx/transitionbase.js', ['goog.fx.TransitionBase', 'goog.fx.TransitionBase.State'], ['goog.events.EventTarget', 'goog.fx.Transition'], false);
 goog.addDependency('graphics/abstractgraphics.js', ['goog.graphics.AbstractGraphics'], ['goog.dom', 'goog.graphics.Path', 'goog.math.Coordinate', 'goog.math.Size', 'goog.style', 'goog.ui.Component'], false);
 goog.addDependency('graphics/affinetransform.js', ['goog.graphics.AffineTransform'], ['goog.math'], false);
-goog.addDependency('graphics/canvaselement.js', ['goog.graphics.CanvasEllipseElement', 'goog.graphics.CanvasGroupElement', 'goog.graphics.CanvasImageElement', 'goog.graphics.CanvasPathElement', 'goog.graphics.CanvasRectElement', 'goog.graphics.CanvasTextElement'], ['goog.array', 'goog.dom', 'goog.dom.TagName', 'goog.graphics.EllipseElement', 'goog.graphics.GroupElement', 'goog.graphics.ImageElement', 'goog.graphics.Path', 'goog.graphics.PathElement', 'goog.graphics.RectElement', 'goog.graphics.TextElement', 'goog.math', 'goog.string'], false);
+goog.addDependency('graphics/canvaselement.js', ['goog.graphics.CanvasEllipseElement', 'goog.graphics.CanvasGroupElement', 'goog.graphics.CanvasImageElement', 'goog.graphics.CanvasPathElement', 'goog.graphics.CanvasRectElement', 'goog.graphics.CanvasTextElement'], ['goog.array', 'goog.dom', 'goog.dom.TagName', 'goog.dom.safe', 'goog.graphics.EllipseElement', 'goog.graphics.GroupElement', 'goog.graphics.ImageElement', 'goog.graphics.Path', 'goog.graphics.PathElement', 'goog.graphics.RectElement', 'goog.graphics.TextElement', 'goog.html.SafeHtml', 'goog.html.uncheckedconversions', 'goog.math', 'goog.string', 'goog.string.Const'], false);
 goog.addDependency('graphics/canvasgraphics.js', ['goog.graphics.CanvasGraphics'], ['goog.events.EventType', 'goog.graphics.AbstractGraphics', 'goog.graphics.CanvasEllipseElement', 'goog.graphics.CanvasGroupElement', 'goog.graphics.CanvasImageElement', 'goog.graphics.CanvasPathElement', 'goog.graphics.CanvasRectElement', 'goog.graphics.CanvasTextElement', 'goog.graphics.SolidFill', 'goog.math.Size', 'goog.style'], false);
 goog.addDependency('graphics/element.js', ['goog.graphics.Element'], ['goog.asserts', 'goog.events', 'goog.events.EventTarget', 'goog.events.Listenable', 'goog.graphics.AffineTransform', 'goog.math'], false);
 goog.addDependency('graphics/ellipseelement.js', ['goog.graphics.EllipseElement'], ['goog.graphics.StrokeAndFillElement'], false);
@@ -2961,7 +2961,7 @@ goog.addDependency('graphics/svgelement.js', ['goog.graphics.SvgEllipseElement',
 goog.addDependency('graphics/svggraphics.js', ['goog.graphics.SvgGraphics'], ['goog.Timer', 'goog.dom', 'goog.events.EventHandler', 'goog.events.EventType', 'goog.graphics.AbstractGraphics', 'goog.graphics.LinearGradient', 'goog.graphics.Path', 'goog.graphics.SolidFill', 'goog.graphics.Stroke', 'goog.graphics.SvgEllipseElement', 'goog.graphics.SvgGroupElement', 'goog.graphics.SvgImageElement', 'goog.graphics.SvgPathElement', 'goog.graphics.SvgRectElement', 'goog.graphics.SvgTextElement', 'goog.math', 'goog.math.Size', 'goog.style', 'goog.userAgent'], false);
 goog.addDependency('graphics/textelement.js', ['goog.graphics.TextElement'], ['goog.graphics.StrokeAndFillElement'], false);
 goog.addDependency('graphics/vmlelement.js', ['goog.graphics.VmlEllipseElement', 'goog.graphics.VmlGroupElement', 'goog.graphics.VmlImageElement', 'goog.graphics.VmlPathElement', 'goog.graphics.VmlRectElement', 'goog.graphics.VmlTextElement'], ['goog.dom', 'goog.graphics.EllipseElement', 'goog.graphics.GroupElement', 'goog.graphics.ImageElement', 'goog.graphics.PathElement', 'goog.graphics.RectElement', 'goog.graphics.TextElement'], false);
-goog.addDependency('graphics/vmlgraphics.js', ['goog.graphics.VmlGraphics'], ['goog.array', 'goog.events', 'goog.events.EventHandler', 'goog.events.EventType', 'goog.graphics.AbstractGraphics', 'goog.graphics.LinearGradient', 'goog.graphics.Path', 'goog.graphics.SolidFill', 'goog.graphics.VmlEllipseElement', 'goog.graphics.VmlGroupElement', 'goog.graphics.VmlImageElement', 'goog.graphics.VmlPathElement', 'goog.graphics.VmlRectElement', 'goog.graphics.VmlTextElement', 'goog.math', 'goog.math.Size', 'goog.string', 'goog.style'], false);
+goog.addDependency('graphics/vmlgraphics.js', ['goog.graphics.VmlGraphics'], ['goog.array', 'goog.dom.safe', 'goog.events', 'goog.events.EventHandler', 'goog.events.EventType', 'goog.graphics.AbstractGraphics', 'goog.graphics.LinearGradient', 'goog.graphics.Path', 'goog.graphics.SolidFill', 'goog.graphics.VmlEllipseElement', 'goog.graphics.VmlGroupElement', 'goog.graphics.VmlImageElement', 'goog.graphics.VmlPathElement', 'goog.graphics.VmlRectElement', 'goog.graphics.VmlTextElement', 'goog.html.uncheckedconversions', 'goog.math', 'goog.math.Size', 'goog.string', 'goog.string.Const', 'goog.style'], false);
 goog.addDependency('history/event.js', ['goog.history.Event'], ['goog.events.Event', 'goog.history.EventType'], false);
 goog.addDependency('history/eventtype.js', ['goog.history.EventType'], [], false);
 goog.addDependency('history/history.js', ['goog.History', 'goog.History.Event', 'goog.History.EventType'], ['goog.Timer', 'goog.dom', 'goog.events.EventHandler', 'goog.events.EventTarget', 'goog.events.EventType', 'goog.history.Event', 'goog.history.EventType', 'goog.labs.userAgent.device', 'goog.memoize', 'goog.string', 'goog.userAgent'], false);
@@ -3606,7 +3606,7 @@ goog.addDependency('tweak/registry.js', ['goog.tweak.Registry'], ['goog.array', 
 goog.addDependency('tweak/registry_test.js', ['goog.tweak.RegistryTest'], ['goog.asserts.AssertionError', 'goog.testing.jsunit', 'goog.tweak', 'goog.tweak.testhelpers'], false);
 goog.addDependency('tweak/testhelpers.js', ['goog.tweak.testhelpers'], ['goog.tweak', 'goog.tweak.BooleanGroup', 'goog.tweak.BooleanInGroupSetting', 'goog.tweak.BooleanSetting', 'goog.tweak.ButtonAction', 'goog.tweak.NumericSetting', 'goog.tweak.Registry', 'goog.tweak.StringSetting'], false);
 goog.addDependency('tweak/tweak.js', ['goog.tweak', 'goog.tweak.ConfigParams'], ['goog.asserts', 'goog.tweak.BaseSetting', 'goog.tweak.BooleanGroup', 'goog.tweak.BooleanInGroupSetting', 'goog.tweak.BooleanSetting', 'goog.tweak.ButtonAction', 'goog.tweak.NumericSetting', 'goog.tweak.Registry', 'goog.tweak.StringSetting'], false);
-goog.addDependency('tweak/tweakui.js', ['goog.tweak.EntriesPanel', 'goog.tweak.TweakUi'], ['goog.array', 'goog.asserts', 'goog.dom', 'goog.object', 'goog.style', 'goog.tweak', 'goog.tweak.BaseEntry', 'goog.tweak.BooleanGroup', 'goog.tweak.BooleanInGroupSetting', 'goog.tweak.BooleanSetting', 'goog.tweak.ButtonAction', 'goog.tweak.NumericSetting', 'goog.tweak.StringSetting', 'goog.ui.Zippy', 'goog.userAgent'], false);
+goog.addDependency('tweak/tweakui.js', ['goog.tweak.EntriesPanel', 'goog.tweak.TweakUi'], ['goog.array', 'goog.asserts', 'goog.dom', 'goog.dom.safe', 'goog.html.SafeHtml', 'goog.object', 'goog.string.Const', 'goog.style', 'goog.tweak', 'goog.tweak.BaseEntry', 'goog.tweak.BooleanGroup', 'goog.tweak.BooleanInGroupSetting', 'goog.tweak.BooleanSetting', 'goog.tweak.ButtonAction', 'goog.tweak.NumericSetting', 'goog.tweak.StringSetting', 'goog.ui.Zippy', 'goog.userAgent'], false);
 goog.addDependency('tweak/tweakui_test.js', ['goog.tweak.TweakUiTest'], ['goog.dom', 'goog.string', 'goog.testing.jsunit', 'goog.tweak', 'goog.tweak.TweakUi', 'goog.tweak.testhelpers'], false);
 goog.addDependency('ui/abstractspellchecker.js', ['goog.ui.AbstractSpellChecker', 'goog.ui.AbstractSpellChecker.AsyncResult'], ['goog.a11y.aria', 'goog.array', 'goog.asserts', 'goog.dom', 'goog.dom.NodeType', 'goog.dom.classlist', 'goog.dom.selection', 'goog.events', 'goog.events.Event', 'goog.events.EventType', 'goog.math.Coordinate', 'goog.spell.SpellCheck', 'goog.structs.Set', 'goog.style', 'goog.ui.Component', 'goog.ui.MenuItem', 'goog.ui.MenuSeparator', 'goog.ui.PopupMenu'], false);
 goog.addDependency('ui/ac/ac.js', ['goog.ui.ac'], ['goog.ui.ac.ArrayMatcher', 'goog.ui.ac.AutoComplete', 'goog.ui.ac.InputHandler', 'goog.ui.ac.Renderer'], false);
@@ -3637,7 +3637,7 @@ goog.addDependency('ui/animatedzippy_test.js', ['goog.ui.AnimatedZippyTest'], ['
 goog.addDependency('ui/attachablemenu.js', ['goog.ui.AttachableMenu'], ['goog.a11y.aria', 'goog.a11y.aria.State', 'goog.array', 'goog.asserts', 'goog.dom', 'goog.dom.classlist', 'goog.events.Event', 'goog.events.KeyCodes', 'goog.string', 'goog.style', 'goog.ui.ItemEvent', 'goog.ui.MenuBase', 'goog.ui.PopupBase', 'goog.userAgent'], false);
 goog.addDependency('ui/bidiinput.js', ['goog.ui.BidiInput'], ['goog.dom', 'goog.events', 'goog.events.InputHandler', 'goog.i18n.bidi', 'goog.i18n.bidi.Dir', 'goog.ui.Component'], false);
 goog.addDependency('ui/bidiinput_test.js', ['goog.ui.BidiInputTest'], ['goog.dom', 'goog.testing.jsunit', 'goog.ui.BidiInput'], false);
-goog.addDependency('ui/bubble.js', ['goog.ui.Bubble'], ['goog.Timer', 'goog.events', 'goog.events.EventType', 'goog.math.Box', 'goog.positioning', 'goog.positioning.AbsolutePosition', 'goog.positioning.AnchoredPosition', 'goog.positioning.Corner', 'goog.positioning.CornerBit', 'goog.style', 'goog.ui.Component', 'goog.ui.Popup'], false);
+goog.addDependency('ui/bubble.js', ['goog.ui.Bubble'], ['goog.Timer', 'goog.dom.safe', 'goog.events', 'goog.events.EventType', 'goog.html.SafeHtml', 'goog.html.legacyconversions', 'goog.math.Box', 'goog.positioning', 'goog.positioning.AbsolutePosition', 'goog.positioning.AnchoredPosition', 'goog.positioning.Corner', 'goog.positioning.CornerBit', 'goog.string.Const', 'goog.style', 'goog.ui.Component', 'goog.ui.Popup'], false);
 goog.addDependency('ui/button.js', ['goog.ui.Button', 'goog.ui.Button.Side'], ['goog.events.EventType', 'goog.events.KeyCodes', 'goog.events.KeyHandler', 'goog.ui.ButtonRenderer', 'goog.ui.ButtonSide', 'goog.ui.Component', 'goog.ui.Control', 'goog.ui.NativeButtonRenderer', 'goog.ui.registry'], false);
 goog.addDependency('ui/button_test.js', ['goog.ui.ButtonTest'], ['goog.dom', 'goog.dom.classlist', 'goog.events', 'goog.events.Event', 'goog.events.EventType', 'goog.events.KeyCodes', 'goog.events.KeyHandler', 'goog.testing.events', 'goog.testing.jsunit', 'goog.ui.Button', 'goog.ui.ButtonRenderer', 'goog.ui.ButtonSide', 'goog.ui.Component', 'goog.ui.NativeButtonRenderer'], false);
 goog.addDependency('ui/buttonrenderer.js', ['goog.ui.ButtonRenderer'], ['goog.a11y.aria', 'goog.a11y.aria.Role', 'goog.a11y.aria.State', 'goog.asserts', 'goog.ui.ButtonSide', 'goog.ui.Component', 'goog.ui.ControlRenderer'], false);
@@ -3915,7 +3915,7 @@ goog.addDependency('useragent/flash_test.js', ['goog.userAgent.flashTest'], ['go
 goog.addDependency('useragent/iphoto.js', ['goog.userAgent.iphoto'], ['goog.string', 'goog.userAgent'], false);
 goog.addDependency('useragent/jscript.js', ['goog.userAgent.jscript'], ['goog.string'], false);
 goog.addDependency('useragent/jscript_test.js', ['goog.userAgent.jscriptTest'], ['goog.testing.jsunit', 'goog.userAgent.jscript'], false);
-goog.addDependency('useragent/keyboard.js', ['goog.userAgent.keyboard'], ['goog.userAgent', 'goog.userAgent.product'], false);
+goog.addDependency('useragent/keyboard.js', ['goog.userAgent.keyboard'], ['goog.labs.userAgent.platform'], false);
 goog.addDependency('useragent/keyboard_test.js', ['goog.userAgent.keyboardTest'], ['goog.labs.userAgent.testAgents', 'goog.labs.userAgent.util', 'goog.testing.MockUserAgent', 'goog.testing.jsunit', 'goog.userAgent.keyboard', 'goog.userAgentTestUtil'], false);
 goog.addDependency('useragent/picasa.js', ['goog.userAgent.picasa'], ['goog.string', 'goog.userAgent'], false);
 goog.addDependency('useragent/platform.js', ['goog.userAgent.platform'], ['goog.string', 'goog.userAgent'], false);
@@ -18737,6 +18737,7 @@ goog.provide('goog.async.throwException');
 goog.require('goog.debug.entryPointRegistry');
 goog.require('goog.functions');
 goog.require('goog.labs.userAgent.browser');
+goog.require('goog.labs.userAgent.engine');
 
 
 /**
@@ -18827,7 +18828,10 @@ goog.async.nextTick.getSetImmediateEmulator_ = function() {
   // document.addEventListener. The latter excludes IE8 because it has a
   // synchronous postMessage implementation.
   if (typeof Channel === 'undefined' && typeof window !== 'undefined' &&
-      window.postMessage && window.addEventListener) {
+      window.postMessage && window.addEventListener &&
+      // Presto (The old pre-blink Opera engine) has problems with iframes
+      // and contentWindow.
+      !goog.labs.userAgent.engine.isPresto()) {
     /** @constructor */
     Channel = function() {
       // Make an empty, invisible iframe.
@@ -22347,7 +22351,7 @@ lf.backstore.IndexedDB.prototype.init = function(opt_onUpgrade) {
     var request;
     try {
       request = indexedDB.open(
-          this.schema_.getName(), this.schema_.getVersion());
+          this.schema_.name(), this.schema_.version());
     } catch (e) {
       reject(e);
       return;
@@ -22433,7 +22437,7 @@ lf.backstore.IndexedDB.prototype.removeIndexTables_ = function(db, tx) {
  * @private
  */
 lf.backstore.IndexedDB.prototype.createTables_ = function(db, tx) {
-  this.schema_.getTables().forEach(
+  this.schema_.tables().forEach(
       goog.partial(this.createObjectStoresForTable_, db, tx),
       this);
 };
@@ -22534,7 +22538,7 @@ lf.backstore.IndexedDB.prototype.createTx = function(
  * @private
  */
 lf.backstore.IndexedDB.prototype.scanRowId_ = function(opt_tx) {
-  var tableNames = this.schema_.getTables().map(function(table) {
+  var tableNames = this.schema_.tables().map(function(table) {
     return table.getName();
   });
 
@@ -22831,7 +22835,7 @@ lf.backstore.Memory = function(schema) {
 
 /** @override */
 lf.backstore.Memory.prototype.init = function(opt_onUpgrade) {
-  this.schema_.getTables().forEach(this.initTable_, this);
+  this.schema_.tables().forEach(this.initTable_, this);
   return goog.Promise.resolve();
 };
 
@@ -23242,6 +23246,31 @@ lf.cache.DefaultCache.prototype.getCount = function(opt_tableName) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+goog.provide('lf.Order');
+
+
+/** @enum {number} */
+lf.Order = {
+  DESC: 0,
+  ASC: 1
+};
+
+/**
+ * @license
+ * Copyright 2014 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 goog.provide('lf.cache.TableDiff');
 
 goog.require('goog.asserts');
@@ -23463,6 +23492,7 @@ goog.require('goog.asserts');
 goog.require('goog.structs.Map');
 goog.require('goog.structs.Set');
 goog.require('lf.Exception');
+goog.require('lf.Order');
 goog.require('lf.cache.ConstraintChecker');
 goog.require('lf.cache.TableDiff');
 goog.require('lf.service');
@@ -23617,19 +23647,36 @@ lf.cache.Journal.prototype.getIndexScope = function() {
  * Finds the rowIds corresponding to records within the given key ranges.
  * @param {!lf.schema.Index} indexSchema
  * @param {!Array.<!lf.index.KeyRange>} keyRanges
+ * @param {!lf.Order} order
+ * @param {number=} opt_limit
+ * @param {number=} opt_skip
  * @return {!Array.<number>}
  */
 lf.cache.Journal.prototype.getIndexRange = function(
-    indexSchema, keyRanges) {
-  var rowIds = new goog.structs.Set();
+    indexSchema, keyRanges, order, opt_limit, opt_skip) {
   var index = this.indexStore_.get(indexSchema.getNormalizedName());
 
+  if (keyRanges.length == 1) {
+    return index.getRange(keyRanges[0], order, opt_limit, opt_skip);
+  }
+
+  var msg = 'Using index for limit/skip not implemented for ' +
+      'multi-keyrange queries.';
+  goog.asserts.assert(!goog.isDefAndNotNull(opt_limit), msg);
+  goog.asserts.assert(!goog.isDefAndNotNull(opt_skip), msg);
+
+  var rowIds = new goog.structs.Set();
   // Getting rowIds within the given key ranges according to IndexStore.
   keyRanges.forEach(function(keyRange) {
-    rowIds.addAll(index.getRange(keyRange));
+    rowIds.addAll(index.getRange(keyRange, order));
   }, this);
 
-  return rowIds.getValues();
+  var results = rowIds.getValues();
+  if (order == lf.Order.DESC) {
+    results.reverse();
+  }
+
+  return results;
 };
 
 
@@ -23640,7 +23687,8 @@ lf.cache.Journal.prototype.getIndexRange = function(
  */
 lf.cache.Journal.prototype.getTableRows = function(table, opt_rowIds) {
   var rowIds = goog.isDefAndNotNull(opt_rowIds) ?
-      opt_rowIds : this.indexStore_.get(table.getRowIdIndexName()).getRange();
+      opt_rowIds :
+      this.indexStore_.get(table.getRowIdIndexName()).getRange();
   return this.cache_.get(rowIds);
 };
 
@@ -23926,6 +23974,8 @@ lf.cache.Journal.prototype.checkScope_ = function(tableSchema) {
  */
 goog.provide('lf.index');
 
+goog.require('lf.Order');
+
 
 /**
  * Java's String.hashCode method.
@@ -23963,24 +24013,43 @@ lf.index.hashArray = function(values) {
 
 /**
  * Slice result array by limit and skip.
- * @param {!Array.<number>} source
+ * Note: For performance reasons the input array might be modified in place.
+ *
+ * @param {!Array.<number>} array
+ * @param {!lf.Order=} opt_order
  * @param {number=} opt_limit
  * @param {number=} opt_skip
  * @return {!Array.<number>}
  */
-lf.index.slice = function(source, opt_limit, opt_skip) {
-  var array = source;
-  if (array.length && (goog.isDef(opt_limit) || goog.isDef(opt_skip))) {
-    var limit = goog.isDef(opt_limit) ? opt_limit : array.length;
-    if (limit == 0) {
-      return [];
+lf.index.slice = function(array, opt_order, opt_limit, opt_skip) {
+  // First handling case where no limit and no skip parameters have been
+  // specified, such that no copying of the input array is performed. This is an
+  // optimization such that unnecessary copying can be avoided for the majority
+  // case (no limit/skip params).
+  if (!goog.isDefAndNotNull(opt_limit) && !goog.isDefAndNotNull(opt_skip)) {
+    // All indices are build in ASC order and the order can't be controlled by
+    // the schema.
+    if (opt_order == lf.Order.DESC) {
+      array.reverse();
     }
-    limit = Math.min(array.length, limit);
-    var skip = opt_skip || 0;
-    skip = Math.min(array.length, skip);
-    array = array.slice(skip, skip + limit);
+    return array;
   }
-  return array;
+
+  // Handling case where at least one of limit/skip parameters has been
+  // specified. The input array will have to be sliced.
+  var limit = Math.min(
+      goog.isDef(opt_limit) ? opt_limit : array.length,
+      array.length);
+  if (limit == 0) {
+    return [];
+  }
+
+  var skip = Math.min(opt_skip || 0, array.length);
+  if (opt_order == lf.Order.DESC) {
+    array.reverse();
+  }
+
+  return array.slice(skip, skip + limit);
 };
 
 /**
@@ -24001,6 +24070,7 @@ lf.index.slice = function(source, opt_limit, opt_skip) {
  */
 goog.provide('lf.index.Index');
 
+goog.forwardDeclare('lf.Order');
 goog.forwardDeclare('lf.Row');
 goog.forwardDeclare('lf.index.KeyRange');
 
@@ -24071,6 +24141,8 @@ lf.index.Index.prototype.cost;
  * Retrieves all data within the range. Returns empty array if not found.
  * @param {!lf.index.KeyRange=} opt_keyRange The key range to search for. If not
  *     provided, all rowIds in this index will be returned.
+ * @param {!lf.Order=} opt_order The order in which the results should be
+ *     retrieved. If not provided, the index's default order will be used.
  * @param {number=} opt_limit Max number of rows to return
  * @param {number=} opt_skip Skip first N rows
  * @return {!Array.<number>}
@@ -24208,7 +24280,7 @@ lf.index.BTree.prototype.cost = function(opt_keyRange) {
 
 /** @override */
 lf.index.BTree.prototype.getRange = function(
-    opt_keyRange, opt_limit, opt_skip) {
+    opt_keyRange, opt_order, opt_limit, opt_skip) {
   var start = null;
   if (opt_keyRange) {
     if (!goog.isNull(opt_keyRange.from)) {
@@ -24220,7 +24292,8 @@ lf.index.BTree.prototype.getRange = function(
     start = this.root_.getLeftMostNode();
   }
 
-  return lf.index.slice(start.getRange(opt_keyRange), opt_limit, opt_skip);
+  return lf.index.slice(
+      start.getRange(opt_keyRange), opt_order, opt_limit, opt_skip);
 };
 
 
@@ -25308,7 +25381,7 @@ lf.index.RowId.prototype.cost = function(opt_keyRange) {
 
 /** @override */
 lf.index.RowId.prototype.getRange = function(
-    opt_keyRange, opt_limit, opt_skip) {
+    opt_keyRange, opt_order, opt_limit, opt_skip) {
   var keyRange = opt_keyRange || lf.index.KeyRange.all();
 
   if ((goog.isDefAndNotNull(keyRange.from) &&
@@ -25318,8 +25391,7 @@ lf.index.RowId.prototype.getRange = function(
   }
   return lf.index.slice(
       this.rows_.getValues().filter(keyRange.getComparator()),
-      opt_limit,
-      opt_skip);
+      opt_order, opt_limit, opt_skip);
 };
 
 
@@ -25417,7 +25489,7 @@ lf.cache.Prefetcher = function(global) {
  */
 lf.cache.Prefetcher.prototype.init = function(schema) {
   // Sequentially load tables
-  var tables = schema.getTables();
+  var tables = schema.tables();
   var execSequentially = goog.bind(function() {
     if (tables.length == 0) {
       return goog.Promise.resolve();
@@ -25448,7 +25520,7 @@ lf.cache.Prefetcher.prototype.fetchTable_ = function(table) {
   var store = tx.getTable(table.getName(), table.deserializeRow);
   return store.get([]).then(goog.bind(function(results) {
     this.cache_.set(table.getName(), results);
-    this.reconstructNonPersitentIndices_(table, results);
+    this.reconstructNonPersistentIndices_(table, results);
   }, this));
 };
 
@@ -25459,14 +25531,14 @@ lf.cache.Prefetcher.prototype.fetchTable_ = function(table) {
  * @param {!Array<!lf.Row>} tableRows The table's contents.
  * @private
  */
-lf.cache.Prefetcher.prototype.reconstructNonPersitentIndices_ = function(
+lf.cache.Prefetcher.prototype.reconstructNonPersistentIndices_ = function(
     tableSchema, tableRows) {
   var indices = this.indexStore_.getTableIndices(tableSchema.getName());
   tableRows.forEach(function(row) {
     indices.forEach(function(index) {
       var key = /** @type {!lf.index.Index.Key} */ (
           row.keyOfIndex(index.getName()));
-      index.set(key, row.id());
+      index.add(key, row.id());
     });
   });
 };
@@ -25875,7 +25947,7 @@ lf.index.AATree.prototype.traverse_ = function(node, keyRange, results) {
 
 /** @override */
 lf.index.AATree.prototype.getRange = function(
-    opt_keyRange, opt_limit, opt_skip) {
+    opt_keyRange, opt_order, opt_limit, opt_skip) {
   var keyRange = null;
 
   if (!goog.isDefAndNotNull(opt_keyRange)) {
@@ -25893,7 +25965,7 @@ lf.index.AATree.prototype.getRange = function(
 
   var results = [];
   this.traverse_(this.root_, keyRange, results);
-  return lf.index.slice(results, opt_limit, opt_skip);
+  return lf.index.slice(results, opt_order, opt_limit, opt_skip);
 };
 
 
@@ -26105,7 +26177,8 @@ lf.index.Map.prototype.cost = function(opt_keyRange) {
 
 
 /** @override */
-lf.index.Map.prototype.getRange = function(opt_keyRange, opt_limit, opt_skip) {
+lf.index.Map.prototype.getRange = function(
+    opt_keyRange, opt_order, opt_limit, opt_skip) {
   var results = [];
 
   var keyRange = opt_keyRange || lf.index.KeyRange.all();
@@ -26117,7 +26190,7 @@ lf.index.Map.prototype.getRange = function(opt_keyRange, opt_limit, opt_skip) {
     }
   }, this);
 
-  return lf.index.slice(results, opt_limit, opt_skip);
+  return lf.index.slice(results, opt_order, opt_limit, opt_skip);
 };
 
 
@@ -26178,7 +26251,7 @@ lf.index.MemoryIndexStore = function() {
 
 /** @override */
 lf.index.MemoryIndexStore.prototype.init = function(schema) {
-  var tables = schema.getTables();
+  var tables = schema.tables();
 
   tables.forEach(function(table) {
     var rowIdIndexName = table.getRowIdIndexName();
@@ -26668,15 +26741,7 @@ lf.tree.map = function(original, mapFn) {
  * @return {!Array.<!goog.structs.TreeNode>}
  */
 lf.tree.getLeafNodes = function(node) {
-  var leafNodes = [];
-
-  node.forEachDescendant(function(child) {
-    if (child.isLeaf()) {
-      leafNodes.push(child);
-    }
-  });
-
-  return leafNodes;
+  return lf.tree.find(node, function(node) { return node.isLeaf(); });
 };
 
 
@@ -26912,6 +26977,36 @@ lf.tree.replaceNodeWithChain = function(node, head, tail) {
  */
 lf.tree.replaceChainWithNode = function(head, tail, node) {
   return lf.tree.replaceChainWithChain(head, tail, node, node);
+};
+
+
+/**
+ * Finds all nodes in the given tree that satisfy a given condition.
+ * @param {!goog.structs.TreeNode} root The root of the tree to search.
+ * @param {!function(!goog.structs.TreeNode):boolean} filterFn The filter
+ *     function. It will be called on every node of the tree.
+ * @param {!function(!goog.structs.TreeNode):boolean=} opt_stopFn A function
+ *     that indicates whether searching should be stopped. It will be called on
+ *     every visited node on the tree. If false is returned searching will stop
+ *     for nodes below that node.
+ *     such a function is not provided the entire tree is searched.
+ * @return {!Array.<!goog.structs.TreeNode>}
+ */
+lf.tree.find = function(root, filterFn, opt_stopFn) {
+  var results = [];
+
+  var filterRec = function(node) {
+    if (filterFn(node)) {
+      results.push(node);
+    }
+    if (!goog.isDefAndNotNull(opt_stopFn) || !opt_stopFn(node)) {
+      node.getChildren().forEach(filterRec);
+    }
+  };
+
+  filterRec(root);
+
+  return results;
 };
 
 
@@ -29318,13 +29413,6 @@ lf.query.SelectContext = function() {
 
   /** @type {!lf.schema.Column} */
   this.groupBy;
-
-  /**
-   * The current version of this query context. Should be bumped up every time
-   * parametrized values are bound to new literal values.
-   * @type {number}
-   */
-  this.currentVersion = 0;
 };
 
 
@@ -30283,31 +30371,6 @@ lf.query.Delete.prototype.where;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-goog.provide('lf.Order');
-
-
-/** @enum {number} */
-lf.Order = {
-  DESC: 0,
-  ASC: 1
-};
-
-/**
- * @license
- * Copyright 2014 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 goog.provide('lf.proc.DeleteStep');
 goog.provide('lf.proc.IndexRangeScanStep');
 goog.provide('lf.proc.OrderByStep');
@@ -30589,11 +30652,17 @@ lf.proc.IndexRangeScanStep = function(index, keyRanges, order) {
   /** @type {!lf.schema.Index} */
   this.index = index;
 
-  /** @private {!Array.<!lf.index.KeyRange>} */
-  this.keyRanges_ = keyRanges;
+  /** @type {!Array.<!lf.index.KeyRange>} */
+  this.keyRanges = keyRanges;
 
   /** @type {!lf.Order} */
   this.order = order;
+
+  /** @type {?number} */
+  this.limit = null;
+
+  /** @type {?number} */
+  this.skip = null;
 };
 goog.inherits(lf.proc.IndexRangeScanStep, lf.proc.PhysicalQueryPlanNode);
 
@@ -30602,17 +30671,21 @@ goog.inherits(lf.proc.IndexRangeScanStep, lf.proc.PhysicalQueryPlanNode);
 lf.proc.IndexRangeScanStep.prototype.toString = function() {
   return 'index_range_scan(' +
       this.index.getNormalizedName() + ', ' +
-      this.keyRanges_.toString() + ', ' +
-      (this.order == lf.Order.ASC ? 'ASC' : 'DESC') + ')';
+      this.keyRanges.toString() + ', ' +
+      (this.order == lf.Order.ASC ? 'ASC' : 'DESC') +
+      (!goog.isNull(this.limit) ? ', limit:' + this.limit : '') +
+      (!goog.isNull(this.skip) ? ', skip:' + this.skip : '') +
+      ')';
 };
 
 
 /** @override */
 lf.proc.IndexRangeScanStep.prototype.exec = function(journal) {
-  var rowIds = journal.getIndexRange(this.index, this.keyRanges_);
-  if (this.order == lf.Order.DESC) {
-    rowIds.reverse();
-  }
+  var rowIds = journal.getIndexRange(
+      this.index, this.keyRanges,
+      this.order,
+      !goog.isNull(this.limit) ? this.limit : undefined,
+      !goog.isNull(this.skip) ? this.skip : undefined);
 
   var rows = rowIds.map(function(rowId) {
     return new lf.Row(rowId, {});
@@ -30784,6 +30857,13 @@ lf.proc.Task.prototype.getScope;
  */
 lf.proc.Task.prototype.getResolver;
 
+
+/**
+ * A unique identifier for this task.
+ * @return {number}
+ */
+lf.proc.Task.prototype.getId;
+
 /**
  * @license
  * Copyright 2014 Google Inc. All Rights Reserved.
@@ -30924,6 +31004,12 @@ lf.proc.QueryTask.prototype.getScope = function() {
 /** @override */
 lf.proc.QueryTask.prototype.getResolver = function() {
   return this.resolver_;
+};
+
+
+/** @override */
+lf.proc.QueryTask.prototype.getId = function() {
+  return goog.getUid(this);
 };
 
 
@@ -31896,8 +31982,10 @@ lf.query.InsertBuilder.prototype.assertValuesPreconditions_ = function() {
 goog.provide('lf.schema.Column');
 goog.provide('lf.schema.Database');
 goog.provide('lf.schema.Index');
+goog.provide('lf.schema.IndexedColumn');
 goog.provide('lf.schema.Table');
 
+goog.forwardDeclare('lf.Order');
 goog.forwardDeclare('lf.Predicate');
 goog.forwardDeclare('lf.Row');
 goog.forwardDeclare('lf.Type');
@@ -31939,15 +32027,25 @@ lf.schema.Database = function() {};
 
 
 /** @return {string} */
-lf.schema.Database.prototype.getName;
+lf.schema.Database.prototype.name;
 
 
 /** @return {number} */
-lf.schema.Database.prototype.getVersion;
+lf.schema.Database.prototype.version;
 
 
 /** @return {!Array.<!lf.schema.Table>} */
-lf.schema.Database.prototype.getTables;
+lf.schema.Database.prototype.tables;
+
+
+/**
+ * @typedef {{
+ *   name: string,
+ *   order: !lf.Order,
+ *   autoIncrement: boolean
+ * }}
+ */
+lf.schema.IndexedColumn;
 
 
 
@@ -31955,10 +32053,10 @@ lf.schema.Database.prototype.getTables;
  * @param {string} tableName
  * @param {string} name
  * @param {boolean} isUnique
- * @param {!Array.<string>} columnNames
+ * @param {!Array.<!lf.schema.IndexedColumn>} columns
  * @constructor @struct
  */
-lf.schema.Index = function(tableName, name, isUnique, columnNames) {
+lf.schema.Index = function(tableName, name, isUnique, columns) {
   /** @type {string} */
   this.tableName = tableName;
 
@@ -31968,8 +32066,8 @@ lf.schema.Index = function(tableName, name, isUnique, columnNames) {
   /** @type {boolean} */
   this.isUnique = isUnique;
 
-  /** @type {!Array.<string>} */
-  this.columnNames = columnNames;
+  /** @type {!Array.<!lf.schema.IndexedColumn>} */
+  this.columns = columns;
 };
 
 
@@ -32741,7 +32839,6 @@ lf.query.SelectBuilder.isAggregationValid_ = function(
 /** @override */
 lf.query.SelectBuilder.prototype.bind = function(values) {
   lf.query.BaseBuilder.bindValuesInSearchCondition(this.query, values);
-  this.query.currentVersion++;
   return this;
 };
 
@@ -33748,7 +33845,12 @@ goog.inherits(lf.proc.IndexRangeScanPass, lf.proc.RewritePass);
 lf.proc.IndexRangeScanPass.prototype.rewrite = function(rootNode) {
   this.rootNode = rootNode;
 
-  var tableAccessFullSteps = this.findTableAccessFullSteps_();
+  var tableAccessFullSteps =
+      /** @type {!Array.<!lf.proc.TableAccessFullStep>} */ (lf.tree.find(
+          rootNode,
+          function(node) {
+            return node instanceof lf.proc.TableAccessFullStep;
+          }));
   tableAccessFullSteps.forEach(
       function(tableAccessFullStep) {
         var selectStepsCandidates = this.findSelectStepCandidates_(
@@ -33767,43 +33869,6 @@ lf.proc.IndexRangeScanPass.prototype.rewrite = function(rootNode) {
       }, this);
 
   return this.rootNode;
-};
-
-
-/**
- * Finds all the TableAccessFullSteps in the physical plan.
- * @return {!Array.<!lf.proc.TableAccessFullStep>}
- * @private
- */
-lf.proc.IndexRangeScanPass.prototype.findTableAccessFullSteps_ = function() {
-  var tableAccessFullSteps = [];
-  lf.proc.IndexRangeScanPass.findTableAccessFullStepsRec_(
-      this.rootNode, tableAccessFullSteps);
-  return tableAccessFullSteps;
-};
-
-
-/**
- * Traverses a tree recursively and finds all full table access steps.
- * @param {!lf.proc.PhysicalQueryPlanNode} rootNode The root node of the
- *     sub-tree to be traversed.
- * @param {!Array.<!lf.proc.TableAccessFullStep>} tableAccessFullSteps An
- *     accumulator containing all the full table access steps that have been
- *     discovered so far.
- * @private
- */
-lf.proc.IndexRangeScanPass.findTableAccessFullStepsRec_ = function(
-    rootNode, tableAccessFullSteps) {
-  if (rootNode instanceof lf.proc.TableAccessFullStep) {
-    tableAccessFullSteps.push(rootNode);
-  }
-
-  rootNode.getChildren().forEach(
-      function(child) {
-        lf.proc.IndexRangeScanPass.findTableAccessFullStepsRec_(
-            /** @type {!lf.proc.PhysicalQueryPlanNode} */ (child),
-            tableAccessFullSteps);
-      });
 };
 
 
@@ -33906,7 +33971,7 @@ lf.proc.IndexRangeScanPass.getIndexForPredicate_ = function(predicate) {
   return goog.array.find(
       indices,
       function(index) {
-        return index.columnNames.length == 1;
+        return index.columns.length == 1;
       });
 };
 
@@ -34205,6 +34270,208 @@ lf.proc.LimitStep.prototype.exec = function(journal) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+goog.provide('lf.proc.SkipStep');
+
+goog.require('goog.asserts');
+goog.require('lf.proc.PhysicalQueryPlanNode');
+goog.require('lf.proc.Relation');
+
+
+
+/**
+ * @constructor @struct
+ * @extends {lf.proc.PhysicalQueryPlanNode}
+ *
+ * @param {number} skip
+ */
+lf.proc.SkipStep = function(skip) {
+  lf.proc.SkipStep.base(this, 'constructor');
+
+  /** @type {number} */
+  this.skip = skip;
+};
+goog.inherits(lf.proc.SkipStep, lf.proc.PhysicalQueryPlanNode);
+
+
+/** @override */
+lf.proc.SkipStep.prototype.toString = function() {
+  return 'skip(' + this.skip + ')';
+};
+
+
+/** @override */
+lf.proc.SkipStep.prototype.exec = function(journal) {
+  goog.asserts.assert(
+      this.getChildCount() == 1,
+      'SkipStep should have exactly one child.');
+
+  return this.getChildAt(0).exec(journal).then(goog.bind(
+      /**
+       * @param {!lf.proc.Relation} relation
+       * @this {lf.proc.SkipStep}
+       */
+      function(relation) {
+        return new lf.proc.Relation(
+            relation.entries.slice(this.skip), relation.getTables());
+      }, this));
+
+};
+
+/**
+ * @license
+ * Copyright 2014 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+goog.provide('lf.proc.LimitSkipByIndexPass');
+
+goog.require('goog.asserts');
+goog.require('lf.proc.IndexRangeScanStep');
+goog.require('lf.proc.LimitStep');
+goog.require('lf.proc.RewritePass');
+goog.require('lf.proc.SelectStep');
+goog.require('lf.proc.SkipStep');
+goog.require('lf.tree');
+
+
+
+/**
+ * The LimitSkipByIndexPass is responsible for leveraging indices to perform
+ * LIMIT and SKIP, if possible.
+ *
+ * @constructor
+ * @struct
+ * @extends {lf.proc.RewritePass.<!lf.proc.PhysicalQueryPlanNode>}
+ */
+lf.proc.LimitSkipByIndexPass = function() {
+  lf.proc.LimitSkipByIndexPass.base(this, 'constructor');
+
+  /**
+   * Populated the first time the IndexRangeScanStep is located such that the
+   * tree does not have to be re-traversed. It is populated with null if the
+   * first traversal reveals that this optimization can't be applied.
+   * @private {?lf.proc.IndexRangeScanStep}
+   */
+  this.indexRangeScanStep_;
+};
+goog.inherits(lf.proc.LimitSkipByIndexPass, lf.proc.RewritePass);
+
+
+/** @override */
+lf.proc.LimitSkipByIndexPass.prototype.rewrite = function(rootNode) {
+  this.rootNode = rootNode;
+  this.traverse_(this.rootNode);
+  return this.rootNode;
+};
+
+
+/**
+ * Traverses each node of the tree starting at the given node, rewriting the
+ * tree if possible.
+ * @param {!lf.proc.PhysicalQueryPlanNode} rootNode The root node of the
+ *     sub-tree to be traversed.
+ * @private
+ */
+lf.proc.LimitSkipByIndexPass.prototype.traverse_ = function(rootNode) {
+  var newRootNode = rootNode;
+  if (rootNode instanceof lf.proc.LimitStep ||
+      rootNode instanceof lf.proc.SkipStep) {
+
+    var indexRangeScanStep = this.findIndexRangeScanStep_(rootNode);
+    if (!goog.isNull(indexRangeScanStep)) {
+      newRootNode = this.mergeToIndexRangeScanStep_(
+          rootNode, indexRangeScanStep);
+    }
+  }
+
+  newRootNode.getChildren().forEach(
+      function(child) {
+        this.traverse_(
+            /** @type {!lf.proc.PhysicalQueryPlanNode} */ (child));
+      }, this);
+};
+
+
+/**
+ * Merges a LimitStep or SkipStep to the given IndexRangeScanStep.
+ * @param {!lf.proc.LimitStep|!lf.proc.SkipStep} node
+ * @param {!lf.proc.IndexRangeScanStep} indexRangeScanStep
+ * @return {!lf.proc.PhysicalQueryPlanNode} The new root of the tree.
+ * @private
+ */
+lf.proc.LimitSkipByIndexPass.prototype.mergeToIndexRangeScanStep_ = function(
+    node, indexRangeScanStep) {
+  if (node instanceof lf.proc.LimitStep) {
+    indexRangeScanStep.limit = node.limit;
+  } else {
+    indexRangeScanStep.skip = node.skip;
+  }
+
+  return /** @type {!lf.proc.PhysicalQueryPlanNode} */ (
+      lf.tree.removeNode(node));
+};
+
+
+/**
+ * Finds any existing IndexRangeScanStep that can be leveraged to limit and
+ * skip results.
+ * @param {!lf.proc.PhysicalQueryPlanNode} rootNode
+ * @return {?lf.proc.IndexRangeScanStep}
+ * @private
+ */
+lf.proc.LimitSkipByIndexPass.prototype.findIndexRangeScanStep_ =
+    function(rootNode) {
+  if (goog.isDef(this.indexRangeScanStep_)) {
+    return this.indexRangeScanStep_;
+  }
+
+  var filterFn = function(node) {
+    // TODO(dpapad): Only IndexRangeScanStep with a single KeyRange instance
+    // can be currently optimized, see b/19005405.
+    return node instanceof lf.proc.IndexRangeScanStep &&
+        node.keyRanges.length == 1;
+  };
+
+  // LIMIT and SKIP needs to be executed after joins, cross-products and
+  // selections have been calculated. Therefore if such nodes exist this
+  // optimization can not be applied.
+  var stopFn = function(node) {
+    return node.getChildCount() != 1 || node instanceof lf.proc.SelectStep;
+  };
+
+  var indexRangeScanSteps = /** @type {!Array<lf.proc.IndexRangeScanStep>} */ (
+      lf.tree.find(rootNode, filterFn, stopFn));
+  this.indexRangeScanStep_ =
+      indexRangeScanSteps.length > 0 ? indexRangeScanSteps[0] : null;
+  return this.indexRangeScanStep_;
+};
+
+/**
+ * @license
+ * Copyright 2014 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 goog.provide('lf.proc.OrderByIndexPass');
 
 goog.require('goog.asserts');
@@ -34332,54 +34599,51 @@ lf.proc.OrderByIndexPass.prototype.applyIndexRangeScanStepOptimization_ =
  * Finds any existing IndexRangeScanStep that can be used to produce the
  * requested ordering instead of the OrderByStep.
  * @param {!lf.query.SelectContext.OrderBy} orderBy
- * @param {!lf.proc.PhysicalQueryPlanNode} currentNode
+ * @param {!lf.proc.PhysicalQueryPlanNode} rootNode
  * @return {lf.proc.IndexRangeScanStep}
  * @private
  */
 lf.proc.OrderByIndexPass.findIndexRangeScanStep_ = function(
-    orderBy, currentNode) {
-  if (currentNode instanceof lf.proc.IndexRangeScanStep &&
-      currentNode.index.columnNames[0] == orderBy.column.getName()) {
-    return currentNode;
-  }
-
+    orderBy, rootNode) {
+  var filterFn = function(node) {
+    return node instanceof lf.proc.IndexRangeScanStep &&
+        node.index.columns[0].name == orderBy.column.getName();
+  };
   // CrossProductStep and JoinStep nodes have more than one child, and mess up
   // the ordering of results. Therefore if such nodes exist this optimization
   // can not be applied.
-  if (currentNode.getChildCount() != 1) {
-    return null;
-  }
+  var stopFn = function(node) {
+    return node.getChildCount() != 1;
+  };
 
-  return lf.proc.OrderByIndexPass.findIndexRangeScanStep_(
-      orderBy,
-      /** @type {!lf.proc.PhysicalQueryPlanNode} */ (
-          currentNode.getChildAt(0)));
+  var indexRangeScanSteps = /** @type {!Array<lf.proc.IndexRangeScanStep>} */ (
+      lf.tree.find(rootNode, filterFn, stopFn));
+  return indexRangeScanSteps.length > 0 ? indexRangeScanSteps[0] : null;
 };
 
 
 /**
  * Finds any existing TableAccessFullStep that can converted to an
  * IndexRangeScanStep instead of using an explicit OrderByStep.
- * @param {!lf.proc.PhysicalQueryPlanNode} currentNode
+ * @param {!lf.proc.PhysicalQueryPlanNode} rootNode
  * @return {lf.proc.TableAccessFullStep}
  * @private
  */
-lf.proc.OrderByIndexPass.findTableAccessFullStep_ = function(
-    currentNode) {
-  if (currentNode instanceof lf.proc.TableAccessFullStep) {
-    return currentNode;
-  }
-
+lf.proc.OrderByIndexPass.findTableAccessFullStep_ = function(rootNode) {
+  var filterFn = function(node) {
+    return node instanceof lf.proc.TableAccessFullStep;
+  };
   // CrossProductStep and JoinStep nodes have more than one child, and mess up
   // the ordering of results. Therefore if such nodes exist this optimization
   // can not be applied.
-  if (currentNode.getChildCount() != 1) {
-    return null;
-  }
+  var stopFn = function(node) {
+    return node.getChildCount() != 1;
+  };
 
-  return lf.proc.OrderByIndexPass.findTableAccessFullStep_(
-      /** @type {!lf.proc.PhysicalQueryPlanNode} */ (
-          currentNode.getChildAt(0)));
+  var tableAccessFullSteps =
+      /** @type {!Array<lf.proc.TableAccessFullStep>} */ (
+      lf.tree.find(rootNode, filterFn, stopFn));
+  return tableAccessFullSteps.length > 0 ? tableAccessFullSteps[0] : null;
 };
 
 /**
@@ -34945,69 +35209,6 @@ lf.proc.ProjectStep.prototype.calculateGroupedRelations_ = function(relation) {
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-goog.provide('lf.proc.SkipStep');
-
-goog.require('goog.asserts');
-goog.require('lf.proc.PhysicalQueryPlanNode');
-goog.require('lf.proc.Relation');
-
-
-
-/**
- * @constructor @struct
- * @extends {lf.proc.PhysicalQueryPlanNode}
- *
- * @param {number} skip
- */
-lf.proc.SkipStep = function(skip) {
-  lf.proc.SkipStep.base(this, 'constructor');
-
-  /** @type {number} */
-  this.skip = skip;
-};
-goog.inherits(lf.proc.SkipStep, lf.proc.PhysicalQueryPlanNode);
-
-
-/** @override */
-lf.proc.SkipStep.prototype.toString = function() {
-  return 'skip(' + this.skip + ')';
-};
-
-
-/** @override */
-lf.proc.SkipStep.prototype.exec = function(journal) {
-  goog.asserts.assert(
-      this.getChildCount() == 1,
-      'SkipStep should have exactly one child.');
-
-  return this.getChildAt(0).exec(journal).then(goog.bind(
-      /**
-       * @param {!lf.proc.Relation} relation
-       * @this {lf.proc.SkipStep}
-       */
-      function(relation) {
-        return new lf.proc.Relation(
-            relation.entries.slice(this.skip), relation.getTables());
-      }, this));
-
-};
-
-/**
- * @license
- * Copyright 2014 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 goog.provide('lf.proc.PhysicalPlanFactory');
 
 goog.require('goog.asserts');
@@ -35023,6 +35224,7 @@ goog.require('lf.proc.InsertStep');
 goog.require('lf.proc.JoinNode');
 goog.require('lf.proc.JoinStep');
 goog.require('lf.proc.LimitNode');
+goog.require('lf.proc.LimitSkipByIndexPass');
 goog.require('lf.proc.LimitStep');
 goog.require('lf.proc.OrderByIndexPass');
 goog.require('lf.proc.OrderByNode');
@@ -35070,7 +35272,8 @@ lf.proc.PhysicalPlanFactory.prototype.create = function(
     return this.createPlan_(
         logicalQueryPlanRoot, [
           new lf.proc.IndexRangeScanPass(this.global_),
-          new lf.proc.OrderByIndexPass()
+          new lf.proc.OrderByIndexPass(),
+          new lf.proc.LimitSkipByIndexPass()
         ]);
   }
 
@@ -35267,10 +35470,242 @@ lf.proc.DefaultQueryEngine.prototype.convertToPhysicalPlan_ = function(
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+goog.provide('lf.proc.LockManager');
+goog.provide('lf.proc.LockType');
+
+goog.require('goog.structs.Map');
+goog.require('goog.structs.Set');
+
+
+
+/**
+ * LockManager is responsible for granting locks to tasks. Each lock corresponds
+ * to a database table.
+ *
+ * Three types of locks exist, SHARED, RESERVED and EXCLUSIVE, in order to
+ * implement a two-phase locking algorithm.
+ * 1) SHARED: Multiple shared locks can be granted (meant to be used by
+ *    READ_ONLY tasks).
+ * 2) RESERVED: Granted to a single READ_WRITE task. It prevents further SHARED
+ *    or RESERVED locks to be granted, but the underlying table should not be
+ *    modified yet, until the lock is escalated to an EXCLUSIVE lock.
+ * 3) EXCLUSIVE: Granted to a single READ_WRITE task. It prevents further
+ *    SHARED or EXCLUSIVE locks to be granted. It is OK to modify a table while
+ *    holding such a lock.
+ *
+ * @constructor
+ * @struct
+ * @final
+ */
+lf.proc.LockManager = function() {
+  /**
+   * @private {!goog.structs.Map<string, !lf.proc.LockTableEntry_>}
+   */
+  this.lockTable_ = new goog.structs.Map();
+};
+
+
+/**
+ * The types of locks that exist.
+ * @enum {number}
+ */
+lf.proc.LockType = {
+  EXCLUSIVE: 0,
+  RESERVED: 1,
+  SHARED: 2
+};
+
+
+/**
+ * @param {!lf.schema.Table} dataItem
+ * @return {!lf.proc.LockTableEntry_}
+ * @private
+ */
+lf.proc.LockManager.prototype.getEntry_ = function(dataItem) {
+  var lockTableEntry = this.lockTable_.get(dataItem.getName(), null);
+  if (goog.isNull(lockTableEntry)) {
+    lockTableEntry = new lf.proc.LockTableEntry_();
+    this.lockTable_.set(dataItem.getName(), lockTableEntry);
+  }
+  return lockTableEntry;
+};
+
+
+/**
+ * @param {number} taskId
+ * @param {Array<!lf.schema.Table>} dataItems
+ * @param {!lf.proc.LockType} lockType
+ * @private
+ */
+lf.proc.LockManager.prototype.grantLock_ = function(
+    taskId, dataItems, lockType) {
+  dataItems.forEach(function(dataItem) {
+    var lockTableEntry = this.getEntry_(dataItem);
+    lockTableEntry.grantLock(taskId, lockType);
+  }, this);
+};
+
+
+/**
+ * @param {number} taskId
+ * @param {!Array<!lf.schema.Table>} dataItems
+ * @param {!lf.proc.LockType} lockType
+ * @return {boolean} Whether the requested lock can be acquired.
+ * @private
+ */
+lf.proc.LockManager.prototype.canAcquireLock_ = function(
+    taskId, dataItems, lockType) {
+  return dataItems.every(
+      function(dataItem) {
+        var lockTableEntry = this.getEntry_(dataItem);
+        return lockTableEntry.canAcquireLock(taskId, lockType);
+      }, this);
+};
+
+
+/**
+ * @param {number} taskId
+ * @param {!Array<!lf.schema.Table>} dataItems
+ * @param {!lf.proc.LockType} lockType
+ * @return {boolean} Whether the requsted lock was acquired.
+ */
+lf.proc.LockManager.prototype.requestLock = function(
+    taskId, dataItems, lockType) {
+  var canAcquireLock = this.canAcquireLock_(taskId, dataItems, lockType);
+  if (canAcquireLock) {
+    this.grantLock_(taskId, dataItems, lockType);
+  }
+  return canAcquireLock;
+};
+
+
+/**
+ * @param {number} taskId
+ * @param {Array<!lf.schema.Table>} dataItems
+ */
+lf.proc.LockManager.prototype.releaseLock = function(taskId, dataItems) {
+  dataItems.forEach(
+      function(dataItem) {
+        var lockTableEntry = this.getEntry_(dataItem);
+        lockTableEntry.releaseLock(taskId);
+      }, this);
+};
+
+
+/**
+ * Removes any reserved locks for the given data items. This is needed in order
+ * ot prioritize a taskId higher than a taskId that already holds a reserved
+ * lock.
+ * @param {Array<!lf.schema.Table>} dataItems
+ */
+lf.proc.LockManager.prototype.clearReservedLocks = function(dataItems) {
+  dataItems.forEach(
+      function(dataItem) {
+        var lockTableEntry = this.getEntry_(dataItem);
+        lockTableEntry.reservedLock = null;
+      }, this);
+};
+
+
+
+/**
+ * @constructor
+ * @struct
+ * @final
+ * @private
+ */
+lf.proc.LockTableEntry_ = function() {
+  /** @type {?number} */
+  this.exclusiveLock = null;
+
+  /** @type {?number} */
+  this.reservedLock = null;
+
+  /** @type {?goog.structs.Set<number>} */
+  this.sharedLocks = null;
+};
+
+
+/**
+ * @param {number} taskId
+ */
+lf.proc.LockTableEntry_.prototype.releaseLock = function(taskId) {
+  if (this.exclusiveLock == taskId) {
+    this.exclusiveLock = null;
+  }
+  if (this.reservedLock == taskId) {
+    this.reservedLock = null;
+  }
+  if (!goog.isNull(this.sharedLocks)) {
+    this.sharedLocks.remove(taskId);
+  }
+};
+
+
+/**
+ * @param {number} taskId
+ * @param {lf.proc.LockType} lockType
+ * @return {boolean}
+ */
+lf.proc.LockTableEntry_.prototype.canAcquireLock = function(taskId, lockType) {
+  if (lockType == lf.proc.LockType.EXCLUSIVE) {
+    var noSharedLocksExist = goog.isNull(this.sharedLocks) ||
+        this.sharedLocks.isEmpty();
+    return noSharedLocksExist && goog.isNull(this.exclusiveLock) &&
+        (goog.isNull(this.reservedLock) || this.reservedLock == taskId);
+  } else if (lockType == lf.proc.LockType.SHARED) {
+    return goog.isNull(this.exclusiveLock) && goog.isNull(this.reservedLock);
+  } else {
+    // Case of RESERVED lock.
+    return goog.isNull(this.reservedLock) || this.reservedLock == taskId;
+  }
+};
+
+
+/**
+ * @param {number} taskId
+ * @param {lf.proc.LockType} lockType
+ */
+lf.proc.LockTableEntry_.prototype.grantLock = function(taskId, lockType) {
+  if (lockType == lf.proc.LockType.EXCLUSIVE) {
+    // TODO(dpapad): Assert that reserved lock was held by this taskId.
+    this.reservedLock = null;
+    this.exclusiveLock = taskId;
+  } else if (lockType == lf.proc.LockType.SHARED) {
+    // TODO(dpapad): Assert that no other locked is held by this taskId and that
+    // no reserved/exclusive locks exist.
+    if (goog.isNull(this.sharedLocks)) {
+      this.sharedLocks = new goog.structs.Set();
+    }
+    this.sharedLocks.add(taskId);
+  } else {
+    // Case of RESERVED lock.
+    // TODO(dpapad): Any oter assertions here?
+    this.reservedLock = taskId;
+  }
+};
+
+/**
+ * @license
+ * Copyright 2014 Google Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 goog.provide('lf.proc.Runner');
 
-goog.require('goog.structs.Set');
 goog.require('lf.TransactionType');
+goog.require('lf.proc.LockManager');
+goog.require('lf.proc.LockType');
 
 goog.forwardDeclare('lf.proc.Task');
 
@@ -35284,16 +35719,11 @@ goog.forwardDeclare('lf.proc.Task');
  * @final
  */
 lf.proc.Runner = function() {
-  /**
-   * The scopes that are currently used by an in-flight query execution
-   * operation. Any other queries with overlapping scopes will be queued until
-   * their scopes are free.
-   * @private {!goog.structs.Set.<!lf.schema.Table>}
-   */
-  this.usedScopes_ = new goog.structs.Set();
-
   /** @private {!Array.<!lf.proc.Task>} */
   this.queue_ = [];
+
+  /** @private {!lf.proc.LockManager} */
+  this.lockManager_ = new lf.proc.LockManager();
 };
 
 
@@ -35306,7 +35736,12 @@ lf.proc.Runner = function() {
  */
 lf.proc.Runner.prototype.scheduleTask = function(task, opt_prioritize) {
   var prioritize = opt_prioritize || false;
-  prioritize ? this.queue_.unshift(task) : this.queue_.push(task);
+  if (prioritize) {
+    this.lockManager_.clearReservedLocks(task.getScope().getValues());
+    this.queue_.unshift(task);
+  } else {
+    this.queue_.push(task);
+  }
   this.consumePending_();
   return task.getResolver().promise;
 };
@@ -35326,7 +35761,23 @@ lf.proc.Runner.prototype.consumePending_ = function() {
     // iterating on this.queue_, as it can't guarantee that every task in the
     // queue will be traversed.
     var task = queue[i];
-    if (this.usedScopes_.intersection(task.getScope()).isEmpty()) {
+
+    var acquiredLock = false;
+    if (task.getType() == lf.TransactionType.READ_ONLY) {
+      acquiredLock = this.lockManager_.requestLock(
+          task.getId(), task.getScope().getValues(), lf.proc.LockType.SHARED);
+    } else {
+      var acquiredReservedLock = this.lockManager_.requestLock(
+          task.getId(), task.getScope().getValues(), lf.proc.LockType.RESERVED);
+      // Escalating the RESERVED lock to an EXCLUSIVE lock.
+      if (acquiredReservedLock) {
+        acquiredLock = this.lockManager_.requestLock(
+            task.getId(), task.getScope().getValues(),
+            lf.proc.LockType.EXCLUSIVE);
+      }
+    }
+
+    if (acquiredLock) {
       // Removing from this.queue_, not queue which is a copy used for
       // iteration.
       this.queue_.splice(i, /* howMany */ 1);
@@ -35337,43 +35788,16 @@ lf.proc.Runner.prototype.consumePending_ = function() {
 
 
 /**
- * Executes a QueryTask. Callers of this method should have already checked
- * that no other running task is using any table within the combined scope of
- * this task.
+ * Executes a QueryTask. Callers of this method should have already acquired a
+ * lock according to the task that is about to be executed.
  * @param {!lf.proc.Task} task
  * @private
  */
 lf.proc.Runner.prototype.execTask_ = function(task) {
-  this.acquireScope_(task);
-
   task.exec().then(
       goog.bind(this.onTaskSuccess_, this, task),
       goog.bind(
           /** @type {function(*)} */ (this.onTaskError_), this, task));
-};
-
-
-/**
- * Acquires the necessary scope for the given task.
- * @param {!lf.proc.Task} task
- * @private
- */
-lf.proc.Runner.prototype.acquireScope_ = function(task) {
-  if (task.getType() == lf.TransactionType.READ_WRITE) {
-    this.usedScopes_.addAll(task.getScope());
-  }
-};
-
-
-/**
- * Releases the scope that was held by the given task.
- * @param {!lf.proc.Task} task
- * @private
- */
-lf.proc.Runner.prototype.releaseScope_ = function(task) {
-  if (task.getType() == lf.TransactionType.READ_WRITE) {
-    this.usedScopes_.removeAll(task.getScope());
-  }
 };
 
 
@@ -35384,7 +35808,7 @@ lf.proc.Runner.prototype.releaseScope_ = function(task) {
  * @private
  */
 lf.proc.Runner.prototype.onTaskSuccess_ = function(task, results) {
-  this.releaseScope_(task);
+  this.lockManager_.releaseLock(task.getId(), task.getScope().getValues());
   task.getResolver().resolve(results);
   this.consumePending_();
 };
@@ -35397,7 +35821,7 @@ lf.proc.Runner.prototype.onTaskSuccess_ = function(task, results) {
  * @private
  */
 lf.proc.Runner.prototype.onTaskError_ = function(task, error) {
-  this.releaseScope_(task);
+  this.lockManager_.releaseLock(task.getId(), task.getScope().getValues());
   task.getResolver().reject(error);
   this.consumePending_();
 };
@@ -35500,10 +35924,7 @@ lf.DiffCalculator.prototype.comparator_ = function(
  * observed array, which triggers observers to be notified.
  * @param {?lf.proc.Relation} oldResults
  * @param {!lf.proc.Relation} newResults
- * @param {boolean} recordChanges Whether any changes made while applying the
- *     diff should be recorded and returned.
- * @return {?Array<!Object>} A list of changes, populated only if recordChanges
- *     was set to true, otherwise null is returned.
+ * @return {!Array<!Object>} The list of changes.
  *
  * TODO(dpapad): Modify this logic to properly detect modifications. Currently
  * a modification is detected as a deletion and an insertion.
@@ -35512,8 +35933,7 @@ lf.DiffCalculator.prototype.comparator_ = function(
  * comparisons are done based on object reference, there might be a cheaper way,
  * such that longestCommonSubsequence is only called once.
  */
-lf.DiffCalculator.prototype.applyDiff = function(
-    oldResults, newResults, recordChanges) {
+lf.DiffCalculator.prototype.applyDiff = function(oldResults, newResults) {
   var oldEntries = goog.isNull(oldResults) ? [] : oldResults.entries;
 
   // Detecting and applying deletions.
@@ -35524,7 +35944,7 @@ lf.DiffCalculator.prototype.applyDiff = function(
         return oldEntries[indexLeft];
       });
 
-  var changeRecords = recordChanges ? [] : null;
+  var changeRecords = [];
 
   var commonIndex = 0;
   for (var i = 0; i < oldEntries.length; i++) {
@@ -35534,11 +35954,9 @@ lf.DiffCalculator.prototype.applyDiff = function(
       continue;
     } else {
       var removed = this.observableResults_.splice(i, 1);
-      if (recordChanges) {
-        var changeRecord = lf.DiffCalculator.createChangeRecord_(
-            i, removed, 0, this.observableResults_);
-        changeRecords.push(changeRecord);
-      }
+      var changeRecord = lf.DiffCalculator.createChangeRecord_(
+          i, removed, 0, this.observableResults_);
+      changeRecords.push(changeRecord);
     }
   }
 
@@ -35558,11 +35976,9 @@ lf.DiffCalculator.prototype.applyDiff = function(
       continue;
     } else {
       this.observableResults_.splice(i, 0, entry.row.payload());
-      if (recordChanges) {
-        var changeRecord = lf.DiffCalculator.createChangeRecord_(
-            i, [], 1, this.observableResults_);
-        changeRecords.push(changeRecord);
-      }
+      var changeRecord = lf.DiffCalculator.createChangeRecord_(
+          i, [], 1, this.observableResults_);
+      changeRecords.push(changeRecord);
     }
   }
 
@@ -35730,7 +36146,7 @@ lf.ObserverRegistry.prototype.getQueriesForTables = function(tables) {
 
 /**
  * Updates the results of a given query. It is ignored if the query is no longer
- * being observed or if the results have already been reported to observers.
+ * being observed.
  * @param {!lf.query.SelectContext} query
  * @param {!lf.proc.Relation} results The new results.
  * @return {boolean} Whether any results were updated.
@@ -35739,8 +36155,7 @@ lf.ObserverRegistry.prototype.updateResultsForQuery = function(query, results) {
   var queryId = this.getQueryId_(query);
   var entry = this.entries_.get(queryId, null);
 
-  if (!goog.isNull(entry) &&
-      entry.lastResultVersion_ != query.currentVersion) {
+  if (!goog.isNull(entry)) {
     entry.updateResults(results);
     return true;
   }
@@ -35769,14 +36184,8 @@ lf.ObserverRegistry.Entry_ = function(query) {
   /** @private {?lf.proc.Relation} */
   this.lastResults_ = null;
 
-  /** @private {number} */
-  this.lastResultVersion_ = -1;
-
   /** @private {!lf.DiffCalculator} */
   this.diffCalculator_ = new lf.DiffCalculator(query, this.observable_);
-
-  /** @private {boolean} */
-  this.hasNativeSupport_ = lf.ObserverRegistry.Entry_.hasNativeSupport_();
 };
 
 
@@ -35789,9 +36198,6 @@ lf.ObserverRegistry.Entry_.prototype.addObserver = function(callback) {
     return;
   }
 
-  if (this.hasNativeSupport_) {
-    Array.observe(this.observable_, callback);
-  }
   this.observers_.add(callback);
 };
 
@@ -35801,9 +36207,6 @@ lf.ObserverRegistry.Entry_.prototype.addObserver = function(callback) {
  * @return {boolean} Whether the callback was found and removed.
  */
 lf.ObserverRegistry.Entry_.prototype.removeObserver = function(callback) {
-  if (this.hasNativeSupport_) {
-    Array.unobserve(this.observable_, callback);
-  }
   return this.observers_.remove(callback);
 };
 
@@ -35828,26 +36231,15 @@ lf.ObserverRegistry.Entry_.prototype.hasObservers = function() {
  */
 lf.ObserverRegistry.Entry_.prototype.updateResults = function(newResults) {
   var changeRecords = this.diffCalculator_.applyDiff(
-      this.lastResults_, newResults, !this.hasNativeSupport_);
+      this.lastResults_, newResults);
   this.lastResults_ = newResults;
-  this.lastResultVersion_ = this.query_.currentVersion;
 
-  if (!this.hasNativeSupport_) {
+  if (changeRecords.length > 0) {
     this.observers_.getValues().forEach(
         function(observerFn) {
           observerFn(changeRecords);
         });
   }
-};
-
-
-/**
- * @return {boolean} Whether the underlying browser supports Array.observe.
- * @private
- */
-lf.ObserverRegistry.Entry_.hasNativeSupport_ = function() {
-  return (typeof Array.observe == 'function' &&
-      typeof Array.unobserve == 'function');
 };
 
 /**
@@ -36350,7 +36742,10 @@ lf.schema.BaseColumn.prototype.getIndices = function() {
     this.indices_ = [];
     this.getTable().getIndices().forEach(
         function(index) {
-          if (index.columnNames.indexOf(this.name_) != -1) {
+          var colNames = index.columns.map(function(col) {
+            return col.name;
+          });
+          if (colNames.indexOf(this.name_) != -1) {
             this.indices_.push(index);
           }
         }, this);

@@ -28,6 +28,8 @@ goog.provide('github.db.schema.PullRequests');
 goog.provide('github.db.schema.Repositories');
 goog.provide('github.db.schema.Users');
 
+/** @suppress {extraRequire} */
+goog.require('lf.Order');
 goog.require('lf.Row');
 goog.require('lf.Type');
 goog.require('lf.schema.BaseColumn');
@@ -68,19 +70,19 @@ github.db.schema.Database = function() {
 
 
 /** @override */
-github.db.schema.Database.prototype.getName = function() {
+github.db.schema.Database.prototype.name = function() {
   return 'github';
 };
 
 
 /** @override */
-github.db.schema.Database.prototype.getVersion = function() {
+github.db.schema.Database.prototype.version = function() {
   return 7;
 };
 
 
 /** @override */
-github.db.schema.Database.prototype.getTables = function() {
+github.db.schema.Database.prototype.tables = function() {
   return [
     this.issues_,
     this.users_,
@@ -230,7 +232,7 @@ github.db.schema.Issues = function() {
   cols.push(this.updated_at);
 
   var indices = [
-    new lf.schema.Index('Issues', 'pkIssues', true, ['id'])
+    new lf.schema.Index('Issues', 'pkIssues', true, [{'name': 'id'}])
   ];
 
   github.db.schema.Issues.base(
@@ -273,7 +275,7 @@ github.db.schema.Issues.prototype.deserializeRow = function(dbRecord) {
 
 /** @override */
 github.db.schema.Issues.prototype.getConstraint = function() {
-  var pk = new lf.schema.Index('Issues', 'pkIssues', true, ['id']);
+  var pk = new lf.schema.Index('Issues', 'pkIssues', true, [{'name': 'id'}]);
   var notNullable = [
     this.id,
     this.owner,
@@ -900,8 +902,9 @@ github.db.schema.Users = function() {
   cols.push(this.updated_at);
 
   var indices = [
-    new lf.schema.Index('Users', 'pkUsers', true, ['id']),
-    new lf.schema.Index('Users', 'idx_Name', false, ['login'])
+    new lf.schema.Index('Users', 'pkUsers', true, [{'name': 'id'}]),
+    new lf.schema.Index('Users', 'idx_Name', false,
+        [{'name': 'login'}])
   ];
 
   github.db.schema.Users.base(
@@ -958,7 +961,7 @@ github.db.schema.Users.prototype.deserializeRow = function(dbRecord) {
 
 /** @override */
 github.db.schema.Users.prototype.getConstraint = function() {
-  var pk = new lf.schema.Index('Users', 'pkUsers', true, ['id']);
+  var pk = new lf.schema.Index('Users', 'pkUsers', true, [{'name': 'id'}]);
   var notNullable = [
     this.login,
     this.id,
@@ -1790,7 +1793,7 @@ github.db.schema.Milestones = function() {
   cols.push(this.due_on);
 
   var indices = [
-    new lf.schema.Index('Milestones', 'pkMilestones', true, ['number'])
+    new lf.schema.Index('Milestones', 'pkMilestones', true, [{'name': 'number'}])
   ];
 
   github.db.schema.Milestones.base(
@@ -1828,7 +1831,7 @@ github.db.schema.Milestones.prototype.deserializeRow = function(dbRecord) {
 
 /** @override */
 github.db.schema.Milestones.prototype.getConstraint = function() {
-  var pk = new lf.schema.Index('Milestones', 'pkMilestones', true, ['number']);
+  var pk = new lf.schema.Index('Milestones', 'pkMilestones', true, [{'name': 'number'}]);
   var notNullable = [
     this.url,
     this.number,
@@ -2300,7 +2303,7 @@ github.db.schema.PullRequests = function() {
   cols.push(this.user);
 
   var indices = [
-    new lf.schema.Index('PullRequests', 'pkPullRequests', true, ['id'])
+    new lf.schema.Index('PullRequests', 'pkPullRequests', true, [{'name': 'id'}])
   ];
 
   github.db.schema.PullRequests.base(
@@ -2347,7 +2350,7 @@ github.db.schema.PullRequests.prototype.deserializeRow = function(dbRecord) {
 
 /** @override */
 github.db.schema.PullRequests.prototype.getConstraint = function() {
-  var pk = new lf.schema.Index('PullRequests', 'pkPullRequests', true, ['id']);
+  var pk = new lf.schema.Index('PullRequests', 'pkPullRequests', true, [{'name': 'id'}]);
   var notNullable = [
     this.id,
     this.url,
@@ -2964,7 +2967,7 @@ github.db.schema.Commits = function() {
   cols.push(this.message);
 
   var indices = [
-    new lf.schema.Index('Commits', 'pkCommits', true, ['sha'])
+    new lf.schema.Index('Commits', 'pkCommits', true, [{'name': 'sha'}])
   ];
 
   github.db.schema.Commits.base(
@@ -2987,7 +2990,7 @@ github.db.schema.Commits.prototype.deserializeRow = function(dbRecord) {
 
 /** @override */
 github.db.schema.Commits.prototype.getConstraint = function() {
-  var pk = new lf.schema.Index('Commits', 'pkCommits', true, ['sha']);
+  var pk = new lf.schema.Index('Commits', 'pkCommits', true, [{'name': 'sha'}]);
   var notNullable = [
     this.sha,
     this.url,
@@ -3273,7 +3276,7 @@ github.db.schema.Organizations = function() {
   cols.push(this.type);
 
   var indices = [
-    new lf.schema.Index('Organizations', 'pkOrganizations', true, ['id'])
+    new lf.schema.Index('Organizations', 'pkOrganizations', true, [{'name': 'id'}])
   ];
 
   github.db.schema.Organizations.base(
@@ -3315,7 +3318,7 @@ github.db.schema.Organizations.prototype.deserializeRow = function(dbRecord) {
 
 /** @override */
 github.db.schema.Organizations.prototype.getConstraint = function() {
-  var pk = new lf.schema.Index('Organizations', 'pkOrganizations', true, ['id']);
+  var pk = new lf.schema.Index('Organizations', 'pkOrganizations', true, [{'name': 'id'}]);
   var notNullable = [
     this.id,
     this.login,
@@ -3935,7 +3938,7 @@ github.db.schema.Repositories = function() {
   cols.push(this.updated_at);
 
   var indices = [
-    new lf.schema.Index('Repositories', 'pkRepositories', true, ['id'])
+    new lf.schema.Index('Repositories', 'pkRepositories', true, [{'name': 'id'}])
   ];
 
   github.db.schema.Repositories.base(
@@ -3989,7 +3992,7 @@ github.db.schema.Repositories.prototype.deserializeRow = function(dbRecord) {
 
 /** @override */
 github.db.schema.Repositories.prototype.getConstraint = function() {
-  var pk = new lf.schema.Index('Repositories', 'pkRepositories', true, ['id']);
+  var pk = new lf.schema.Index('Repositories', 'pkRepositories', true, [{'name': 'id'}]);
   var notNullable = [
     this.id,
     this.owner,

@@ -26,6 +26,6 @@
     "karma-chrome-launcher": "^0.1.7",
     "karma-jasmine": "^0.3.3",
     "karma-ng-html2js-preprocessor": "^0.1.2",
-    "lovefield": "git://github.com/jeffbcross/lovefield"
+    "lovefield": "git://github.com/google/lovefield"
   }
 }
