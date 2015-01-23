@@ -13,18 +13,13 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
   var page = parseInt($routeParams.page, 10) || 1;
 
   $scope.issues = [];
-  $scope.$on('$locationChangeStart', updateQueryAndSubscription);
+  $scope.$on('$locationChangeStart', reFetchIssues);
 
   fetchIssues(db).
-    then(logAndReturn).
     then(renderData).
-    then(logAndReturn).
     then(countPages).
-    then(logAndReturn).
     then(renderPageCount).
-    then(logAndReturn).
     then(subscribeToIssues).
-    then(logAndReturn).
     then(function() {
       issuesCacheUpdater(db);
     });
@@ -55,13 +50,12 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
   }
 
 
-  function updateQueryAndSubscription(page,state,search) {
-    unobserve().
-      then(fetchIssues).
+  function reFetchIssues(page) {
+    console.log('reFetchIssues');
+    fetchIssues().
       then(renderData).
       then(countPages).
-      then(renderPageCount).
-      then(subscribeToIssues);
+      then(renderPageCount);
   }
 
   function getBaseQuery() {
@@ -134,6 +128,7 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
         table.title).from(table).where(predicate)
 
     //Stay abreast of further updates
+    console.log('setting observer');
     db.observe(observeQuery, updateData);
   }
 
@@ -157,13 +152,18 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
 
   //TODO: eventually utilize observer changes if API can provide what we need
   function updateData () {
+    console.log('update data');
     getBaseQuery().
       then(paginate).
       then(orderAndPredicate).
-      exec().
+      then(function(q) {
+        return q.exec();
+      }).
       then(renderData).
       then(countPages).
       then(renderPageCount);
+
+    console.log('done with updateData');
   }
 }
 
@@ -179,9 +179,11 @@ function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
   }
 
   function updateIssuesCache (url) {
+    console.log('fetching ', url);
     $http.get(url).
       then(insertData).
       then(function(res) {
+        console.log('updateIssuesCache res', res, res && res.headers());
         var nextPage = getNextPageUrl(res);
         if (res.data && res.data.length) {
           updatedAt = res.data[0].updated_at;
@@ -189,7 +191,7 @@ function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
         }
 
         if (nextPage) {
-          // updateIssuesCache(nextPage);
+          updateIssuesCache(nextPage);
         }
       });
   }
@@ -221,15 +223,9 @@ function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
     }, {issues: [], users: [], milestones: []});
 
     return Promise.all([
-      db.insertOrReplace().into(table).values(group.issues).exec().then(function(input) {
-        return input;
-      }),
-      db.insertOrReplace().into(usersTable).values(group.users).exec().then(function(input) {
-        return input;
-      }),
-      db.insertOrReplace().into(milestonesTable).values(group.milestones).exec().then(function(input) {
-        return input;
-      })
+      db.insertOrReplace().into(table).values(group.issues).exec().then(logAndReturn('issues')),
+      db.insertOrReplace().into(usersTable).values(group.users).exec().then(logAndReturn('users')),
+      db.insertOrReplace().into(milestonesTable).values(group.milestones).exec().then(logAndReturn('milestones'))
     ]).
     then(function() {
       return res;
@@ -331,6 +327,13 @@ function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
       split('; rel=');
     if (firstLinkTuple[1].replace(/"/g,'') === 'next') {
       return firstLinkTuple[0].replace(/[<>]*/g, '');
+    }
+  }
+
+  function logAndReturn (type) {
+    return function (input) {
+      console.log('done inserting', type, ':', input);
+      return input;
     }
   }
 }
