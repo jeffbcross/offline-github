@@ -10,13 +10,17 @@
 
       <nav>
         <ul class="pager">
-          <li class="previous" ng-class="{'disabled':getPage() == 0}">
-            <a ng-click="prevPage()">
+          <li class="previous"
+              ng-disabled="getPage() == 0"
+              ng-class="{'disabled':getPage() == 0}">
+            <a ng-click="goToPrevPage()">
               Previous
             </a>
           </li>
-          <li class="next" ng-class="{'disabled':getPage() == pages.length - 1}">
-            <a ng-click="nextPage()">
+          <li class="next"
+              ng-disabled="getPage() >= pages.length - 1"
+              ng-class="{'disabled':getPage() >= pages.length - 1}">
+            <a ng-click="goToNextPage()">
               Next
             </a>
           </li>

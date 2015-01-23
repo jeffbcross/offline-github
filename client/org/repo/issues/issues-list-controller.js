@@ -15,7 +15,7 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
   $scope.issues = [];
   $scope.$on('$locationChangeStart', updateQueryAndSubscription);
 
-  getAndRenderIssues(db).
+  fetchIssues(db).
     then(renderData).
     then(countPages).
     then(renderPageCount).
@@ -26,16 +26,16 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
 
   $scope.$on('$destroy', unobserve);
 
-  $scope.prevPage = function() {
+  $scope.goToPrevPage = function() {
     if (page > 0) {
       setPage(page-1);
     }
   };
 
-  $scope.nextPage = function() {
-    if ($scope.pages && page < $scope.pages.length) {
+  $scope.goToNextPage = function() {
+    if ($scope.pages && page < $scope.pages.length - 1) {
       setPage(page+1);
-    } else if ($scope.pages && page > $scope.pages.length - 1) {
+    } else if ($scope.pages && page >= $scope.pages.length - 1) {
       setPage($scope.pages.length - 1);
     }
   };
@@ -52,8 +52,10 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
 
   function updateQueryAndSubscription(page,state,search) {
     unobserve().
-      then(getAndRenderIssues).
+      then(fetchIssues).
+      then(renderData).
       then(countPages).
+      then(renderPageCount).
       then(subscribeToIssues);
   }
 
@@ -101,16 +103,21 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
   }
 
   function countPages() {
-    return getCountQuery().exec();
+    return getCountQuery().exec().then(logAndReturn);
   }
 
-  function getAndRenderIssues() {
+  function fetchIssues() {
     return getBaseQuery().
       then(paginate).
       then(orderAndPredicate).
       then(function(q) {
         return q.exec();
       });
+  }
+
+  function logAndReturn (input) {
+    console.log(input)
+    return input
   }
 
   function subscribeToIssues() {
@@ -136,6 +143,7 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
 
   function renderPageCount(count) {
     var pages = Math.ceil(count[0][COUNT_PROPERTY_NAME] / ITEMS_PER_PAGE);
+    console.log('renderPageCount', pages);
     $scope.$apply(function(){
       $scope.pages=new Array(pages);
     });
@@ -159,7 +167,6 @@ function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
   var updatedAt
   var totalAdded = 0;
   return function(_db_) {
-    console.log('starting cache fetch');
     db = _db_;
     table = db.getSchema().getIssues();
     updateIssuesCache(buildUpdateUrl());
@@ -169,16 +176,14 @@ function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
     $http.get(url).
       then(insertData).
       then(function(res) {
-        console.log('got response', res);
         var nextPage = getNextPageUrl(res);
         if (res.data && res.data.length) {
           updatedAt = res.data[0].updated_at;
           localStorage.setItem(localKeyBuilder($routeParams.org, $routeParams.repo), updatedAt)
-          console.log('set updatedAt', updatedAt);
         }
 
         if (nextPage) {
-          updateIssuesCache(nextPage);
+          // updateIssuesCache(nextPage);
         }
       });
   }
@@ -188,33 +193,41 @@ function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
   }
 
   function insertData(res) {
+    var usersTable = db.getSchema().getUsers();
+    var milestonesTable = db.getSchema().getMilestones();
     totalAdded += (res && res.data && res.data.length) || 0;
-    console.log('adding more data', totalAdded);
-    console.log('res', res);
+    var group = res.data.reduce(function(prev, issue) {
+      var transformedIssue = issueStorageTranslator(issue);
+      var transformedUser = userStorageTranslator(issue.user);
+      var transformedMilestone = milestoneStorageTranslator(issue.milestone);
 
-    return Promise.all(res.data.map(function(issue) {
-      console.log('mapping', issue);
-      var promise = issueStorageTranslator(issue);
-      console.log('then', promise.then);
-      return promise.then(createRow);
-    })).
-      then(function(issues) {
-        console.log('issues');
-        return db.insertOrReplace().into(table).values(issues).exec()
-      }, function(e) {
-        console.log('could not get issues', e.stack)
-      }).
-      then(function() {
-        console.log('done inserting');
-        return res;
-      }, function(e) {
-        console.log('problem inserting', e.message);
-      });
-  }
+      if (transformedMilestone) {
+        prev.milestones.push(milestonesTable.createRow(transformedMilestone));
+      }
+      if (transformedUser) {
+        prev.users.push(usersTable.createRow(transformedUser));
+      }
+      if (transformedIssue) {
+        prev.issues.push(table.createRow(transformedIssue));
+      }
 
-  function createRow(issue) {
-    console.log('createRow', issue);
-    return table.createRow(issue);
+      return prev;
+    }, {issues: [], users: [], milestones: []});
+
+    return Promise.all([
+      db.insertOrReplace().into(table).values(group.issues).exec().then(function(input) {
+        return input;
+      }),
+      db.insertOrReplace().into(usersTable).values(group.users).exec().then(function(input) {
+        return input;
+      }),
+      db.insertOrReplace().into(milestonesTable).values(group.milestones).exec().then(function(input) {
+        return input;
+      })
+    ]).
+    then(function() {
+      return res;
+    });
   }
 
   function buildUpdateUrl() {
@@ -238,44 +251,17 @@ function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
 
   function issueStorageTranslator(issue){
     /*jshint camelcase: false */
-    var usersTable = db.getSchema().getUsers();
-    var milestonesTable = db.getSchema().getMilestones();
 
-    return userStorageTranslator(issue.user).
-      then(function(user) {
-        var row = usersTable.createRow(user);
-        return db.
-          insertOrReplace().
-          into(usersTable).
-          values([row]).
-          exec().
-          then(function() {
-            console.log('then transform milestone');
-            return milestoneStorageTranslator(issue.milestone);
-          }).
-          then(function(milestone) {
-            console.log('then insert milestone');
-            var row = milestonesTable.createRow(milestone);
-            return db.
-              insertOrReplace().
-              into(milestonesTable).
-              values([row]).
-              exec()
-          }).
-          then(function() {
-            console.log('then create issue');
-            var newIssue = angular.copy(issue);
-            newIssue.assignee = issue.assignee || -1;
-            newIssue.body = issue.body || '';
-            newIssue.user = issue.user.id;
+    var newIssue = angular.copy(issue);
+    newIssue.assignee = issue.assignee || -1;
+    newIssue.body = issue.body || '';
+    newIssue.user = issue.user.id;
 
-            newIssue.milestone = issue.milestone || -1;
-            newIssue.created_at = new Date(issue.created_at);
-            newIssue.updated_at = new Date(issue.updated_at);
-            newIssue.closed_at = new Date(issue.closed_at);
-            return newIssue;
-          });
-      });
+    newIssue.milestone = issue.milestone || -1;
+    newIssue.created_at = new Date(issue.created_at);
+    newIssue.updated_at = new Date(issue.updated_at);
+    newIssue.closed_at = new Date(issue.closed_at);
+    return newIssue;
   }
 
   function userStorageTranslator(user) {
@@ -310,10 +296,11 @@ function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
     newUser.following =parseInt(user.following, 10) || -1;
     newUser.created_at =new Date(user.created_at);
     newUser.updated_at =new Date(user.updated_at);
-    return Promise.resolve(newUser);
+    return newUser;
   }
 
   function milestoneStorageTranslator (milestone) {
+    if (!milestone) return milestone;
     var newMilestone = angular.copy(milestone);
     newMilestone.url = milestone.url || '';
     newMilestone.number = parseInt(milestone.number, 10);
@@ -327,7 +314,7 @@ function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
     newMilestone.updated_at = new Date(milestone.updated_at);
     newMilestone.closed_at = new Date(milestone.closed_at);
     newMilestone.due_on = new Date(milestone.due_on);
-    return Promise.resolve(newMilestone);
+    return newMilestone;
   }
 
   function getNextPageUrl (res) {

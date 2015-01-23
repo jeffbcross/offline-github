@@ -75,7 +75,7 @@ github.db.schema.Database.prototype.getName = function() {
 
 /** @override */
 github.db.schema.Database.prototype.getVersion = function() {
-  return 6;
+  return 7;
 };
 
 
@@ -234,7 +234,7 @@ github.db.schema.Issues = function() {
   ];
 
   github.db.schema.Issues.base(
-      this, 'constructor', 'Issues', cols, indices, false);
+      this, 'constructor', 'Issues', cols, indices, true);
 };
 goog.inherits(github.db.schema.Issues, lf.schema.Table);
 
@@ -900,11 +900,12 @@ github.db.schema.Users = function() {
   cols.push(this.updated_at);
 
   var indices = [
-    new lf.schema.Index('Users', 'pkUsers', true, ['id'])
+    new lf.schema.Index('Users', 'pkUsers', true, ['id']),
+    new lf.schema.Index('Users', 'idx_Name', false, ['login'])
   ];
 
   github.db.schema.Users.base(
-      this, 'constructor', 'Users', cols, indices, false);
+      this, 'constructor', 'Users', cols, indices, true);
 };
 goog.inherits(github.db.schema.Users, lf.schema.Table);
 
@@ -1228,6 +1229,8 @@ github.db.row.Users.prototype.keyOfIndex = function(indexName) {
   switch (indexName) {
     case 'Users.pkUsers':
       return this.payload().id;
+    case 'Users.idx_Name':
+      return this.payload().login;
     case 'Users.#':
       return this.id();
     default:
@@ -1791,7 +1794,7 @@ github.db.schema.Milestones = function() {
   ];
 
   github.db.schema.Milestones.base(
-      this, 'constructor', 'Milestones', cols, indices, false);
+      this, 'constructor', 'Milestones', cols, indices, true);
 };
 goog.inherits(github.db.schema.Milestones, lf.schema.Table);
 
@@ -2301,7 +2304,7 @@ github.db.schema.PullRequests = function() {
   ];
 
   github.db.schema.PullRequests.base(
-      this, 'constructor', 'PullRequests', cols, indices, false);
+      this, 'constructor', 'PullRequests', cols, indices, true);
 };
 goog.inherits(github.db.schema.PullRequests, lf.schema.Table);
 
@@ -2965,7 +2968,7 @@ github.db.schema.Commits = function() {
   ];
 
   github.db.schema.Commits.base(
-      this, 'constructor', 'Commits', cols, indices, false);
+      this, 'constructor', 'Commits', cols, indices, true);
 };
 goog.inherits(github.db.schema.Commits, lf.schema.Table);
 
@@ -3274,7 +3277,7 @@ github.db.schema.Organizations = function() {
   ];
 
   github.db.schema.Organizations.base(
-      this, 'constructor', 'Organizations', cols, indices, false);
+      this, 'constructor', 'Organizations', cols, indices, true);
 };
 goog.inherits(github.db.schema.Organizations, lf.schema.Table);
 
@@ -3936,7 +3939,7 @@ github.db.schema.Repositories = function() {
   ];
 
   github.db.schema.Repositories.base(
-      this, 'constructor', 'Repositories', cols, indices, false);
+      this, 'constructor', 'Repositories', cols, indices, true);
 };
 goog.inherits(github.db.schema.Repositories, lf.schema.Table);
 
@@ -4782,5 +4785,5 @@ github.db.getInstance = function(opt_onUpgrade, opt_volatile) {
   return db.init(
       opt_onUpgrade,
       opt_volatile ? lf.base.BackStoreType.MEMORY : undefined,
-      false);
+      true);
 };

@@ -1,7 +1,9 @@
 %YAML 1.2
 ---
 name: github
-version: 6
+pragma:
+  enableBundledMode: true
+version: 7
 table:
   Issues:
     column:
@@ -24,7 +26,7 @@ table:
       created_at: datetime
       updated_at: datetime
     constraint:
-      nullable: [ closed_at ]
+      nullable: [ milestone, closed_at ]
       primaryKey: [ id ]
       foreignKey:
         fk_UserId:
@@ -47,6 +49,8 @@ table:
           localColumn: repository
           reference: Repositories
           remoteColumn: name
+    pragma:
+      persistentIndex: true
   Users:
     column:
       login: string
@@ -83,6 +87,11 @@ table:
     constraint:
       nullable: [ name, company, blog, location, email, bio, created_at, updated_at ]
       primaryKey: [ id ]
+    index:
+      idx_Name:
+        column: [ login ]
+    pragma:
+      persistentIndex: true
   Milestones:
     column:
       url: string
@@ -105,6 +114,8 @@ table:
           localColumn: creator
           reference: Users
           remoteColumn: id
+    pragma:
+      persistentIndex: true
   PullRequests:
     column:
       id: integer
@@ -144,6 +155,8 @@ table:
           localColumn: user
           reference: Users
           remoteColumn: id
+    pragma:
+      persistentIndex: true
   Commits:
     column:
       sha: string
@@ -164,6 +177,8 @@ table:
           localColumn: committer
           reference: Users
           remoteColumn: id
+    pragma:
+      persistentIndex: true
   Organizations:
     column:
       id: integer
@@ -186,6 +201,8 @@ table:
     constraint:
       primaryKey: [ id ]
       nullable: [ avatar_url, description ]
+    pragma:
+      persistentIndex: true
   Repositories:
     column:
       id: integer
@@ -230,3 +247,5 @@ table:
           localColumn: owner
           reference: Users
           remoteColumn: id
+    pragma:
+      persistentIndex: true
