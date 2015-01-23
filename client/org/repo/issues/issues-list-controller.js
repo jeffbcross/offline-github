@@ -10,16 +10,21 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
     repository: $routeParams.repo,
     organization: $routeParams.org
   });
-  var page = parseInt($routeParams.page, 10) || 0;
+  var page = parseInt($routeParams.page, 10) || 1;
 
   $scope.issues = [];
   $scope.$on('$locationChangeStart', updateQueryAndSubscription);
 
   fetchIssues(db).
+    then(logAndReturn).
     then(renderData).
+    then(logAndReturn).
     then(countPages).
+    then(logAndReturn).
     then(renderPageCount).
+    then(logAndReturn).
     then(subscribeToIssues).
+    then(logAndReturn).
     then(function() {
       issuesCacheUpdater(db);
     });
@@ -27,16 +32,16 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
   $scope.$on('$destroy', unobserve);
 
   $scope.goToPrevPage = function() {
-    if (page > 0) {
+    if (page > 1) {
       setPage(page-1);
     }
   };
 
   $scope.goToNextPage = function() {
-    if ($scope.pages && page < $scope.pages.length - 1) {
+    if ($scope.pages && page < $scope.pages.length) {
       setPage(page+1);
-    } else if ($scope.pages && page >= $scope.pages.length - 1) {
-      setPage($scope.pages.length - 1);
+    } else if ($scope.pages && page >= $scope.pages.length) {
+      setPage($scope.pages.length);
     }
   };
 
@@ -70,7 +75,7 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
     var pageNum = 0;
 
     if(angular.isDefined($routeParams.page)) {
-      pageNum = parseInt($routeParams.page, 10);
+      pageNum = parseInt($routeParams.page, 10) - 1;
     }
 
     if(pageNum) {
@@ -107,6 +112,7 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
   }
 
   function fetchIssues() {
+    console.log('fetch them!')
     return getBaseQuery().
       then(paginate).
       then(orderAndPredicate).
