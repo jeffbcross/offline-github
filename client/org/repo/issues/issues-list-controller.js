@@ -1,16 +1,47 @@
+//TODO: subscription logic needs to subscribe/unsubscribe when route changes
+
 (function() {
 
 function IssuesListController ($http, $location, $scope, $routeParams, db,
     issuesCacheUpdater, lovefieldQueryBuilder, mockIssues, firebaseAuth) {
   var ITEMS_PER_PAGE = 30;
-  var COUNT_PROPERTY_NAME = 'COUNT(id)';
   var observeQuery;
   var table = db.getSchema().getIssues();
-  var predicate = lovefieldQueryBuilder({
+  var predicate = lovefieldQueryBuilder(table, {
     repository: $routeParams.repo,
-    organization: $routeParams.org
+    owner: $routeParams.org
   });
+  var COUNT_PROPERTY_NAME = 'COUNT(id)';
   var page = parseInt($routeParams.page, 10) || 1;
+
+  var worker = new Worker('issues-synchronizer.js');
+  worker.onmessage = function(msg) {
+    console.log('message received from worker', msg);
+  }
+
+  worker.onmessage = function(e) {
+    switch (e.data.operation) {
+      case 'localStorage.getItem':
+        worker.postMessage({
+          operation: 'localStorage.getItem',
+          result: localStorage.getItem(e.data.key),
+          key: e.data.key
+        });
+        break;
+      case 'localStorage.setItem':
+        localStorage.setItem(e.data.key, e.data.payload);
+        break;
+      case 'firebaseAuth.getAuth':
+        worker.postMessage({
+          operation: 'firebaseAuth.getAuth',
+          auth: firebaseAuth.getAuth()
+        });
+        break;
+      case 'count.update':
+        renderPageCount(e.data.count);
+        break;
+    }
+  }
 
   $scope.issues = [];
   $scope.$on('$locationChangeStart', reFetchIssues);
@@ -19,12 +50,17 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
     then(renderData).
     then(countPages).
     then(renderPageCount).
-    then(subscribeToIssues).
-    then(function() {
-      issuesCacheUpdater(db);
-    });
+    then(syncFromWorker);
 
-  $scope.$on('$destroy', unobserve);
+  function syncFromWorker() {
+    worker.postMessage({
+      operation: 'sync.read',
+      query: {
+        repository: $routeParams.repo,
+        owner: $routeParams.org
+      }
+    });
+  }
 
   $scope.goToPrevPage = function() {
     if (page > 1) {
@@ -49,13 +85,35 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
     $location.search('page', page);
   }
 
+  function lovefieldQueryBuilder(schema, query){
+    var normalizedQuery = [];
+    var count = 0;
+    for (var key in query) {
+      console.log('query input', query.repository, query.owner);
+      if (query.hasOwnProperty(key) && schema[key]) {
+        count++
+        normalizedQuery.push(schema[key].eq(query[key]));
+      }
+    }
+
+    if (!count) {
+      return;
+    }
+    else if (count === 1) {
+      return normalizedQuery[0];
+    }
+    else {
+      return lf.op.and.apply(null, normalizedQuery);
+    }
+  }
 
   function reFetchIssues(page) {
     console.log('reFetchIssues');
     fetchIssues().
       then(renderData).
       then(countPages).
-      then(renderPageCount);
+      then(renderPageCount).
+      then(syncFromWorker);
   }
 
   function getBaseQuery() {
@@ -81,9 +139,11 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
   }
 
   function orderAndPredicate(query) {
+    console.log('predicate', predicate)
     return query.
-      orderBy(table.number, lf.Order.DESC).
-      where(predicate);
+      where(predicate).
+      orderBy(table.number, lf.Order.DESC);
+
   }
 
   function getCountQuery() {
@@ -111,6 +171,7 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
       then(paginate).
       then(orderAndPredicate).
       then(function(q) {
+        console.log('executing query', q.explain())
         return q.exec();
       });
   }
@@ -129,7 +190,7 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
 
     //Stay abreast of further updates
     console.log('setting observer');
-    db.observe(observeQuery, updateData);
+    // db.observe(observeQuery, updateData);
   }
 
   function showError() {
@@ -143,7 +204,13 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
   }
 
   function renderPageCount(count) {
-    var pages = Math.ceil(count[0][COUNT_PROPERTY_NAME] / ITEMS_PER_PAGE);
+
+    var pages;
+    if (Array.isArray(count)) {
+      pages = Math.ceil(count[0][COUNT_PROPERTY_NAME] / ITEMS_PER_PAGE);
+    } else {
+      pages = Math.ceil(count / ITEMS_PER_PAGE);
+    }
     console.log('renderPageCount', pages);
     $scope.$apply(function(){
       $scope.pages=new Array(pages);

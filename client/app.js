@@ -47,6 +47,8 @@ function getDB() {
   return github.db.getInstance().then(function(_db){
     db = _db;
     return db;
+  }, function(e) {
+    console.log('error loading database', e.stack);
   });
 }
 
