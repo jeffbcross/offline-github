@@ -38,7 +38,11 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
         });
         break;
       case 'count.update':
-        renderPageCount(e.data.count);
+        if (e.data.query.owner === $routeParams.org &&
+            e.data.query.repository === $routeParams.repo) {
+          renderPageCount(e.data.count);
+        }
+
         break;
     }
   }
@@ -234,186 +238,11 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
   }
 }
 
-function issuesCacheUpdaterFactory($http, $routeParams, firebaseAuth) {
-  var db;
-  var table;
-  var updatedAt
-  var totalAdded = 0;
-  return function(_db_) {
-    db = _db_;
-    table = db.getSchema().getIssues();
-    updateIssuesCache(buildUpdateUrl());
-  }
-
-  function updateIssuesCache (url) {
-    console.log('fetching ', url);
-    $http.get(url).
-      then(insertData).
-      then(function(res) {
-        console.log('updateIssuesCache res', res, res && res.headers());
-        var nextPage = getNextPageUrl(res);
-        if (res.data && res.data.length) {
-          updatedAt = res.data[0].updated_at;
-          localStorage.setItem(localKeyBuilder($routeParams.org, $routeParams.repo), updatedAt)
-        }
-
-        if (nextPage) {
-          updateIssuesCache(nextPage);
-        }
-      });
-  }
-
-  function localKeyBuilder(owner, repo) {
-    return owner + ':' + repo + ':last_update';
-  }
-
-  function insertData(res) {
-    var usersTable = db.getSchema().getUsers();
-    var milestonesTable = db.getSchema().getMilestones();
-    totalAdded += (res && res.data && res.data.length) || 0;
-    var group = res.data.reduce(function(prev, issue) {
-      var transformedIssue = issueStorageTranslator(issue);
-      var transformedUser = userStorageTranslator(issue.user);
-      var transformedMilestone = milestoneStorageTranslator(issue.milestone);
-
-      if (transformedMilestone) {
-        prev.milestones.push(milestonesTable.createRow(transformedMilestone));
-      }
-      if (transformedUser) {
-        prev.users.push(usersTable.createRow(transformedUser));
-      }
-      if (transformedIssue) {
-        prev.issues.push(table.createRow(transformedIssue));
-      }
-
-      return prev;
-    }, {issues: [], users: [], milestones: []});
-
-    return Promise.all([
-      db.insertOrReplace().into(table).values(group.issues).exec().then(logAndReturn('issues')),
-      db.insertOrReplace().into(usersTable).values(group.users).exec().then(logAndReturn('users')),
-      db.insertOrReplace().into(milestonesTable).values(group.milestones).exec().then(logAndReturn('milestones'))
-    ]).
-    then(function() {
-      return res;
-    });
-  }
-
-  function buildUpdateUrl() {
-    //TODO: order by and updated since
-    //TODO: store timestamp in localstorage
-    var lastUpdated = localStorage.getItem(
-        localKeyBuilder($routeParams.org, $routeParams.repo));
-    return 'https://api.github.com/repos/'+
-      $routeParams.org+
-      '/'+
-      $routeParams.repo+
-      '/issues?'+
-      'per_page=100&'+
-      'state=all&'+
-      'sort=updated&'+
-      'direction=asc&'+
-      (lastUpdated?'since='+lastUpdated+'&':'')+
-      'access_token='+
-      firebaseAuth.getAuth().github.accessToken;
-  }
-
-  function issueStorageTranslator(issue){
-    /*jshint camelcase: false */
-
-    var newIssue = angular.copy(issue);
-    newIssue.assignee = issue.assignee || -1;
-    newIssue.body = issue.body || '';
-    newIssue.user = issue.user.id;
-
-    newIssue.milestone = issue.milestone || -1;
-    newIssue.created_at = new Date(issue.created_at);
-    newIssue.updated_at = new Date(issue.updated_at);
-    newIssue.closed_at = new Date(issue.closed_at);
-    return newIssue;
-  }
-
-  function userStorageTranslator(user) {
-    var newUser = angular.copy(user);
-    newUser.login =user.login || '';
-    newUser.id =parseInt(user.id, 10);
-    newUser.avatar_url =user.avatar_url || '';
-    newUser.gravatar_id =user.gravatar_id || '';
-    newUser.url =user.url || '';
-    newUser.html_url =user.html_url || '';
-    newUser.followers_url =user.followers_url || '';
-    newUser.following_url =user.following_url || '';
-    newUser.gists_url =user.gists_url || '';
-    newUser.starred_url =user.starred_url || '';
-    newUser.subscriptions_url =user.subscriptions_url || '';
-    newUser.organizations_url =user.organizations_url || '';
-    newUser.repos_url =user.repos_url || '';
-    newUser.events_url =user.events_url || '';
-    newUser.received_events_url =user.received_events_url || '';
-    newUser.type =user.type || '';
-    newUser.site_admin =user.site_admin || false;
-    newUser.name =user.name || '';
-    newUser.company =user.company || '';
-    newUser.blog =user.blog || '';
-    newUser.location =user.location || '';
-    newUser.email =user.email || '';
-    newUser.hireable =user.hireable || false;
-    newUser.bio =user.bio || '';
-    newUser.public_repos =parseInt(user.public_repos, 10) || -1;
-    newUser.public_gists =parseInt(user.public_gists, 10) || -1;
-    newUser.followers =parseInt(user.followers, 10) || -1;
-    newUser.following =parseInt(user.following, 10) || -1;
-    newUser.created_at =new Date(user.created_at);
-    newUser.updated_at =new Date(user.updated_at);
-    return newUser;
-  }
-
-  function milestoneStorageTranslator (milestone) {
-    if (!milestone) return milestone;
-    var newMilestone = angular.copy(milestone);
-    newMilestone.url = milestone.url || '';
-    newMilestone.number = parseInt(milestone.number, 10);
-    newMilestone.state = milestone.state || '';
-    newMilestone.title = milestone.title || '';
-    newMilestone.description = milestone.description || '';
-    newMilestone.creator = parseInt(milestone.creator, 10);
-    newMilestone.open_issues = parseInt(milestone.open_issues, 10);
-    newMilestone.closed_issues = parseInt(milestone.closed_issues, 10);
-    newMilestone.created_at = new Date(milestone.created_at);
-    newMilestone.updated_at = new Date(milestone.updated_at);
-    newMilestone.closed_at = new Date(milestone.closed_at);
-    newMilestone.due_on = new Date(milestone.due_on);
-    return newMilestone;
-  }
-
-  function getNextPageUrl (res) {
-    var linkHeader = res && res.headers('link')
-    if (!linkHeader) return undefined;
-    var firstLinkTuple = linkHeader.
-      split(', ')[0].
-      split('; rel=');
-    if (firstLinkTuple[1].replace(/"/g,'') === 'next') {
-      return firstLinkTuple[0].replace(/[<>]*/g, '');
-    }
-  }
-
-  function logAndReturn (type) {
-    return function (input) {
-      console.log('done inserting', type, ':', input);
-      return input;
-    }
-  }
-}
-
 angular.module('ghIssuesApp').
-  factory(
-      'issuesCacheUpdater',
-      ['$http', '$routeParams', 'firebaseAuth',
-          issuesCacheUpdaterFactory]).
   controller(
       'IssuesListController',
-      ['$http', '$location', '$scope', '$routeParams', 'db',
-          'issuesCacheUpdater', 'lovefieldQueryBuilder', 'mockIssues',
+      ['$location', '$scope', '$routeParams', 'db',
+          'lovefieldQueryBuilder',
           'firebaseAuth', IssuesListController]);
 
 }());

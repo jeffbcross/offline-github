@@ -1,4 +1,5 @@
 var COUNT_PROPERTY_NAME = 'COUNT(id)';
+//Have to do this so lovefield doesn't throw
 window = self
 importScripts('lovefield.js');
 importScripts('db/github_db_gen.js');
