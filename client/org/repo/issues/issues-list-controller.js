@@ -2,8 +2,8 @@
 
 (function() {
 
-function IssuesListController ($http, $location, $scope, $routeParams, db,
-    issuesCacheUpdater, lovefieldQueryBuilder, mockIssues, firebaseAuth) {
+function IssuesListController ($location, $scope, $routeParams, db,
+    lovefieldQueryBuilder, firebaseAuth) {
   var ITEMS_PER_PAGE = 30;
   var observeQuery;
   var table = db.getSchema().getIssues();
@@ -16,7 +16,6 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
 
   var worker = new Worker('issues-synchronizer.js');
   worker.onmessage = function(msg) {
-    console.log('message received from worker', msg);
   }
 
   worker.onmessage = function(e) {
@@ -89,30 +88,7 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
     $location.search('page', page);
   }
 
-  function lovefieldQueryBuilder(schema, query){
-    var normalizedQuery = [];
-    var count = 0;
-    for (var key in query) {
-      console.log('query input', query.repository, query.owner);
-      if (query.hasOwnProperty(key) && schema[key]) {
-        count++
-        normalizedQuery.push(schema[key].eq(query[key]));
-      }
-    }
-
-    if (!count) {
-      return;
-    }
-    else if (count === 1) {
-      return normalizedQuery[0];
-    }
-    else {
-      return lf.op.and.apply(null, normalizedQuery);
-    }
-  }
-
   function reFetchIssues(page) {
-    console.log('reFetchIssues');
     fetchIssues().
       then(renderData).
       then(countPages).
@@ -143,7 +119,6 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
   }
 
   function orderAndPredicate(query) {
-    console.log('predicate', predicate)
     return query.
       where(predicate).
       orderBy(table.number, lf.Order.DESC);
@@ -170,18 +145,15 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
   }
 
   function fetchIssues() {
-    console.log('fetch them!')
     return getBaseQuery().
       then(paginate).
       then(orderAndPredicate).
       then(function(q) {
-        console.log('executing query', q.explain())
         return q.exec();
       });
   }
 
   function logAndReturn (input) {
-    console.log(input)
     return input
   }
 
@@ -193,7 +165,6 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
         table.title).from(table).where(predicate)
 
     //Stay abreast of further updates
-    console.log('setting observer');
     // db.observe(observeQuery, updateData);
   }
 
@@ -215,7 +186,6 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
     } else {
       pages = Math.ceil(count / ITEMS_PER_PAGE);
     }
-    console.log('renderPageCount', pages);
     $scope.$apply(function(){
       $scope.pages=new Array(pages);
     });
@@ -223,7 +193,6 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
 
   //TODO: eventually utilize observer changes if API can provide what we need
   function updateData () {
-    console.log('update data');
     getBaseQuery().
       then(paginate).
       then(orderAndPredicate).
@@ -234,15 +203,13 @@ function IssuesListController ($http, $location, $scope, $routeParams, db,
       then(countPages).
       then(renderPageCount);
 
-    console.log('done with updateData');
   }
 }
 
 angular.module('ghIssuesApp').
   controller(
       'IssuesListController',
-      ['$location', '$scope', '$routeParams', 'db',
-          'lovefieldQueryBuilder',
+      ['$location', '$scope', '$routeParams', 'db', 'lovefieldQueryBuilder',
           'firebaseAuth', IssuesListController]);
 
 }());

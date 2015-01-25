@@ -19,7 +19,6 @@ var totalAdded = 0;
 
 onmessage = function(e) {
   var subscription;
-  console.log('message!', e);
   switch(e.data.operation) {
     case 'sync.read':
       Promise.resolve(promise).then(function() {
@@ -75,12 +74,11 @@ function lovefieldQueryBuilder(schema, query){
 
 
 function fetchAllData(subscription) {
-  console.log('fetchAllData', subscription.nextUrl);
 
-  return fetchIssues(subscription).
+  return fetchItems(subscription).
     then(insertData).
     then(getNextPageUrl).
-    then(countIssues).
+    then(countItems).
     then(function(subscription) {
       if (subscription.res && subscription.res.data && subscription.res.data.length) {
         var updatedAt = subscription.res.data[0].updated_at;
@@ -93,12 +91,11 @@ function fetchAllData(subscription) {
       if (subscription.nextUrl) {
         return fetchAllData(subscription);
       } else {
-        console.log('no nextPageUrl', subscription.nextUrl);
       }
     });
 }
 
-function countIssues(subscription) {
+function countItems(subscription) {
   return db.
     select(lf.fn.count(table.id)).
     from(table).
@@ -144,14 +141,12 @@ var firebaseAuth = {
   }
 };
 
-function fetchIssues(subscription) {
+function fetchItems(subscription) {
   return new Promise(function(resolve, reject) {
-    console.log('fetching ', subscription.nextUrl);
     var xhr = new XMLHttpRequest();
     xhr.open('get', subscription.nextUrl);
     xhr.responseType = 'json';
     xhr.addEventListener('load', function(e) {
-      console.log('xhr load', xhr)
       subscription.res = {
         headers: xhr.getAllResponseHeaders(),
         data: xhr.response
@@ -160,7 +155,6 @@ function fetchIssues(subscription) {
     })
 
     xhr.addEventListener('error', function(e) {
-      console.log('error', e);
       reject(xhr.error);
     });
     xhr.send();
@@ -212,7 +206,6 @@ function buildUpdateUrl(subscription) {
     firebaseAuth.getAuth()
   ]).
   then(function(results) {
-    console.log('results in buildUpdateUrl', results);
     var lastUpdated = results[0];
     var auth = results[1];
     subscription.nextUrl = 'https://api.github.com/repos/'+
@@ -318,7 +311,6 @@ function getNextPageUrl (subscription) {
 
 function logAndReturn (type) {
   return function (input) {
-    console.log('done inserting', type, ':', input);
     return input;
   }
 }
