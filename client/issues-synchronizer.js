@@ -10,7 +10,6 @@ var promise = github.db.getInstance().then(function(_db_) {
   table = db.getSchema().getIssues();
 });
 
-
 var getItemQueue = {};
 var firebaseAuthQueue;
 var cachedAuth;
@@ -76,17 +75,25 @@ function lovefieldQueryBuilder(schema, query){
 
 
 function fetchAllData(pipeline) {
-  console.log('fetchAllData', pipeline.startingUrl);
+  console.log('fetchAllData', pipeline.nextUrl);
 
   return fetchIssues(pipeline).
     then(insertData).
     then(getNextPageUrl).
     then(countIssues).
     then(function(pipeline) {
-      if (pipeline.startingUrl) {
+      if (pipeline.res && pipeline.res.data && pipeline.res.data.length) {
+        var updatedAt = pipeline.res.data[0].updated_at;
+        localStorage.setItem(
+            localKeyBuilder(pipeline.query.owner,
+              pipeline.query.repository),
+            updatedAt)
+      }
+
+      if (pipeline.nextUrl) {
         return fetchAllData(pipeline);
       } else {
-        console.log('no nextPageUrl', pipeline.startingUrl);
+        console.log('no nextPageUrl', pipeline.nextUrl);
       }
     });
 }
@@ -114,6 +121,13 @@ var localStorage = {
         key: key
       });
     });
+  },
+  setItem: function(key, val) {
+    postMessage({
+      operation: 'localStorage.setItem',
+      key: key,
+      payload: val
+    });
   }
 };
 
@@ -131,9 +145,9 @@ var firebaseAuth = {
 
 function fetchIssues(pipeline) {
   return new Promise(function(resolve, reject) {
-    console.log('fetching ', pipeline.startingUrl);
+    console.log('fetching ', pipeline.nextUrl);
     var xhr = new XMLHttpRequest();
-    xhr.open('get', pipeline.startingUrl);
+    xhr.open('get', pipeline.nextUrl);
     xhr.responseType = 'json';
     xhr.addEventListener('load', function(e) {
       console.log('xhr load', xhr)
@@ -200,7 +214,7 @@ function buildUpdateUrl(pipeline) {
     console.log('results in buildUpdateUrl', results);
     var lastUpdated = results[0];
     var auth = results[1];
-    pipeline.startingUrl = 'https://api.github.com/repos/'+
+    pipeline.nextUrl = 'https://api.github.com/repos/'+
       pipeline.query.owner+
       '/'+
       pipeline.query.repository+
@@ -294,9 +308,9 @@ function getNextPageUrl (pipeline) {
     var index = header.indexOf('Link');
     return index === 0;
   })[0];
-  if (!linkHeader) pipeline.startingUrl = null;
+  if (!linkHeader) pipeline.nextUrl = null;
   var matched = /^Link: <(https:\/\/[a-z0-9\.\/\?_=&]*)>; rel="next"/gi.exec(linkHeader);
-  pipeline.startingUrl = matched? matched[1] : null;
+  pipeline.nextUrl = matched? matched[1] : null;
 
   return pipeline;
 }
