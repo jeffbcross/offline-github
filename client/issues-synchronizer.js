@@ -17,18 +17,17 @@ var predicate;
 var totalAdded = 0;
 
 onmessage = function(e) {
-  var pipeline;
+  var subscription;
   console.log('message!', e);
   switch(e.data.operation) {
     case 'sync.read':
-
       Promise.resolve(promise).then(function() {
-        pipeline = {
+        subscription = {
           query: e.data.query,
           res: null,
           predicate: null
         }
-        return pipeline;
+        return subscription;
       }).
         then(setPredicate).
         then(buildUpdateUrl).
@@ -44,12 +43,12 @@ onmessage = function(e) {
   }
 }
 
-function setPredicate(pipeline) {
-  pipeline.predicate = lovefieldQueryBuilder(table, {
-    owner: pipeline.query.owner,
-    repository: pipeline.query.repository
+function setPredicate(subscription) {
+  subscription.predicate = lovefieldQueryBuilder(table, {
+    owner: subscription.query.owner,
+    repository: subscription.query.repository
   });
-  return pipeline;
+  return subscription;
 }
 
 function lovefieldQueryBuilder(schema, query){
@@ -74,46 +73,47 @@ function lovefieldQueryBuilder(schema, query){
 };
 
 
-function fetchAllData(pipeline) {
-  console.log('fetchAllData', pipeline.nextUrl);
+function fetchAllData(subscription) {
+  console.log('fetchAllData', subscription.nextUrl);
 
-  return fetchIssues(pipeline).
+  return fetchIssues(subscription).
     then(insertData).
     then(getNextPageUrl).
     then(countIssues).
-    then(function(pipeline) {
-      if (pipeline.res && pipeline.res.data && pipeline.res.data.length) {
-        var updatedAt = pipeline.res.data[0].updated_at;
+    then(function(subscription) {
+      if (subscription.res && subscription.res.data && subscription.res.data.length) {
+        var updatedAt = subscription.res.data[0].updated_at;
         localStorage.setItem(
-            localKeyBuilder(pipeline.query.owner,
-              pipeline.query.repository),
+            localKeyBuilder(subscription.query.owner,
+              subscription.query.repository),
             updatedAt)
       }
 
-      if (pipeline.nextUrl) {
-        return fetchAllData(pipeline);
+      if (subscription.nextUrl) {
+        return fetchAllData(subscription);
       } else {
-        console.log('no nextPageUrl', pipeline.nextUrl);
+        console.log('no nextPageUrl', subscription.nextUrl);
       }
     });
 }
 
-function countIssues(pipeline) {
+function countIssues(subscription) {
   return db.
     select(lf.fn.count(table.id)).
     from(table).
-    where(pipeline.predicate).
+    where(subscription.predicate).
     exec().then(function(count){
       postMessage({
         operation: 'count.update',
+        query: subscription.query,
         count: count[0][COUNT_PROPERTY_NAME]
       });
-      return pipeline;
+      return subscription;
     })
 }
 
 var localStorage = {
-  getItem: function(key) {
+  getItem: function(key, query) {
     return new Promise(function(resolve, reject) {
       getItemQueue[key] = resolve;
       postMessage({
@@ -143,19 +143,19 @@ var firebaseAuth = {
   }
 };
 
-function fetchIssues(pipeline) {
+function fetchIssues(subscription) {
   return new Promise(function(resolve, reject) {
-    console.log('fetching ', pipeline.nextUrl);
+    console.log('fetching ', subscription.nextUrl);
     var xhr = new XMLHttpRequest();
-    xhr.open('get', pipeline.nextUrl);
+    xhr.open('get', subscription.nextUrl);
     xhr.responseType = 'json';
     xhr.addEventListener('load', function(e) {
       console.log('xhr load', xhr)
-      pipeline.res = {
+      subscription.res = {
         headers: xhr.getAllResponseHeaders(),
         data: xhr.response
       };
-      resolve(pipeline);
+      resolve(subscription);
     })
 
     xhr.addEventListener('error', function(e) {
@@ -170,13 +170,13 @@ function localKeyBuilder(owner, repo) {
   return owner + ':' + repo + ':last_update';
 }
 
-function insertData(pipeline) {
-  if (!pipeline.res || !pipeline.res.data) return pipeline;
+function insertData(subscription) {
+  if (!subscription.res || !subscription.res.data) return subscription;
   var usersTable = db.getSchema().getUsers();
   var milestonesTable = db.getSchema().getMilestones();
-  totalAdded += (pipeline.res && pipeline.res.data && pipeline.res.data.length) || 0;
-  var group = pipeline.res.data.reduce(function(prev, issue) {
-    var transformedIssue = issueStorageTranslator(issue, pipeline.query);
+  totalAdded += (subscription.res && subscription.res.data && subscription.res.data.length) || 0;
+  var group = subscription.res.data.reduce(function(prev, issue) {
+    var transformedIssue = issueStorageTranslator(issue, subscription.query);
     var transformedUser = userStorageTranslator(issue.user);
     var transformedMilestone = milestoneStorageTranslator(issue.milestone);
 
@@ -199,25 +199,25 @@ function insertData(pipeline) {
     db.insertOrReplace().into(milestonesTable).values(group.milestones).exec().then(logAndReturn('milestones'))
   ]).
   then(function() {
-    return pipeline;
+    return subscription;
   });
 }
 
-function buildUpdateUrl(pipeline) {
+function buildUpdateUrl(subscription) {
   //TODO: order by and updated since
   //TODO: store timestamp in localstorage
   return Promise.all([
-    localStorage.getItem(localKeyBuilder(pipeline.query.owner, pipeline.query.repository)),
+    localStorage.getItem(localKeyBuilder(subscription.query.owner, subscription.query.repository)),
     firebaseAuth.getAuth()
   ]).
   then(function(results) {
     console.log('results in buildUpdateUrl', results);
     var lastUpdated = results[0];
     var auth = results[1];
-    pipeline.nextUrl = 'https://api.github.com/repos/'+
-      pipeline.query.owner+
+    subscription.nextUrl = 'https://api.github.com/repos/'+
+      subscription.query.owner+
       '/'+
-      pipeline.query.repository+
+      subscription.query.repository+
       '/issues?'+
       'per_page=100&'+
       'state=all&'+
@@ -226,7 +226,7 @@ function buildUpdateUrl(pipeline) {
       (lastUpdated?'since='+lastUpdated+'&':'')+
       'access_token='+
       auth.github.accessToken;
-    return pipeline;
+    return subscription;
   });
 
 }
@@ -301,18 +301,18 @@ function milestoneStorageTranslator (milestone) {
   return newMilestone;
 }
 
-function getNextPageUrl (pipeline) {
-  var linkHeader = pipeline.res && pipeline.res.headers;
+function getNextPageUrl (subscription) {
+  var linkHeader = subscription.res && subscription.res.headers;
   linkHeader = linkHeader.split('\n');
   linkHeader = linkHeader.filter(function(header) {
     var index = header.indexOf('Link');
     return index === 0;
   })[0];
-  if (!linkHeader) pipeline.nextUrl = null;
+  if (!linkHeader) subscription.nextUrl = null;
   var matched = /^Link: <(https:\/\/[a-z0-9\.\/\?_=&]*)>; rel="next"/gi.exec(linkHeader);
-  pipeline.nextUrl = matched? matched[1] : null;
+  subscription.nextUrl = matched? matched[1] : null;
 
-  return pipeline;
+  return subscription;
 }
 
 function logAndReturn (type) {
