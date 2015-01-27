@@ -2,7 +2,7 @@
 
 (function() {
 
-function IssuesListController ($location, $scope, db,
+function IssuesListController ($location, $scope, db, issueDefaults,
     lovefieldQueryBuilder, firebaseAuth, synchronizer) {
   var ITEMS_PER_PAGE = 30;
   var table = db.getSchema().getIssues();
@@ -57,41 +57,9 @@ function IssuesListController ($location, $scope, db,
         repository: viewQuery.repository,
         owner: viewQuery.owner
       },
-      {
-        assignee: {
-          default: -1
-        },
-        milestone: {
-          transformer: 'prop:id',
-          default: -1
-        },
-
-        user: {
-          transformer: 'prop:id',
-          default: -1
-        },
-        created_at: {
-          transformer: 'as_date',
-          default: new Date()
-        },
-        updated_at: {
-          transformer: 'as_date',
-          default: new Date()
-        },
-        closed_at: {
-          transformer: 'as_date',
-          default: new Date()
-        },
-        owner: {
-          default: viewQuery.owner
-        },
-        repository: {
-          default: viewQuery.repository
-        },
-        body: {
-          default: ''
-        }
-      }, url, storageKey);
+      issueDefaults(viewQuery.owner, viewQuery.repository),
+      url,
+      storageKey);
   }
 
   $scope.goToPrevPage = function() {
@@ -250,7 +218,7 @@ function IssuesListController ($location, $scope, db,
 angular.module('ghIssuesApp').
   controller(
       'IssuesListController',
-      ['$location', '$scope', 'db', 'lovefieldQueryBuilder',
+      ['$location', '$scope', 'db', 'issueDefaults', 'lovefieldQueryBuilder',
           'firebaseAuth', 'synchronizer', IssuesListController]);
 
 }());

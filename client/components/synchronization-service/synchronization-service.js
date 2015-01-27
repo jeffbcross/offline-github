@@ -28,12 +28,10 @@ function SyncService($window, firebaseAuth) {
         });
         break;
       case 'count.update':
-        console.log('count.update', e.data.processId, e.data.count);
         var subject = self._processes.get(e.data.processId).subject;
         subject.onNext({totalCount: e.data.count});
         break;
       case 'lastUpdated.set':
-        console.log('lastUpdated.set', e.data.lastUpdated);
         localStorage.setItem(self._processes.get(e.data.processId).config.storageKey, e.data.lastUpdated);
         break;
     }
@@ -50,7 +48,6 @@ SyncService.prototype.synchronize = function(tableName, query, rowDefaults, url,
     storageKey: storageKey,
     processId: ++this._pids
   };
-  console.log('pid', syncConfig.processId);
   this._worker.postMessage(syncConfig);
   this._processes.set(syncConfig.processId, {
     config: syncConfig,

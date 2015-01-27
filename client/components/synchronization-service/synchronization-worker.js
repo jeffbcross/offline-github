@@ -181,7 +181,7 @@ function storageTranslator (object, defaults) {
           break;
       }
     } else {
-      object[k] = object[k] || defaults[k].default;
+      object[k] = object[k] || defaults[k].defaultValue;
     }
   }
 
