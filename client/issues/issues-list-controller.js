@@ -35,7 +35,7 @@ function IssuesListController ($location, $scope, db,
 
   function syncFromWorker(viewQuery) {
     //TODO: don't sync when just the page changes, only when owner or repository
-    var storageKey = viewQuery.owner + ':' + viewQuery.repo + ':last_update';
+    var storageKey = viewQuery.owner + ':' + viewQuery.repository + ':last_update';
     var lastUpdated = localStorage.getItem(storageKey);
     var url = 'https://api.github.com/repos/'+
       viewQuery.owner+
@@ -55,10 +55,42 @@ function IssuesListController ($location, $scope, db,
     synchronizer.synchronize('Issues',
       {
         repository: viewQuery.repository,
-          owner: viewQuery.owner
+        owner: viewQuery.owner
       },
       {
-        defaults:'defaults'
+        assignee: {
+          default: -1
+        },
+        milestone: {
+          transformer: 'prop:id',
+          default: -1
+        },
+
+        user: {
+          transformer: 'prop:id',
+          default: -1
+        },
+        created_at: {
+          transformer: 'as_date',
+          default: new Date()
+        },
+        updated_at: {
+          transformer: 'as_date',
+          default: new Date()
+        },
+        closed_at: {
+          transformer: 'as_date',
+          default: new Date()
+        },
+        owner: {
+          default: viewQuery.owner
+        },
+        repository: {
+          default: viewQuery.repository
+        },
+        body: {
+          default: ''
+        }
       }, url, storageKey);
   }
 
@@ -117,8 +149,10 @@ function IssuesListController ($location, $scope, db,
     var pageNum = 0;
 
     if(angular.isDefined($location.search().page)) {
-      pageNum = parseInt($location.search().page, 10) - 1;
+      pageNum = parseInt($location.search().page, 10);
     }
+
+    console.log('pageNum', pageNum);
 
     if(pageNum) {
       //Skip throws if passed a zero
@@ -166,6 +200,7 @@ function IssuesListController ($location, $scope, db,
       then(orderAndPredicate).
       then(function() {
         return viewQuery.lfQuery.exec().then(function(issues) {
+          console.log('fetchIssues done: ', issues);
           viewQuery.issues = issues;
           return viewQuery;
         })

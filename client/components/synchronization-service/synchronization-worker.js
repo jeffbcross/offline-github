@@ -21,6 +21,7 @@ onmessage = function(e) {
     case 'synchronize.fetch':
       Promise.resolve(promise).then(function() {
         var config = e.data;
+        console.log('fetch: ', config.query.owner, config.query.repository);
         var subscription = new Subscription(config.query, config.tableName,
             config.processId, config.url, config.rowDefaults,
             config.storageKey);
@@ -108,6 +109,7 @@ function loadMore(subscription) {
 }
 
 function countItems(subscription) {
+  console.log('countItems', subscription);
   return db.
     select(lf.fn.count(table.id)).
     from(table).
@@ -148,24 +150,42 @@ function localKeyBuilder(owner, repo) {
 }
 
 function insertData(subscription) {
+  var issues;
   if (!subscription.res || !subscription.res.data) return subscription;
-  subscription.totalAdded += (subscription.res && subscription.res.data && subscription.res.data.length) || 0;
-
-  var rows = subscription.res.data.map(function(object){
+  issues = subscription.res.data;
+  subscription.totalAdded += (subscription.res.data.length) || 0;
+  var rows = issues.map(function(object){
     return subscription.table.createRow(
-        storageTranslator(object, subscription.defaults));
-  })
+        storageTranslator(object, subscription.rowDefaults));
+  });
 
-  return db.insertOrReplace().into(subscription.table).values(rows).exec().
-    then(function() {
+
+  return db.
+    insertOrReplace().
+    into(subscription.table).
+    values(rows).exec().then(function() {
       return subscription;
     });
 }
 
 function storageTranslator (object, defaults) {
   for (var k in defaults) {
-    object[k] = object[k] || defaults[k];
+    if (defaults[k].transformer && object[k]) {
+      var instructions = defaults[k].transformer.split(':');
+      switch(instructions[0]) {
+        case 'prop':
+          object[k] = object[k][instructions[1]];
+          break;
+        case 'as_date':
+          object[k] = new Date(object[k]);
+          break;
+      }
+    } else {
+      object[k] = object[k] || defaults[k].default;
+    }
   }
+
+  return object;
 }
 
 function getNextPageUrl (subscription) {
