@@ -63,15 +63,14 @@ function IssuesListController ($location, $scope, db, issueDefaults,
   }
 
   $scope.goToPrevPage = function() {
-    var page = $location.search().page || 0;
+    var page = $location.search().page || 1;
     if (page > 1) {
       setPage(page-1);
     }
   };
 
   $scope.goToNextPage = function() {
-    var page = parseInt($location.search().page, 10) || 0;
-    console.log('page in goToNextPage', page);
+    var page = parseInt($location.search().page, 10) || 1;
     if ($scope.pages && page < $scope.pages.length) {
       setPage(page+1);
     } else if ($scope.pages && page >= $scope.pages.length) {
@@ -94,7 +93,6 @@ function IssuesListController ($location, $scope, db, issueDefaults,
     }
     var viewQuery = new ViewQuery(searchParams.owner, searchParams.repository,
         searchParams.page);
-    console.log('updateView');
     return fetchIssues(viewQuery).
       then(renderData).
       then(countPages).
@@ -114,24 +112,21 @@ function IssuesListController ($location, $scope, db, issueDefaults,
   }
 
   function paginate(viewQuery) {
-    var pageNum = 0;
+    var pageNum = 1;
 
     if(angular.isDefined($location.search().page)) {
       pageNum = parseInt($location.search().page, 10);
     }
 
-    console.log('pageNum', pageNum);
-
-    if(pageNum) {
+    if(pageNum > 1) {
       //Skip throws if passed a zero
-      viewQuery.lfQuery.skip(pageNum * ITEMS_PER_PAGE);
+      viewQuery.lfQuery.skip((pageNum - 1) * ITEMS_PER_PAGE);
     }
 
     return viewQuery;
   }
 
   function orderAndPredicate(viewQuery) {
-    console.log('creating predicate from', viewQuery.owner, viewQuery.repository)
     viewQuery.predicate = lovefieldQueryBuilder(table, {
       owner: viewQuery.owner,
       repository: viewQuery.repository
@@ -168,7 +163,6 @@ function IssuesListController ($location, $scope, db, issueDefaults,
       then(orderAndPredicate).
       then(function() {
         return viewQuery.lfQuery.exec().then(function(issues) {
-          console.log('fetchIssues done: ', issues);
           viewQuery.issues = issues;
           return viewQuery;
         })
