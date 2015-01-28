@@ -4,7 +4,6 @@ importScripts('../../lovefield.js');
 importScripts('../../db/github_db_gen.js');
 
 var db;
-var COUNT_PROPERTY_NAME = 'COUNT(id)';
 var startGettingDb = performance.now();
 var dbPromise = github.db.getInstance().then(function(_db_) {
   console.log('db instance loaded time', performance.now());
@@ -123,6 +122,8 @@ function Subscription (config, processId) {
   this.defaults = config.defaults;
   this.storageKey = config.storageKey;
   this.totalAdded = 0;
+  this.countPropertyName = config.countPropertyName;
+  this.countColumn = config.countColumn;
 }
 
 function fetchItems(subscription) {
@@ -229,7 +230,7 @@ function loadMore(subscription) {
 function countItems(subscription) {
   console.log('countItems', subscription);
   return db.
-    select(lf.fn.count(subscription.table.id)).
+    select(lf.fn.count(subscription.table[subscription.countColumn])).
     from(subscription.table).
     where(subscription.predicate).
     exec().then(function(count){
@@ -237,7 +238,7 @@ function countItems(subscription) {
         operation: 'count.update',
         processId: subscription.processId,
         query: subscription.query,
-        count: count[0][COUNT_PROPERTY_NAME]
+        count: count[0][subscription.countPropertyName]
       });
       return subscription;
     })

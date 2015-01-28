@@ -57,6 +57,8 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
         repository: viewQuery.repository,
         owner: viewQuery.owner
       },
+      countPropertyName: COUNT_PROPERTY_NAME,
+      countColumn: 'id',
       defaults: issueDefaults(viewQuery.owner, viewQuery.repository),
       url: url,
       storageKey: storageKey
