@@ -94,9 +94,9 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
     var viewQuery = new ViewQuery(searchParams.owner, searchParams.repository,
         searchParams.page);
     return fetchIssues(viewQuery).
-      then(renderData);//.
-      // then(countPages).
-      // then(renderPageCount).
+      then(renderData).
+      then(countPages).
+      then(renderPageCount);//.
       // then(syncFromWorker);
   }
 
@@ -146,6 +146,18 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
   }
 
   function countPages(viewQuery) {
+    return github.count({
+      tableName: 'Issues',
+      column: 'id',
+      predicate: {
+        owner: viewQuery.owner,
+        repository: viewQuery.repository
+      }
+    }).then(function(count) {
+      console.log('got the count!', count);
+      viewQuery.totalCount = count;
+      return viewQuery;
+    })
     return db.
       select(lf.fn.count(table.id)).
       from(table).

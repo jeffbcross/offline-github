@@ -10,13 +10,21 @@ function GithubService($window) {
 
   this._worker.onmessage = function(msg) {
     var resolution, rejection;
-    console.log('timestamp 2', performance.now())
+    console.log('this._worker.onmessage', performance.now())
     switch(msg.data.operation) {
       case 'query.success':
         resolution = self._queries.get(msg.data.queryId).resolve;
         resolution(msg.data.results)
         break;
       case 'query.error':
+        rejection = self._queries.get(msg.data.queryId).reject;
+        rejection(msg.data.error)
+        break;
+      case 'count.success':
+        resolution = self._queries.get(msg.data.queryId).resolve;
+        resolution(msg.data.results)
+        break;
+      case 'count.error':
         rejection = self._queries.get(msg.data.queryId).reject;
         rejection(msg.data.error)
         break;
@@ -41,6 +49,22 @@ GithubService.prototype.whenDbLoaded = function() {
     self._dbInstanceRejectors.push(reject);
   });
 };
+
+GithubService.prototype.count = function(query) {
+  var self = this;
+  return new Promise(function(resolve, reject) {
+    var queryId = self._queryId++;
+    self._queries.set(queryId, {
+      resolve: resolve,
+      reject: reject
+    });
+    self._worker.postMessage({
+      operation: 'count.exec',
+      query: query,
+      queryId: queryId
+    });
+  });
+}
 
 GithubService.prototype.query = function(query) {
   var self = this;

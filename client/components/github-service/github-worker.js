@@ -40,7 +40,32 @@ onmessage = function(msg) {
               });
             });
           });
-
+      break;
+    case 'count.exec':
+      Promise.resolve(dbPromise).then(function(db) {
+        var queryContext = new CountQueryContext(msg.data.query.tableName, msg.data.query);
+        Promise.resolve(queryContext).
+          then(getTable).
+          then(setCountQuery).
+          then(setPredicate).
+          then(execQuery).
+          then(function(queryContext) {
+            console.log('timestamp', performance.now());
+            postMessage({
+              queryId: msg.data.queryId,
+              operation: 'count.success',
+              results: queryContext.results
+            });
+          },
+          function(queryContext) {
+            console.log('something went wrong :(', queryContext)
+            postMessage({
+              queryId: msg.data.queryId,
+              operation: 'count.error',
+              error: queryContext.error
+            });
+          });
+      });
       break;
   }
 
@@ -55,6 +80,14 @@ function QueryContext(tableName, query) {
   this.skip = query.skip;
   this.limit = query.limit;
   this.query = null;
+}
+
+function CountQueryContext(tableName, query) {
+  this.tableName = tableName;
+  this.rawQueryPredicate = query.predicate;
+  this.table = null;
+  this.predicate = null;
+  this.column = query.column;
 }
 
 function getTable(queryContext) {
@@ -74,6 +107,13 @@ function setBaseQuery (queryContext) {
       from(queryContext.table);
   } catch (e) {
   }
+  return queryContext;
+}
+
+function setCountQuery (queryContext) {
+  queryContext.query = db.
+    select(lf.fn.count(queryContext.table[queryContext.column])).
+    from(queryContext.table);
   return queryContext;
 }
 
