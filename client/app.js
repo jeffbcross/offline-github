@@ -16,8 +16,8 @@ function config($httpProvider, $routeProvider){
         auth: function(firebaseAuth) {
           return firebaseAuth.getRouteAuth();
         },
-        db: function() {
-          return getDB();
+        db: function(github) {
+          return github.whenDbLoaded();
         }
       },
       reloadOnSearch: false
@@ -52,6 +52,7 @@ function run($rootScope, $route, $location, $window, firebaseAuth) {
 angular.module('ghIssuesApp', [
     'ngRoute',
     'ghoFirebaseAuth',
+    'ghoGithubService',
     'ghoIssueDefaultsFactory',
     'ghoLovefieldQueryFactory',
     'ghoSynchronizationService'

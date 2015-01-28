@@ -2,11 +2,11 @@
 
 (function() {
 
-function IssuesListController ($location, $scope, db, issueDefaults,
+function IssuesListController ($location, $scope, db, github, issueDefaults,
     lovefieldQueryBuilder, firebaseAuth, synchronizer) {
   var ITEMS_PER_PAGE = 30;
-  var table = db.getSchema().getIssues();
   var COUNT_PROPERTY_NAME = 'COUNT(id)';
+
 
   function ViewQuery (owner, repository, page) {
     this.owner = owner;
@@ -94,10 +94,10 @@ function IssuesListController ($location, $scope, db, issueDefaults,
     var viewQuery = new ViewQuery(searchParams.owner, searchParams.repository,
         searchParams.page);
     return fetchIssues(viewQuery).
-      then(renderData).
-      then(countPages).
-      then(renderPageCount).
-      then(syncFromWorker);
+      then(renderData);//.
+      // then(countPages).
+      // then(renderPageCount).
+      // then(syncFromWorker);
   }
 
   function getBaseQuery(viewQuery) {
@@ -158,11 +158,29 @@ function IssuesListController ($location, $scope, db, issueDefaults,
   }
 
   function fetchIssues(viewQuery) {
+    var queryStart = performance.now();
+    return github.query({
+      tableName: 'Issues',
+      select: ['number', 'title', 'id', 'comments'],
+      predicate: {
+        owner: viewQuery.owner,
+        repository: viewQuery.repository
+      },
+      limit: ITEMS_PER_PAGE,
+      skip: (viewQuery.page - 1) * ITEMS_PER_PAGE
+    }).then(function(issues) {
+      console.log('time to query', performance.now() - queryStart)
+      viewQuery.issues = issues;
+      return viewQuery;
+    });
+
+
     return getBaseQuery(viewQuery).
       then(paginate).
       then(orderAndPredicate).
       then(function() {
         return viewQuery.lfQuery.exec().then(function(issues) {
+          console.log('time to query', performance.now() - queryStart)
           viewQuery.issues = issues;
           return viewQuery;
         })
@@ -212,7 +230,7 @@ function IssuesListController ($location, $scope, db, issueDefaults,
 angular.module('ghIssuesApp').
   controller(
       'IssuesListController',
-      ['$location', '$scope', 'db', 'issueDefaults', 'lovefieldQueryBuilder',
+      ['$location', '$scope', 'db', 'github', 'issueDefaults', 'lovefieldQueryBuilder',
           'firebaseAuth', 'synchronizer', IssuesListController]);
 
 }());
