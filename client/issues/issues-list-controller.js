@@ -8,6 +8,7 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
   var COUNT_PROPERTY_NAME = 'COUNT(id)';
 
 
+
   function ViewQuery (owner, repository, page) {
     this.owner = owner;
     this.repository = repository;
@@ -96,53 +97,8 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
     return fetchIssues(viewQuery).
       then(renderData).
       then(countPages).
-      then(renderPageCount);//.
-      // then(syncFromWorker);
-  }
-
-  function getBaseQuery(viewQuery) {
-    return Promise.resolve(db.
-      select(table.number, table.id, table.comments, table.title).
-      from(table).
-      limit(ITEMS_PER_PAGE)).
-    then(function(lfQuery) {
-      viewQuery.lfQuery = lfQuery;
-      return viewQuery;
-    });
-  }
-
-  function paginate(viewQuery) {
-    var pageNum = 1;
-
-    if(angular.isDefined($location.search().page)) {
-      pageNum = parseInt($location.search().page, 10);
-    }
-
-    if(pageNum > 1) {
-      //Skip throws if passed a zero
-      viewQuery.lfQuery.skip((pageNum - 1) * ITEMS_PER_PAGE);
-    }
-
-    return viewQuery;
-  }
-
-  function orderAndPredicate(viewQuery) {
-    viewQuery.predicate = lovefieldQueryBuilder(table, {
-      owner: viewQuery.owner,
-      repository: viewQuery.repository
-    });
-    viewQuery.lfQuery.
-      where(viewQuery.predicate).
-      orderBy(table.number, lf.Order.DESC);
-    return viewQuery;
-
-  }
-
-  function getCountQuery(viewQuery) {
-    return db.
-      select(lf.fn.count(table.id)).
-      from(table).
-      where(viewQuery.predicate);
+      then(renderPageCount).
+      then(syncFromWorker);
   }
 
   function countPages(viewQuery) {
@@ -158,15 +114,6 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
       viewQuery.totalCount = count;
       return viewQuery;
     })
-    return db.
-      select(lf.fn.count(table.id)).
-      from(table).
-      where(viewQuery.predicate).
-      exec().
-      then(function(count) {
-        viewQuery.totalCount = count;
-        return viewQuery;
-      });
   }
 
   function fetchIssues(viewQuery) {
@@ -178,25 +125,16 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
         owner: viewQuery.owner,
         repository: viewQuery.repository
       },
+      orderByColumn: 'number',
+      orderByDirection: 'DESC',
       limit: ITEMS_PER_PAGE,
       skip: (viewQuery.page - 1) * ITEMS_PER_PAGE
     }).then(function(issues) {
       console.log('time to query', performance.now() - queryStart)
+      console.log('issues. dupe?', issues)
       viewQuery.issues = issues;
       return viewQuery;
     });
-
-
-    return getBaseQuery(viewQuery).
-      then(paginate).
-      then(orderAndPredicate).
-      then(function() {
-        return viewQuery.lfQuery.exec().then(function(issues) {
-          console.log('time to query', performance.now() - queryStart)
-          viewQuery.issues = issues;
-          return viewQuery;
-        })
-      });
   }
 
   function showError() {
@@ -222,20 +160,6 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
     });
 
     return viewQuery;
-  }
-
-  //TODO: eventually utilize observer changes if API can provide what we need
-  function updateData () {
-    getBaseQuery().
-      then(paginate).
-      then(orderAndPredicate).
-      then(function(q) {
-        return q.exec();
-      }).
-      then(renderData).
-      then(countPages).
-      then(renderPageCount);
-
   }
 }
 

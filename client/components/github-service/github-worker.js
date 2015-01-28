@@ -1,15 +1,19 @@
+console.log('time at start of WebWorker', performance.now());
 window = self;
 importScripts('../../lovefield.js');
 importScripts('../../db/github_db_gen.js');
 
 var db;
+var startGettingDb = performance.now();
 var dbPromise = github.db.getInstance().then(function(_db_) {
-  console.log('db instance timestamp', performance.now());
+  console.log('db instance loaded time', performance.now());
+  console.log('db instance delta', performance.now() - startGettingDb);
   db = _db_;
-  postMessage({operation: 'dbInstance.success'});
+  console.log('postMessage at ', performance.now());
+  postMessage('dbInstance.success');
   return _db_;
 }, function(e) {
-  postMessage({operation: 'dbInstance.error'});
+  postMessage('dbInstance.error');
 });
 
 onmessage = function(msg) {
@@ -23,6 +27,7 @@ onmessage = function(msg) {
           then(setBaseQuery).
           then(setPredicate).
           then(paginate).
+          then(orderBy).
           then(execQuery).
             then(function(queryContext) {
               console.log('timestamp', performance.now());
@@ -80,6 +85,8 @@ function QueryContext(tableName, query) {
   this.skip = query.skip;
   this.limit = query.limit;
   this.query = null;
+  this.orderByColumn = query.orderByColumn;
+  this.orderByDirection = query.orderByDirection;
 }
 
 function CountQueryContext(tableName, query) {
@@ -134,6 +141,19 @@ function paginate (queryContext) {
     queryContext.query = queryContext.query.limit(queryContext.limit).
     skip(queryContext.skip);
   } else {
+  }
+
+  return queryContext;
+}
+
+function orderBy (queryContext) {
+  if (queryContext.orderByColumn && queryContext.orderByDirection) {
+    queryContext.query = queryContext.query.orderBy(
+        queryContext.table[queryContext.orderByColumn],
+        queryContext.orderByDirection);
+  } else if (queryContext.orderByColumn) {
+    queryContext.query = queryContext.query.orderBy(
+        queryContext.table[queryContext.orderByColumn]);
   }
 
   return queryContext;
