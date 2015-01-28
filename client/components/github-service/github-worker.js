@@ -4,6 +4,7 @@ importScripts('../../lovefield.js');
 importScripts('../../db/github_db_gen.js');
 
 var db;
+var COUNT_PROPERTY_NAME = 'COUNT(id)';
 var startGettingDb = performance.now();
 var dbPromise = github.db.getInstance().then(function(_db_) {
   console.log('db instance loaded time', performance.now());
@@ -15,6 +16,7 @@ var dbPromise = github.db.getInstance().then(function(_db_) {
 }, function(e) {
   postMessage('dbInstance.error');
 });
+var subscriptions = new Map();
 
 onmessage = function(msg) {
   console.log('message received timestamp: ', performance.now());
@@ -72,9 +74,23 @@ onmessage = function(msg) {
           });
       });
       break;
+    case 'synchronize.fetch':
+      Promise.resolve(dbPromise).then(function() {
+        var config = msg.data;
+        console.log('fetch: ', config.query.owner, config.query.repository);
+        var subscription = new Subscription(config.query, config.tableName,
+            config.processId, config.url, config.rowDefaults,
+            config.storageKey);
+        subscriptions.set(config.processId, subscription);
+        return subscription;
+      }).
+        then(setPredicate).
+        then(fetchAllData);
+      break;
   }
-
 }
+
+// Constructors
 
 function QueryContext(tableName, query) {
   this.tableName = tableName;
@@ -95,6 +111,139 @@ function CountQueryContext(tableName, query) {
   this.table = null;
   this.predicate = null;
   this.column = query.column;
+}
+
+function Subscription (query, tableName, processId, url, rowDefaults,
+    storageKey) {
+  this.rawQueryPredicate = query;
+  this.res = null;
+  this.predicate = null;
+  this.nextUrl = null;
+  this.tableName = tableName;
+  this.table = db.getSchema()['get'+tableName]();
+  this.processId = processId;
+  this.nextUrl = url;
+  this.rowDefaults = rowDefaults;
+  this.storageKey = storageKey;
+  this.totalAdded = 0;
+}
+
+function fetchItems(subscription) {
+  return new Promise(function(resolve, reject) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('get', subscription.nextUrl);
+    xhr.responseType = 'json';
+    xhr.addEventListener('load', function(e) {
+      subscription.res = {
+        headers: xhr.getAllResponseHeaders(),
+        data: xhr.response
+      };
+      resolve(subscription);
+    })
+
+    xhr.addEventListener('error', function(e) {
+      reject(xhr.error);
+    });
+    xhr.send();
+  });
+}
+
+function insertData(subscription) {
+  var issues;
+  if (!subscription.res || !subscription.res.data) return subscription;
+  issues = subscription.res.data;
+  subscription.totalAdded += (subscription.res.data.length) || 0;
+  var rows = issues.map(function(object){
+    return subscription.table.createRow(
+        storageTranslator(object, subscription.rowDefaults));
+  });
+
+
+  return db.
+    insertOrReplace().
+    into(subscription.table).
+    values(rows).exec().then(function() {
+      return subscription;
+    });
+}
+
+function storageTranslator (object, defaults) {
+  for (var k in defaults) {
+    if (defaults[k].transformer && object[k]) {
+      var instructions = defaults[k].transformer.split(':');
+      switch(instructions[0]) {
+        case 'prop':
+          object[k] = object[k][instructions[1]];
+          break;
+        case 'as_date':
+          object[k] = new Date(object[k]);
+          break;
+      }
+    } else {
+      object[k] = object[k] || defaults[k].defaultValue;
+    }
+  }
+
+  return object;
+}
+
+function getNextPageUrl (subscription) {
+  var linkHeader = subscription.res && subscription.res.headers;
+  linkHeader = linkHeader.split('\n');
+  linkHeader = linkHeader.filter(function(header) {
+    var index = header.indexOf('Link');
+    return index === 0;
+  })[0];
+  if (!linkHeader) subscription.nextUrl = null;
+  var matched = /^Link: <(https:\/\/[a-z0-9\.\/\?_=&]*)>; rel="next"/gi.exec(linkHeader);
+  subscription.nextUrl = matched? matched[1] : null;
+
+  return subscription;
+}
+
+
+function fetchAllData(subscription) {
+  return fetchItems(subscription).
+    then(insertData).
+    then(getNextPageUrl).
+    then(countItems).
+    then(setLastUpdated).
+    then(loadMore);
+}
+
+function setLastUpdated(subscription) {
+  if (subscription.res && subscription.res.data && subscription.res.data.length) {
+    subscription.lastUpdated = subscription.res.data[0].updated_at;
+    postMessage({
+      operation: 'lastUpdated.set',
+      processId: subscription.processId,
+      lastUpdated: subscription.lastUpdated
+    });
+  }
+  return subscription;
+}
+
+function loadMore(subscription) {
+  if (subscription.nextUrl) {
+    return fetchAllData(subscription);
+  }
+}
+
+function countItems(subscription) {
+  console.log('countItems', subscription);
+  return db.
+    select(lf.fn.count(subscription.table.id)).
+    from(subscription.table).
+    where(subscription.predicate).
+    exec().then(function(count){
+      postMessage({
+        operation: 'count.update',
+        processId: subscription.processId,
+        query: subscription.query,
+        count: count[0][COUNT_PROPERTY_NAME]
+      });
+      return subscription;
+    })
 }
 
 function getTable(queryContext) {

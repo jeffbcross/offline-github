@@ -3,7 +3,7 @@
 (function() {
 
 function IssuesListController ($location, $scope, db, github, issueDefaults,
-    lovefieldQueryBuilder, firebaseAuth, synchronizer) {
+    lovefieldQueryBuilder, firebaseAuth) {
   var ITEMS_PER_PAGE = 30;
   var COUNT_PROPERTY_NAME = 'COUNT(id)';
 
@@ -53,7 +53,7 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
 
     console.log('synchronizing', url);
 
-    synchronizer.synchronize('Issues',
+    github.synchronize('Issues',
       {
         repository: viewQuery.repository,
         owner: viewQuery.owner
@@ -167,6 +167,6 @@ angular.module('ghIssuesApp').
   controller(
       'IssuesListController',
       ['$location', '$scope', 'db', 'github', 'issueDefaults', 'lovefieldQueryBuilder',
-          'firebaseAuth', 'synchronizer', IssuesListController]);
+          'firebaseAuth', IssuesListController]);
 
 }());

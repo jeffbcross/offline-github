@@ -8,6 +8,7 @@ function GithubService($window) {
   this._queryId = 0;
   this._dbInstanceResolvers = [];
   this._dbInstanceRejectors = [];
+  this._processes = new Map();
 
   this._worker.onmessage = function(msg) {
     console.log('this._worker.onmessage', performance.now())
@@ -40,6 +41,13 @@ function GithubService($window) {
         self._dbInstanceRejectors.forEach(function(rejector) {
           rejector();
         });
+        break;
+      case 'count.update':
+        var subject = self._processes.get(msg.data.processId).subject;
+        subject.onNext({totalCount: msg.data.count});
+        break;
+      case 'lastUpdated.set':
+        localStorage.setItem(self._processes.get(msg.data.processId).config.storageKey, msg.data.lastUpdated);
         break;
     }
   }
@@ -84,6 +92,23 @@ GithubService.prototype.query = function(query) {
     });
   });
 }
+
+GithubService.prototype.synchronize = function(tableName, query, rowDefaults, url, storageKey) {
+  var syncConfig = {
+    operation: 'synchronize.fetch',
+    tableName: tableName,
+    query: query,
+    rowDefaults: rowDefaults,
+    url: url,
+    storageKey: storageKey,
+    processId: ++this._pids
+  };
+  this._worker.postMessage(syncConfig);
+  this._processes.set(syncConfig.processId, {
+    config: syncConfig,
+    subject: new Rx.Subject()
+  });
+};
 
 angular.module('ghoGithubService', []).
   service('github', ['$window', GithubService]);
