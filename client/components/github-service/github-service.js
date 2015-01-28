@@ -93,14 +93,10 @@ GithubService.prototype.query = function(query) {
   });
 }
 
-GithubService.prototype.synchronize = function(tableName, query, rowDefaults, url, storageKey) {
+GithubService.prototype.synchronize = function(config) {
   var syncConfig = {
     operation: 'synchronize.fetch',
-    tableName: tableName,
-    query: query,
-    rowDefaults: rowDefaults,
-    url: url,
-    storageKey: storageKey,
+    config: config,
     processId: ++this._pids
   };
   this._worker.postMessage(syncConfig);

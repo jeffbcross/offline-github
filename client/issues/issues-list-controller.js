@@ -7,8 +7,6 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
   var ITEMS_PER_PAGE = 30;
   var COUNT_PROPERTY_NAME = 'COUNT(id)';
 
-
-
   function ViewQuery (owner, repository, page) {
     this.owner = owner;
     this.repository = repository;
@@ -53,14 +51,16 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
 
     console.log('synchronizing', url);
 
-    github.synchronize('Issues',
-      {
+    github.synchronize({
+      tableName: 'Issues',
+      query: {
         repository: viewQuery.repository,
         owner: viewQuery.owner
       },
-      issueDefaults(viewQuery.owner, viewQuery.repository),
-      url,
-      storageKey);
+      defaults: issueDefaults(viewQuery.owner, viewQuery.repository),
+      url: url,
+      storageKey: storageKey
+    });
   }
 
   $scope.goToPrevPage = function() {

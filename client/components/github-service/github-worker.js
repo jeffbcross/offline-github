@@ -16,7 +16,7 @@ var dbPromise = github.db.getInstance().then(function(_db_) {
 }, function(e) {
   postMessage('dbInstance.error');
 });
-var subscriptions = new Map();
+var syncProcesses = new Map();
 
 onmessage = function(msg) {
   console.log('message received timestamp: ', performance.now());
@@ -76,12 +76,10 @@ onmessage = function(msg) {
       break;
     case 'synchronize.fetch':
       Promise.resolve(dbPromise).then(function() {
-        var config = msg.data;
-        console.log('fetch: ', config.query.owner, config.query.repository);
-        var subscription = new Subscription(config.query, config.tableName,
-            config.processId, config.url, config.rowDefaults,
-            config.storageKey);
-        subscriptions.set(config.processId, subscription);
+        var config = msg.data.config;
+        console.log('fetch: ', config);
+        var subscription = new Subscription(config, msg.data.processId);
+        syncProcesses.set(config.processId, subscription);
         return subscription;
       }).
         then(setPredicate).
@@ -113,18 +111,17 @@ function CountQueryContext(tableName, query) {
   this.column = query.column;
 }
 
-function Subscription (query, tableName, processId, url, rowDefaults,
-    storageKey) {
-  this.rawQueryPredicate = query;
+function Subscription (config, processId) {
+  this.rawQueryPredicate = config.query;
   this.res = null;
   this.predicate = null;
   this.nextUrl = null;
-  this.tableName = tableName;
-  this.table = db.getSchema()['get'+tableName]();
+  this.tableName = config.tableName;
+  this.table = db.getSchema()['get'+config.tableName]();
   this.processId = processId;
-  this.nextUrl = url;
-  this.rowDefaults = rowDefaults;
-  this.storageKey = storageKey;
+  this.nextUrl = config.url;
+  this.defaults = config.defaults;
+  this.storageKey = config.storageKey;
   this.totalAdded = 0;
 }
 
@@ -155,7 +152,7 @@ function insertData(subscription) {
   subscription.totalAdded += (subscription.res.data.length) || 0;
   var rows = issues.map(function(object){
     return subscription.table.createRow(
-        storageTranslator(object, subscription.rowDefaults));
+        storageTranslator(object, subscription.defaults));
   });
 
 
