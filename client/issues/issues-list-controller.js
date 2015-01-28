@@ -53,7 +53,7 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
 
     github.synchronize({
       tableName: 'Issues',
-      query: {
+      rawQueryPredicate: {
         repository: viewQuery.repository,
         owner: viewQuery.owner
       },

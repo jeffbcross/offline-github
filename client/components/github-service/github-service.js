@@ -94,14 +94,12 @@ GithubService.prototype.query = function(query) {
 }
 
 GithubService.prototype.synchronize = function(config) {
-  var syncConfig = {
-    operation: 'synchronize.fetch',
+  config.operation = 'synchronize.fetch';
+  config.processId = ++this._pids;
+
+  this._worker.postMessage(config);
+  this._processes.set(config.processId, {
     config: config,
-    processId: ++this._pids
-  };
-  this._worker.postMessage(syncConfig);
-  this._processes.set(syncConfig.processId, {
-    config: syncConfig,
     subject: new Rx.Subject()
   });
 };

@@ -4,7 +4,9 @@ importScripts('../../lovefield.js');
 importScripts('../../db/github_db_gen.js');
 
 var db;
+var syncProcesses = new Map();
 var startGettingDb = performance.now();
+
 var dbPromise = github.db.getInstance().then(function(_db_) {
   console.log('db instance loaded time', performance.now());
   console.log('db instance delta', performance.now() - startGettingDb);
@@ -15,7 +17,7 @@ var dbPromise = github.db.getInstance().then(function(_db_) {
 }, function(e) {
   postMessage('dbInstance.error');
 });
-var syncProcesses = new Map();
+
 
 onmessage = function(msg) {
   console.log('message received timestamp: ', performance.now());
@@ -75,9 +77,9 @@ onmessage = function(msg) {
       break;
     case 'synchronize.fetch':
       Promise.resolve(dbPromise).then(function() {
-        var config = msg.data.config;
+        var config = msg.data;
         console.log('fetch: ', config);
-        var subscription = new Subscription(config, msg.data.processId);
+        var subscription = extendSubscription(config);
         syncProcesses.set(config.processId, subscription);
         return subscription;
       }).
@@ -110,20 +112,11 @@ function CountQueryContext(tableName, query) {
   this.column = query.column;
 }
 
-function Subscription (config, processId) {
-  this.rawQueryPredicate = config.query;
-  this.res = null;
-  this.predicate = null;
-  this.nextUrl = null;
-  this.tableName = config.tableName;
-  this.table = db.getSchema()['get'+config.tableName]();
-  this.processId = processId;
-  this.nextUrl = config.url;
-  this.defaults = config.defaults;
-  this.storageKey = config.storageKey;
+function extendSubscription (config) {
+  config.table = db.getSchema()['get'+config.tableName]();
+  config.nextUrl = config.url;
   this.totalAdded = 0;
-  this.countPropertyName = config.countPropertyName;
-  this.countColumn = config.countColumn;
+  return config;
 }
 
 function fetchItems(subscription) {
