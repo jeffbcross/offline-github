@@ -4,7 +4,6 @@ importScripts('../../lovefield.js');
 importScripts('../../db/github_db_gen.js');
 
 var db;
-var syncProcesses = new Map();
 var startGettingDb = performance.now();
 
 var dbPromise = github.db.getInstance().then(function(_db_) {
@@ -51,11 +50,10 @@ onmessage = function(msg) {
       break;
     case 'count.exec':
       Promise.resolve(dbPromise).then(function(db) {
-        var queryContext = new CountQueryContext(msg.data.query.tableName, msg.data.query);
+        var config = msg.data;
+        var queryContext = extendCountQueryContext(config);
         Promise.resolve(queryContext).
-          then(getTable).
           then(setCountQuery).
-          then(setPredicate).
           then(execQuery).
           then(function(queryContext) {
             console.log('timestamp', performance.now());
@@ -77,14 +75,12 @@ onmessage = function(msg) {
       break;
     case 'synchronize.fetch':
       Promise.resolve(dbPromise).then(function() {
-        var config = msg.data;
-        console.log('fetch: ', config);
-        var subscription = extendSubscription(config);
-        syncProcesses.set(config.processId, subscription);
-        return subscription;
+        return extendSubscription(msg.data);
       }).
-        then(setPredicate).
-        then(fetchAllData);
+        then(fetchAndInsertData).
+        then(function(subscription) {
+          console.log('all done inserting for', subscription.rawQueryPredicate);
+        });
       break;
   }
 }
@@ -104,18 +100,16 @@ function QueryContext(tableName, query) {
   this.orderByDirection = query.orderByDirection;
 }
 
-function CountQueryContext(tableName, query) {
-  this.tableName = tableName;
-  this.rawQueryPredicate = query.predicate;
-  this.table = null;
-  this.predicate = null;
-  this.column = query.column;
+function extendCountQueryContext(config) {
+  config.table = db.getSchema()['get'+config.tableName]();
+  return config;
 }
 
 function extendSubscription (config) {
   config.table = db.getSchema()['get'+config.tableName]();
   config.nextUrl = config.url;
-  this.totalAdded = 0;
+  config.totalAdded = 0;
+  config.select = config.select || [];
   return config;
 }
 
@@ -193,7 +187,7 @@ function getNextPageUrl (subscription) {
 }
 
 
-function fetchAllData(subscription) {
+function fetchAndInsertData(subscription) {
   return fetchItems(subscription).
     then(insertData).
     then(getNextPageUrl).
@@ -216,8 +210,9 @@ function setLastUpdated(subscription) {
 
 function loadMore(subscription) {
   if (subscription.nextUrl) {
-    return fetchAllData(subscription);
+    return fetchAndInsertData(subscription);
   }
+  return subscription;
 }
 
 function countItems(subscription) {
@@ -249,27 +244,30 @@ function setBaseQuery (queryContext) {
     var select = queryContext.table[select];
     return select;
   });
-  try {
-    queryContext.query = db.select.apply(db, mapped).
-      from(queryContext.table);
-  } catch (e) {
-  }
+
+  queryContext.query = db.select.apply(db, mapped).
+    from(queryContext.table);
+
   return queryContext;
 }
 
 function setCountQuery (queryContext) {
+  console.log('setCountQuery');
   queryContext.query = db.
     select(lf.fn.count(queryContext.table[queryContext.column])).
-    from(queryContext.table);
+    from(queryContext.table).
+    where(predicateBuilder(
+        queryContext.table,
+        queryContext.rawQueryPredicate));
   return queryContext;
 }
 
 function setPredicate(queryContext) {
   console.log('setPredicate timestamp: ', performance.now());
-  try {
-    queryContext.predicate = predicateBuilder(queryContext.table, queryContext.rawQueryPredicate);
+  console.log(queryContext)
+  queryContext.predicate = predicateBuilder(queryContext.table, queryContext.rawQueryPredicate);
+  if(queryContext.query) {
     queryContext.query = queryContext.query.where(queryContext.predicate);
-  } catch (e) {
   }
 
   return queryContext;

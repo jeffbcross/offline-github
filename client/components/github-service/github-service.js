@@ -61,19 +61,16 @@ GithubService.prototype.whenDbLoaded = function() {
   });
 };
 
-GithubService.prototype.count = function(query) {
+GithubService.prototype.count = function(config) {
   var self = this;
+  config.operation = 'count.exec';
+  config.queryId = this._queryId++
   return new Promise(function(resolve, reject) {
-    var queryId = self._queryId++;
-    self._queries.set(queryId, {
+    self._queries.set(config.queryId, {
       resolve: resolve,
       reject: reject
     });
-    self._worker.postMessage({
-      operation: 'count.exec',
-      query: query,
-      queryId: queryId
-    });
+    self._worker.postMessage(config);
   });
 }
 

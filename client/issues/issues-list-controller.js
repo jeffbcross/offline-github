@@ -107,7 +107,7 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
     return github.count({
       tableName: 'Issues',
       column: 'id',
-      predicate: {
+      rawQueryPredicate: {
         owner: viewQuery.owner,
         repository: viewQuery.repository
       }
