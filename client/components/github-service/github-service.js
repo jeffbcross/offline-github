@@ -77,16 +77,15 @@ GithubService.prototype.count = function(config) {
 GithubService.prototype.query = function(query) {
   var self = this;
   return new Promise(function(resolve, reject) {
-    var queryId = self._queryId++;
-    self._queries.set(queryId, {
+    query.operation = 'query.exec';
+    query.queryId = self._queryId++;
+
+    self._queries.set(query.queryId, {
       resolve: resolve,
       reject: reject
     });
-    self._worker.postMessage({
-      operation: 'query.exec',
-      query: query,
-      queryId: queryId
-    });
+
+    self._worker.postMessage(query);
   });
 }
 

@@ -20,84 +20,84 @@ var dbPromise = github.db.getInstance().then(function(_db_) {
 
 onmessage = function(msg) {
   console.log('message received timestamp: ', performance.now());
-  switch(msg.data.operation) {
-    case 'query.exec':
-      Promise.resolve(dbPromise).then(function(db) {
-        var queryContext = new QueryContext(msg.data.query.tableName, msg.data.query);
-        Promise.resolve(queryContext).
-          then(getTable).
-          then(setBaseQuery).
-          then(setPredicate).
-          then(paginate).
-          then(orderBy).
-          then(execQuery).
-            then(function(queryContext) {
-              console.log('timestamp', performance.now());
-              postMessage({
-                queryId: msg.data.queryId,
-                operation: 'query.success',
-                results: queryContext.results
-              });
-            },
-            function(queryContext) {
-              postMessage({
-                queryId: msg.data.queryId,
-                operation: 'query.error',
-                error: queryContext.error
-              });
-            });
+  Promise.resolve(dbPromise).then(function() {
+    switch(msg.data.operation) {
+      case 'query.exec':
+        return Promise.resolve(extendQueryContext(msg.data)).
+          then(buildAndExecQuery).
+          then(notifyMainThreadOfQuerySuccess, notifyMainThreadOfQueryError);
+        break;
+      case 'count.exec':
+        return Promise.resolve(extendCountQueryContext(msg.data)).
+          then(execCountQuery).
+          then(notifyMainThreadOfCountSuccess,notifyMainThreadOfCountError);
+        break;
+      case 'synchronize.fetch':
+        return Promise.resolve(extendSubscription(msg.data)).
+          then(fetchAndInsertData).
+          then(function(subscription) {
+            console.log('all done inserting for', subscription.rawQueryPredicate);
           });
-      break;
-    case 'count.exec':
-      Promise.resolve(dbPromise).then(function(db) {
-        var config = msg.data;
-        var queryContext = extendCountQueryContext(config);
-        Promise.resolve(queryContext).
-          then(setCountQuery).
-          then(execQuery).
-          then(function(queryContext) {
-            console.log('timestamp', performance.now());
-            postMessage({
-              queryId: msg.data.queryId,
-              operation: 'count.success',
-              results: queryContext.results
-            });
-          },
-          function(queryContext) {
-            console.log('something went wrong :(', queryContext)
-            postMessage({
-              queryId: msg.data.queryId,
-              operation: 'count.error',
-              error: queryContext.error
-            });
-          });
-      });
-      break;
-    case 'synchronize.fetch':
-      Promise.resolve(dbPromise).then(function() {
-        return extendSubscription(msg.data);
-      }).
-        then(fetchAndInsertData).
-        then(function(subscription) {
-          console.log('all done inserting for', subscription.rawQueryPredicate);
-        });
-      break;
-  }
+        break;
+    }
+  });
+}
+
+function execCountQuery(queryContext) {
+  return Promise.resolve(setCountQuery(queryContext)).
+        then(execQuery);
+}
+
+function buildAndExecQuery(queryContext) {
+  return Promise.resolve(getTable(queryContext)).
+    then(setBaseQuery).
+    then(setPredicate).
+    then(paginate).
+    then(orderBy).
+    then(execQuery);
+}
+
+function notifyMainThreadOfQuerySuccess(queryContext) {
+  console.log('notifyMainThreadOfQuerySuccess', queryContext, performance.now());
+  postMessage({
+    queryId: queryContext.queryId,
+    operation: 'query.success',
+    results: queryContext.results
+  });
+}
+
+function notifyMainThreadOfQueryError(queryContext) {
+  postMessage({
+    queryId: queryContext.queryId,
+    operation: 'query.error',
+    error: queryContext.error
+  });
+}
+
+function notifyMainThreadOfCountSuccess(queryContext) {
+  console.log('notifyMainThreadOfCountSuccess');
+  postMessage({
+    queryId: queryContext.queryId,
+    operation: 'count.success',
+    results: queryContext.results
+  });
+}
+
+function notifyMainThreadOfCountError(queryContext) {
+  console.log('something went wrong :(', queryContext)
+  postMessage({
+    queryId: queryContext.queryId,
+    operation: 'count.error',
+    error: queryContext.error
+  });
 }
 
 // Constructors
 
-function QueryContext(tableName, query) {
-  this.tableName = tableName;
-  this.rawQueryPredicate = query.predicate;
-  this.table = null;
-  this.predicate = null;
-  this.select = query.select || [];
-  this.skip = query.skip;
-  this.limit = query.limit;
-  this.query = null;
-  this.orderByColumn = query.orderByColumn;
-  this.orderByDirection = query.orderByDirection;
+function extendQueryContext(config) {
+  config.rawQueryPredicate = config.predicate;
+  config.select = config.select || [];
+  return config;
 }
 
 function extendCountQueryContext(config) {
@@ -235,6 +235,7 @@ function countItems(subscription) {
 function getTable(queryContext) {
   console.log('getTable timestamp: ', performance.now());
   queryContext.table = db.getSchema()['get'+queryContext.tableName]();
+  console.log('done in getTable')
   return queryContext;
 }
 
