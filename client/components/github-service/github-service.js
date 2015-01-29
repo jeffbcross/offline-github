@@ -21,11 +21,11 @@ function GithubService($window) {
         rejection = self._queries.get(msg.data.queryId).reject;
         rejection(msg.data.error)
         break;
-      case 'count.success':
+      case 'count.exec.success':
         resolution = self._queries.get(msg.data.queryId).resolve;
         resolution(msg.data.results)
         break;
-      case 'count.error':
+      case 'count.exec.error':
         rejection = self._queries.get(msg.data.queryId).reject;
         rejection(msg.data.error)
         break;
