@@ -1,5 +1,3 @@
-
-
 if (typeof window === 'undefined') {
   window = self;
 }
@@ -8,7 +6,6 @@ importScripts('../../lovefield.js');
 importScripts('../../db/github_db_gen.js');
 
 var db;
-var startGettingDb = performance.now();
 
 var dbPromise = github.db.getInstance().then(function(_db_) {
   db = _db_;
@@ -23,7 +20,6 @@ var operationHandlers = {
   'count.exec': execCountQuery,
   'synchronize.fetch': fetchAndInsertData
 };
-
 
 onmessage = function(msg) {
   Promise.resolve(dbPromise).
