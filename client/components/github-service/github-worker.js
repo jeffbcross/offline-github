@@ -85,12 +85,12 @@ function insertData(queryContext) {
   if (!queryContext.res || !queryContext.res.data) {
     return queryContext;
   }
-  var issues = queryContext.res.data;
+  var items = queryContext.res.data;
   if (queryContext.totalAdded === undefined) {
     queryContext.totalAdded = 0;
   }
   queryContext.totalAdded += (queryContext.res.data.length) || 0;
-  var rows = issues.map(function(object){
+  var rows = items.map(function(object){
     return queryContext.table.createRow(
         storageTranslator(object, queryContext.defaults));
   });
