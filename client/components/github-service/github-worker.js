@@ -1,5 +1,9 @@
-console.log('time at start of WebWorker', performance.now());
-window = self;
+
+
+if (typeof window === 'undefined') {
+  window = self;
+}
+
 importScripts('../../lovefield.js');
 importScripts('../../db/github_db_gen.js');
 
@@ -7,43 +11,28 @@ var db;
 var startGettingDb = performance.now();
 
 var dbPromise = github.db.getInstance().then(function(_db_) {
-  console.log('db instance loaded time', performance.now());
-  console.log('db instance delta', performance.now() - startGettingDb);
   db = _db_;
-  console.log('postMessage at ', performance.now());
   postMessage('dbInstance.success');
   return _db_;
 }, function(e) {
   postMessage('dbInstance.error');
 });
 
+var operationHandlers = {
+  'query.exec': buildAndExecQuery,
+  'count.exec': execCountQuery,
+  'synchronize.fetch': fetchAndInsertData
+};
+
 
 onmessage = function(msg) {
-  console.log('message received timestamp: ', performance.now());
-  Promise.resolve(dbPromise).then(function() {
-    switch(msg.data.operation) {
-      case 'query.exec':
-        return Promise.resolve(msg.data).
-          then(getTable).
-          then(buildAndExecQuery).
-          then(notifyMainThread, notifyMainThread);
-        break;
-      case 'count.exec':
-        return Promise.resolve(msg.data).
-          then(getTable).
-          then(execCountQuery).
-          then(notifyMainThread, notifyMainThread);
-        break;
-      case 'synchronize.fetch':
-        return Promise.resolve(msg.data).
-          then(getTable).
-          then(fetchAndInsertData).
-          then(notifyMainThread, notifyMainThread);
-        break;
-      default:
-        console.log('could not match', msg);
-    }
-  });
+  Promise.resolve(dbPromise).
+    then(function() {
+      return msg.data;
+    }).
+    then(getTable).
+    then(operationHandlers[msg.data.operation]).
+    then(notifyMainThread, notifyMainThread);
 }
 
 /**
@@ -70,14 +59,6 @@ function fetchAndInsertData(queryContext) {
     then(countItems).
     then(setLastUpdated).
     then(loadMore);
-}
-
-function notifyMainThread (queryContext) {
-  postMessage({
-    queryId: queryContext.queryId,
-    operation: queryContext.operation+'.'+(queryContext.error?'error':'success'),
-    results: queryContext.results || queryContext.error
-  });
 }
 
 /**
@@ -181,7 +162,6 @@ function loadMore(queryContext) {
 }
 
 function countItems(queryContext) {
-  console.log('countItems', queryContext);
   return db.
     select(lf.fn.count(queryContext.table[queryContext.countColumn])).
     from(queryContext.table).
@@ -198,14 +178,11 @@ function countItems(queryContext) {
 }
 
 function getTable(queryContext) {
-  console.log('getTable timestamp: ', performance.now());
   queryContext.table = db.getSchema()['get'+queryContext.tableName]();
-  console.log('done in getTable')
   return queryContext;
 }
 
 function setBaseQuery (queryContext) {
-  console.log('setBaseQuery timestamp: ', performance.now());
   var mapped = queryContext.select.map(function(select) {
     var select = queryContext.table[select];
     return select;
@@ -218,7 +195,6 @@ function setBaseQuery (queryContext) {
 }
 
 function setCountQuery (queryContext) {
-  console.log('setCountQuery');
   queryContext.query = db.
     select(lf.fn.count(queryContext.table[queryContext.column])).
     from(queryContext.table).
@@ -229,8 +205,6 @@ function setCountQuery (queryContext) {
 }
 
 function setPredicate(queryContext) {
-  console.log('setPredicate timestamp: ', performance.now());
-  console.log(queryContext)
   queryContext.predicate = predicateBuilder(queryContext.table, queryContext.rawQueryPredicate);
   if(queryContext.query) {
     queryContext.query = queryContext.query.where(queryContext.predicate);
@@ -240,7 +214,6 @@ function setPredicate(queryContext) {
 }
 
 function paginate (queryContext) {
-  console.log('paginate timestamp: ', performance.now());
   if (queryContext.skip && queryContext.limit) {
     queryContext.query = queryContext.query.limit(queryContext.limit).
     skip(queryContext.skip);
@@ -264,11 +237,8 @@ function orderBy (queryContext) {
 }
 
 function execQuery(queryContext) {
-  console.log('execQuery timestamp: ', performance.now());
   var startTime = performance.now();
   return queryContext.query.exec().then(function(results) {
-    console.log('query time inside worker', performance.now() - startTime)
-    console.log('exec done timestamp', performance.now())
     queryContext.results = results;
     return queryContext;
   }, function(e) {
@@ -276,6 +246,18 @@ function execQuery(queryContext) {
     return Promise.reject(queryContext);
   });
 }
+
+function notifyMainThread (queryContext) {
+  postMessage({
+    queryId: queryContext.queryId,
+    operation: queryContext.operation+'.'+(queryContext.error?'error':'success'),
+    results: queryContext.results || queryContext.error
+  });
+}
+
+/**
+ * Factory functions
+ **/
 
 function predicateBuilder(schema, query){
   var normalizedQuery = [];

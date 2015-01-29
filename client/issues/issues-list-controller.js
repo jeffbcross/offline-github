@@ -49,7 +49,6 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
       'access_token='+
       firebaseAuth.getAuth().github.accessToken;
 
-    console.log('synchronizing', url);
 
     github.synchronize({
       tableName: 'Issues',
@@ -112,7 +111,6 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
         repository: viewQuery.repository
       }
     }).then(function(count) {
-      console.log('got the count!', count);
       viewQuery.totalCount = count;
       return viewQuery;
     })
@@ -132,8 +130,6 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
       limit: ITEMS_PER_PAGE,
       skip: (viewQuery.page - 1) * ITEMS_PER_PAGE
     }).then(function(issues) {
-      console.log('time to query', performance.now() - queryStart)
-      console.log('issues. dupe?', issues)
       viewQuery.issues = issues;
       return viewQuery;
     });
@@ -151,7 +147,6 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
   }
 
   function renderPageCount(viewQuery) {
-    console.log('renderPageCount', viewQuery);
     var pages;
     if (Array.isArray(viewQuery.totalCount)) {
       pages = Math.ceil(viewQuery.totalCount[0][COUNT_PROPERTY_NAME] / ITEMS_PER_PAGE);

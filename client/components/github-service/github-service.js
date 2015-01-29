@@ -2,7 +2,6 @@
 
 function GithubService($window) {
   var self = this;
-  console.log('time before instantiating web worker', performance.now());
   this._worker = new $window.Worker('components/github-service/github-worker.js');
   this._queries = new Map();
   this._queryId = 0;
@@ -11,7 +10,6 @@ function GithubService($window) {
   this._processes = new Map();
 
   this._worker.onmessage = function(msg) {
-    console.log('this._worker.onmessage', performance.now())
     var resolution, rejection;
     var operation = typeof msg.data === 'string'?msg.data:msg.data.operation;
     switch(operation) {
