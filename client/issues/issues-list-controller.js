@@ -151,6 +151,7 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
   }
 
   function renderPageCount(viewQuery) {
+    console.log('renderPageCount', viewQuery);
     var pages;
     if (Array.isArray(viewQuery.totalCount)) {
       pages = Math.ceil(viewQuery.totalCount[0][COUNT_PROPERTY_NAME] / ITEMS_PER_PAGE);

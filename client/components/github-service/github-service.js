@@ -14,13 +14,12 @@ function GithubService($window) {
     console.log('this._worker.onmessage', performance.now())
     var resolution, rejection;
     var operation = typeof msg.data === 'string'?msg.data:msg.data.operation;
-
     switch(operation) {
-      case 'query.success':
+      case 'query.exec.success':
         resolution = self._queries.get(msg.data.queryId).resolve;
         resolution(msg.data.results)
         break;
-      case 'query.error':
+      case 'query.exec.error':
         rejection = self._queries.get(msg.data.queryId).reject;
         rejection(msg.data.error)
         break;

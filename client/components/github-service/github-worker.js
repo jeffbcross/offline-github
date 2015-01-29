@@ -26,22 +26,22 @@ onmessage = function(msg) {
         return Promise.resolve(msg.data).
           then(getTable).
           then(buildAndExecQuery).
-          then(notifyMainThreadOfQuerySuccess, notifyMainThreadOfQueryError);
+          then(notifyMainThread, notifyMainThread);
         break;
       case 'count.exec':
         return Promise.resolve(msg.data).
           then(getTable).
           then(execCountQuery).
-          then(notifyMainThreadOfCountSuccess,notifyMainThreadOfCountError);
+          then(notifyMainThread, notifyMainThread);
         break;
       case 'synchronize.fetch':
         return Promise.resolve(msg.data).
           then(getTable).
           then(fetchAndInsertData).
-          then(function(queryContext) {
-            console.log('all done inserting for', queryContext.rawQueryPredicate);
-          });
+          then(notifyMainThread, notifyMainThread);
         break;
+      default:
+        console.log('could not match', msg);
     }
   });
 }
@@ -56,8 +56,7 @@ function execCountQuery(queryContext) {
 }
 
 function buildAndExecQuery(queryContext) {
-  return Promise.resolve(getTable(queryContext)).
-    then(setBaseQuery).
+  return Promise.resolve(setBaseQuery(queryContext)).
     then(setPredicate).
     then(paginate).
     then(orderBy).
@@ -73,38 +72,11 @@ function fetchAndInsertData(queryContext) {
     then(loadMore);
 }
 
-function notifyMainThreadOfQuerySuccess(queryContext) {
-  console.log('notifyMainThreadOfQuerySuccess', queryContext, performance.now());
+function notifyMainThread (queryContext) {
   postMessage({
     queryId: queryContext.queryId,
-    operation: 'query.success',
-    results: queryContext.results
-  });
-}
-
-function notifyMainThreadOfQueryError(queryContext) {
-  postMessage({
-    queryId: queryContext.queryId,
-    operation: 'query.error',
-    error: queryContext.error
-  });
-}
-
-function notifyMainThreadOfCountSuccess(queryContext) {
-  console.log('notifyMainThreadOfCountSuccess');
-  postMessage({
-    queryId: queryContext.queryId,
-    operation: 'count.success',
-    results: queryContext.results
-  });
-}
-
-function notifyMainThreadOfCountError(queryContext) {
-  console.log('something went wrong :(', queryContext)
-  postMessage({
-    queryId: queryContext.queryId,
-    operation: 'count.error',
-    error: queryContext.error
+    operation: queryContext.operation+'.'+(queryContext.error?'error':'success'),
+    results: queryContext.results || queryContext.error
   });
 }
 
