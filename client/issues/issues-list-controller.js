@@ -123,7 +123,7 @@ function IssuesListController ($location, $scope, db, github, issueDefaults,
     return github.query({
       tableName: 'Issues',
       select: ['number', 'title', 'id', 'comments'],
-      predicate: {
+      rawQueryPredicate: {
         owner: viewQuery.owner,
         repository: viewQuery.repository
       },

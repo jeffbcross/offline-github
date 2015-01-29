@@ -23,25 +23,32 @@ onmessage = function(msg) {
   Promise.resolve(dbPromise).then(function() {
     switch(msg.data.operation) {
       case 'query.exec':
-        return Promise.resolve(extendQueryContext(msg.data)).
+        return Promise.resolve(msg.data).
+          then(getTable).
           then(buildAndExecQuery).
           then(notifyMainThreadOfQuerySuccess, notifyMainThreadOfQueryError);
         break;
       case 'count.exec':
-        return Promise.resolve(extendCountQueryContext(msg.data)).
+        return Promise.resolve(msg.data).
+          then(getTable).
           then(execCountQuery).
           then(notifyMainThreadOfCountSuccess,notifyMainThreadOfCountError);
         break;
       case 'synchronize.fetch':
-        return Promise.resolve(extendSubscription(msg.data)).
+        return Promise.resolve(msg.data).
+          then(getTable).
           then(fetchAndInsertData).
-          then(function(subscription) {
-            console.log('all done inserting for', subscription.rawQueryPredicate);
+          then(function(queryContext) {
+            console.log('all done inserting for', queryContext.rawQueryPredicate);
           });
         break;
     }
   });
 }
+
+/**
+ * Meta functions
+ **/
 
 function execCountQuery(queryContext) {
   return Promise.resolve(setCountQuery(queryContext)).
@@ -55,6 +62,15 @@ function buildAndExecQuery(queryContext) {
     then(paginate).
     then(orderBy).
     then(execQuery);
+}
+
+function fetchAndInsertData(queryContext) {
+  return fetchItems(queryContext).
+    then(insertData).
+    then(getNextPageUrl).
+    then(countItems).
+    then(setLastUpdated).
+    then(loadMore);
 }
 
 function notifyMainThreadOfQuerySuccess(queryContext) {
@@ -92,38 +108,21 @@ function notifyMainThreadOfCountError(queryContext) {
   });
 }
 
-// Constructors
+/**
+ * Pipeline functions
+ **/
 
-function extendQueryContext(config) {
-  config.rawQueryPredicate = config.predicate;
-  config.select = config.select || [];
-  return config;
-}
-
-function extendCountQueryContext(config) {
-  config.table = db.getSchema()['get'+config.tableName]();
-  return config;
-}
-
-function extendSubscription (config) {
-  config.table = db.getSchema()['get'+config.tableName]();
-  config.nextUrl = config.url;
-  config.totalAdded = 0;
-  config.select = config.select || [];
-  return config;
-}
-
-function fetchItems(subscription) {
+function fetchItems(queryContext) {
   return new Promise(function(resolve, reject) {
     var xhr = new XMLHttpRequest();
-    xhr.open('get', subscription.nextUrl);
+    xhr.open('get', queryContext.nextUrl || queryContext.url);
     xhr.responseType = 'json';
     xhr.addEventListener('load', function(e) {
-      subscription.res = {
+      queryContext.res = {
         headers: xhr.getAllResponseHeaders(),
         data: xhr.response
       };
-      resolve(subscription);
+      resolve(queryContext);
     })
 
     xhr.addEventListener('error', function(e) {
@@ -133,22 +132,26 @@ function fetchItems(subscription) {
   });
 }
 
-function insertData(subscription) {
-  var issues;
-  if (!subscription.res || !subscription.res.data) return subscription;
-  issues = subscription.res.data;
-  subscription.totalAdded += (subscription.res.data.length) || 0;
+function insertData(queryContext) {
+  if (!queryContext.res || !queryContext.res.data) {
+    return queryContext;
+  }
+  var issues = queryContext.res.data;
+  if (queryContext.totalAdded === undefined) {
+    queryContext.totalAdded = 0;
+  }
+  queryContext.totalAdded += (queryContext.res.data.length) || 0;
   var rows = issues.map(function(object){
-    return subscription.table.createRow(
-        storageTranslator(object, subscription.defaults));
+    return queryContext.table.createRow(
+        storageTranslator(object, queryContext.defaults));
   });
 
 
   return db.
     insertOrReplace().
-    into(subscription.table).
+    into(queryContext.table).
     values(rows).exec().then(function() {
-      return subscription;
+      return queryContext;
     });
 }
 
@@ -172,63 +175,53 @@ function storageTranslator (object, defaults) {
   return object;
 }
 
-function getNextPageUrl (subscription) {
-  var linkHeader = subscription.res && subscription.res.headers;
+function getNextPageUrl (queryContext) {
+  var linkHeader = queryContext.res && queryContext.res.headers;
   linkHeader = linkHeader.split('\n');
   linkHeader = linkHeader.filter(function(header) {
     var index = header.indexOf('Link');
     return index === 0;
   })[0];
-  if (!linkHeader) subscription.nextUrl = null;
+  if (!linkHeader) queryContext.nextUrl = null;
   var matched = /^Link: <(https:\/\/[a-z0-9\.\/\?_=&]*)>; rel="next"/gi.exec(linkHeader);
-  subscription.nextUrl = matched? matched[1] : null;
+  queryContext.nextUrl = matched? matched[1] : null;
 
-  return subscription;
+  return queryContext;
 }
 
-
-function fetchAndInsertData(subscription) {
-  return fetchItems(subscription).
-    then(insertData).
-    then(getNextPageUrl).
-    then(countItems).
-    then(setLastUpdated).
-    then(loadMore);
-}
-
-function setLastUpdated(subscription) {
-  if (subscription.res && subscription.res.data && subscription.res.data.length) {
-    subscription.lastUpdated = subscription.res.data[0].updated_at;
+function setLastUpdated(queryContext) {
+  if (queryContext.res && queryContext.res.data && queryContext.res.data.length) {
+    queryContext.lastUpdated = queryContext.res.data[0].updated_at;
     postMessage({
       operation: 'lastUpdated.set',
-      processId: subscription.processId,
-      lastUpdated: subscription.lastUpdated
+      processId: queryContext.processId,
+      lastUpdated: queryContext.lastUpdated
     });
   }
-  return subscription;
+  return queryContext;
 }
 
-function loadMore(subscription) {
-  if (subscription.nextUrl) {
-    return fetchAndInsertData(subscription);
+function loadMore(queryContext) {
+  if (queryContext.nextUrl) {
+    return fetchAndInsertData(queryContext);
   }
-  return subscription;
+  return queryContext;
 }
 
-function countItems(subscription) {
-  console.log('countItems', subscription);
+function countItems(queryContext) {
+  console.log('countItems', queryContext);
   return db.
-    select(lf.fn.count(subscription.table[subscription.countColumn])).
-    from(subscription.table).
-    where(subscription.predicate).
+    select(lf.fn.count(queryContext.table[queryContext.countColumn])).
+    from(queryContext.table).
+    where(queryContext.predicate).
     exec().then(function(count){
       postMessage({
         operation: 'count.update',
-        processId: subscription.processId,
-        query: subscription.query,
-        count: count[0][subscription.countPropertyName]
+        processId: queryContext.processId,
+        query: queryContext.query,
+        count: count[0][queryContext.countPropertyName]
       });
-      return subscription;
+      return queryContext;
     })
 }
 
