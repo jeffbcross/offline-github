@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <script>
+    function startWorker() {
+      var startTime = performance.now();
+      console.log('time before worker started', startTime);
+      var worker = new Worker('worker.js');
+      worker.onmessage = function(msg) {
+        console.log('delta', msg.data - startTime);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', startWorker);
+
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

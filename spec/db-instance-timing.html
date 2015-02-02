@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <script>
+    window.CLOSURE_NO_DEPS=true;
+    </script>
+    <script src="../client/lovefield.js"></script>
+    <script src="../client/db/github_db_gen.js"></script>
+    <script>
+      function loadDB() {
+        var startTime = performance.now();
+        github.db.getInstance().then(function() {
+          console.log('time to get instance', performance.now() - startTime)
+        })
+      }
+      window.addEventListener('DOMContentLoaded', loadDB);
+
+    </script>
+  </head>
+</html>
