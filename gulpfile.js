@@ -23,7 +23,7 @@ gulp.task('lint', function() {
 gulp.task('webserver', function() {
   gulp.src('client')
     .pipe(webserver({
-      livereload: true,
+      livereload: false,
       directoryListing: false,
       open: true
     }));

@@ -48,7 +48,6 @@ function run($rootScope, $route, $location, $window, firebaseAuth) {
 
 angular.module('ghIssuesApp', [
     'ngRoute',
-    'mgcrea.ngStrap.typeahead',
     'ghoFirebaseAuth',
     'ghoGithubService',
     'ghoIssueDefaultsFactory',

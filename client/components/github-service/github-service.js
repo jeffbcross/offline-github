@@ -14,7 +14,6 @@ function GithubService($window) {
     var operation = typeof msg.data === 'string'?msg.data:msg.data.operation;
     switch(operation) {
       case 'query.exec.success':
-        console.log('query.exec.success', msg);
         resolution = self._queries.get(msg.data.queryId).resolve;
         resolution(msg.data.results)
         break;
@@ -40,17 +39,17 @@ function GithubService($window) {
           rejector();
         });
         break;
-      case 'count.update':
+      case 'synchronize.fetch.progress':
         var subject = self._processes.get(msg.data.queryId).subject;
-        subject.onNext({totalCount: msg.data.count});
+        subject.onNext(self._processes.get(msg.data.queryId).config);
         break;
       case 'lastUpdated.set':
         localStorage.setItem(self._processes.get(msg.data.queryId).config.storageKey, msg.data.lastUpdated);
         break;
       case 'synchronize.fetch.success':
-        console.log('synchronize.fetch.success', msg.data);
         var subject = self._processes.get(msg.data.queryId).subject;
         subject.onCompleted({totalCount: msg.data.count});
+        // subject.dispose();
         break;
     }
   }

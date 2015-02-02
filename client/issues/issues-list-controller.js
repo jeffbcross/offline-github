@@ -4,7 +4,6 @@
 
 function filterByOrg () {
   return function(repos, org) {
-    console.log(org);
     if (!org || !repos) return repos;
     return repos.filter(function(repo) {
       return repo.owner === org;
@@ -12,29 +11,79 @@ function filterByOrg () {
   };
 }
 
-function IssuesListController ($filter, $location, $scope, github, issueDefaults,
+function IssuesListController ($filter, $location, $rootScope, $scope, github, issueDefaults,
     lovefieldQueryBuilder, firebaseAuth, organizationDefaults, repositoryDefaults) {
   var ITEMS_PER_PAGE = 30;
   var COUNT_PROPERTY_NAME = 'COUNT(id)';
   var params = $location.search();
   $scope.issues = [];
+  $scope.synchronizing = {};
+
+  Rx.Observable.$locationParamsWatch = function (scope, watchExpression) {
+    return Rx.Observable.create(function (observer) {
+      // Create function to handle old and new Value
+      function listener (e) {
+        var params = $location.search();
+        observer.onNext(params);
+      }
+
+      // Returns function which disconnects the $watch expression
+      return scope.$on(watchExpression, listener);
+    });
+  };
+
+  var locationObservable = Rx.Observable.$locationParamsWatch($scope,
+      '$locationChangeStart').
+    map(function (param) {
+      return {
+        owner: param.owner,
+        repository: param.repository,
+        page: parseInt(param.page, 10) || 1,
+        totalCount: -1
+      };
+    });
+
+  /**
+   * Synchronize and keep total page counter up to date.
+   **/
+  locationObservable
+    .do(function(data) {
+      $scope.synchronizing[data.owner+data.repository] = true;
+    })
+    .flatMapLatest(function(latest) {
+      return syncFromWorker(latest);
+    })
+    .subscribe(function(data) {
+      countPages(data.rawQueryPredicate).then(function(count) {
+        $scope.$apply(function() {
+          $scope.pages = new Array(Math.ceil(count.totalCount[0][COUNT_PROPERTY_NAME] / ITEMS_PER_PAGE));
+        });
+      });
+    }, console.error.bind(console),
+    function() {
+    });
+
+  locationObservable
+    .do(function (data) {
+      $scope.loadingNewIssues = true;
+      $scope.issues = [];
+    })
+    .flatMapLatest(function(latest) {
+      return Rx.Observable.fromPromise(fetchIssues(latest));
+    })
+    .subscribe(function (data) {
+      $scope.loadingNewIssues = false;
+      $scope.issues = data.issues;
+      $scope.$digest();
+    });
 
   if (params.owner && params.repository) {
     $scope.repository = params.repository;
     $scope.owner = params.owner;
-    console.log('set owner and repository', $scope.owner, $scope.repository);
-    updateView(new IssuesQuery(params.owner, params.repository, params.page));
+    $scope.$emit('$locationChangeStart');
   }
 
-
-
-  $scope.$on('$locationChangeStart', function(e) {
-    var params = $location.search();
-    updateView(new IssuesQuery(params.owner, params.repository, params.page));
-  });
-
   $scope.updateOrgRepo = function(organization, repository) {
-    console.log('updateOrgRepo', organization, repository);
     $location.search({
       owner: organization,
       repository: repository,
@@ -42,13 +91,13 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
     });
   };
 
-  getRepositories();
-  getOrganizations();
+  // getRepositories();
+  // getOrganizations();
 
-  function IssuesQuery (owner, repository, page) {
-    this.owner = owner;
-    this.repository = repository;
-    this.page = page || 1;
+  function IssuesQuery (params) {
+    this.owner = params.owner;
+    this.repository = params.repository;
+    this.page = params.page || 1;
     this.predicate = null;
     this.lfQuery = null;
     this.issues = null;
@@ -105,7 +154,7 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
         defaults: organizationDefaults(),
         url: url,
         storageKey: storageKey
-      }).subscribe(console.log.bind(console), reject, resolve);
+      }).subscribe(angular.noop, reject, resolve);
     });
   }
 
@@ -139,7 +188,7 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
               defaults: repositoryDefaults(),
               url: url,
               storageKey: storageKey
-            }).subscribe(console.log.bind(console), reject, resolve);
+            }).subscribe(angular.noop, reject, resolve);
           })
         }));
       })
@@ -147,7 +196,6 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
   }
 
   function syncFromWorker(issuesQuery) {
-    console.log('syncFromWorker', issuesQuery);
     //TODO: don't sync when just the page changes, only when owner or repository
     var storageKey = issuesQuery.owner + ':' + issuesQuery.repository + ':last_update';
     var lastUpdated = localStorage.getItem(storageKey);
@@ -165,7 +213,7 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       firebaseAuth.getAuth().github.accessToken;
 
 
-    github.synchronize({
+    return github.synchronize({
       tableName: 'Issues',
       rawQueryPredicate: {
         repository: issuesQuery.repository,
@@ -203,14 +251,6 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
     $location.search('page', num);
   }
 
-  function updateView(issuesQuery) {
-    return fetchIssues(issuesQuery).
-      then(renderData).
-      then(countPages).
-      then(renderPageCount).
-      then(syncFromWorker);
-  }
-
   function countPages(issuesQuery) {
     return github.count({
       tableName: 'Issues',
@@ -227,10 +267,12 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
 
   function fetchIssues(issuesQuery) {
     var skipValue = (issuesQuery.page - 1) * ITEMS_PER_PAGE;
+    var query;
     if (skipValue < 0) {
       skipValue = 0;
     }
-    return github.query({
+
+    query = {
       tableName: 'Issues',
       select: ['number', 'title', 'id', 'comments'],
       rawQueryPredicate: {
@@ -241,10 +283,15 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       orderByDirection: 'DESC',
       limit: ITEMS_PER_PAGE,
       skip: skipValue
-    }).then(function(issues) {
-      issuesQuery.issues = issues;
-      return issuesQuery;
-    });
+    }
+
+
+    return github.query(query).
+      then(function(issues) {
+        issuesQuery.issues = issues;
+        return issuesQuery;
+      });
+
   }
 
   function showError() {
@@ -252,7 +299,6 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
   }
 
   function renderData(issuesQuery) {
-    console.log('renderData', issuesQuery);
     $scope.$apply(function() {
       $scope.issues = issuesQuery.issues;
     });
@@ -277,7 +323,7 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
 angular.module('ghIssuesApp').
   controller(
       'IssuesListController',
-      ['$filter', '$location', '$scope', 'github', 'issueDefaults', 'lovefieldQueryBuilder',
+      ['$filter', '$location', '$rootScope', '$scope', 'github', 'issueDefaults', 'lovefieldQueryBuilder',
           'firebaseAuth', 'organizationDefaults', 'repositoryDefaults', IssuesListController]).
   filter('filterByOrg', [filterByOrg]);
 

@@ -41,7 +41,6 @@ function execCountQuery(queryContext) {
 }
 
 function buildAndExecQuery(queryContext) {
-  console.log('buildAndExecQuery', queryContext);
   return Promise.resolve(setBaseQuery(queryContext)).
     then(setPredicate).
     then(paginate).
@@ -53,8 +52,8 @@ function fetchAndInsertData(queryContext) {
   return fetchItems(queryContext).
     then(insertData).
     then(getNextPageUrl).
-    then(countItems).
     then(setLastUpdated).
+    then(notifyMainThreadProgress)
     then(loadMore);
 }
 
@@ -159,22 +158,6 @@ function loadMore(queryContext) {
   return queryContext;
 }
 
-function countItems(queryContext) {
-  return db.
-    select(lf.fn.count(queryContext.table[queryContext.countColumn])).
-    from(queryContext.table).
-    where(queryContext.predicate).
-    exec().then(function(count){
-      postMessage({
-        operation: 'count.update',
-        queryId: queryContext.queryId,
-        query: queryContext.query,
-        count: count[0][queryContext.countPropertyName]
-      });
-      return queryContext;
-    })
-}
-
 function getTable(queryContext) {
   queryContext.table = db.getSchema()['get'+queryContext.tableName]();
   return queryContext;
@@ -212,7 +195,6 @@ function setPredicate(queryContext) {
 }
 
 function paginate (queryContext) {
-  console.log('paginate', queryContext.skip, queryContext.limit, queryContext);
   if (queryContext.limit) {
     queryContext.query = queryContext.query.limit(queryContext.limit);
   }
@@ -253,6 +235,14 @@ function notifyMainThread (queryContext) {
     operation: queryContext.operation+'.'+(queryContext.error?'error':'success'),
     results: queryContext.results || queryContext.error
   });
+}
+
+function notifyMainThreadProgress (queryContext) {
+  postMessage({
+    queryId: queryContext.queryId,
+    operation: queryContext.operation+'.progress'
+  });
+  return queryContext;
 }
 
 /**
