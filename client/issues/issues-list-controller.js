@@ -22,9 +22,8 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
   Rx.Observable.$locationParamsWatch = function (scope, watchExpression) {
     return Rx.Observable.create(function (observer) {
       // Create function to handle old and new Value
-      function listener (e) {
-        var params = $location.search();
-        observer.onNext(params);
+      function listener () {
+        observer.onNext($location.search());
       }
 
       // Returns function which disconnects the $watch expression
@@ -89,108 +88,28 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
     });
   };
 
-  getRepositories();
-  getOrganizations();
+  $scope.goToPrevPage = function() {
+    var page = $location.search().page || 1;
+    if (page > 1) {
+      setPage(page-1);
+    }
+  };
 
-  function IssuesQuery (params) {
-    this.owner = params.owner;
-    this.repository = params.repository;
-    this.page = params.page || 1;
-    this.predicate = null;
-    this.lfQuery = null;
-    this.issues = null;
-    this.totalCount = -1;
-  }
+  $scope.goToNextPage = function() {
+    var page = parseInt($location.search().page, 10) || 1;
+    if ($scope.pages && page < $scope.pages.length) {
+      setPage(page+1);
+    } else if ($scope.pages && page >= $scope.pages.length) {
+      setPage($scope.pages.length);
+    }
+  };
 
-  function getRepositories() {
-    github.query({
-      tableName: 'Organizations',
-      select: ['id','login']
-    }).
-    then(function(organizations) {
-      $scope.$apply(function(){
-        $scope.organizations = organizations;
-      });
+  $scope.getPage = function() {
+    return $location.search().page;
+  };
 
-    }).
-    then(syncOrganizations);
-  }
-
-  function getOrganizations() {
-    github.query({
-      tableName: 'Repositories',
-      select: ['id','owner','name']
-    }).
-    then(function(repositories) {
-      $scope.$apply(function(){
-        $scope.repositories = repositories;
-      });
-
-    }).
-    then(syncRepositories);
-  }
-
-  function syncOrganizations() {
-    return new Promise(function(resolve, reject) {
-      //TODO: only get repositories for user and organizations that user belongs to
-
-      var storageKey = 'Organizations:last_update';
-      var lastUpdated = localStorage.getItem(storageKey);
-      var url = 'https://api.github.com/user/orgs?'+
-        'per_page=100&'+
-        'sort=updated&'+
-        'direction=asc&'+
-        (lastUpdated?'since='+lastUpdated+'&':'')+
-        'access_token='+
-        firebaseAuth.getAuth().github.accessToken;
-
-      github.synchronize({
-        tableName: 'Organizations',
-        rawQueryPredicate: {},
-        countPropertyName: COUNT_PROPERTY_NAME,
-        countColumn: 'id',
-        defaults: organizationDefaults(),
-        url: url,
-        storageKey: storageKey
-      }).subscribe(angular.noop, reject, resolve);
-    });
-  }
-
-  function syncRepositories() {
-    return new Promise(function(resolve, reject) {
-      github.query({
-        tableName: 'Organizations',
-        select: ['login']
-      }).
-      then(function(organizations) {
-
-        return Promise.all(organizations.map(function(organization) {
-          return new Promise(function(resolve, reject) {
-            var storageKey = organization.login+':Repositories:last_update';
-            var lastUpdated = localStorage.getItem(storageKey);
-            var url = 'https://api.github.com/orgs/'+
-              organization.login+
-              '/repos?'+
-              'per_page=100&'+
-              'sort=updated&'+
-              'direction=asc&'+
-              (lastUpdated?'since='+lastUpdated+'&':'')+
-              'access_token='+
-              firebaseAuth.getAuth().github.accessToken;
-
-            github.synchronize({
-              tableName: 'Repositories',
-              rawQueryPredicate: {},
-              countPropertyName: COUNT_PROPERTY_NAME,
-              countColumn: 'id',
-              defaults: repositoryDefaults(),
-              url: url,
-              storageKey: storageKey
-            }).subscribe(angular.noop, reject, resolve);
-          })
-        }));
-      })
-    });
+  function setPage(num) {
+    $location.search('page', num);
   }
 
   function syncFromWorker(issuesQuery) {
@@ -223,30 +142,6 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       url: url,
       storageKey: storageKey
     });
-  }
-
-  $scope.goToPrevPage = function() {
-    var page = $location.search().page || 1;
-    if (page > 1) {
-      setPage(page-1);
-    }
-  };
-
-  $scope.goToNextPage = function() {
-    var page = parseInt($location.search().page, 10) || 1;
-    if ($scope.pages && page < $scope.pages.length) {
-      setPage(page+1);
-    } else if ($scope.pages && page >= $scope.pages.length) {
-      setPage($scope.pages.length);
-    }
-  };
-
-  $scope.getPage = function() {
-    return $location.search().page;
-  };
-
-  function setPage(num) {
-    $location.search('page', num);
   }
 
   function countPages(issuesQuery) {
@@ -290,31 +185,6 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
         return issuesQuery;
       });
 
-  }
-
-  function showError() {
-    $scope.error = 'Could not update issues from server';
-  }
-
-  function renderData(issuesQuery) {
-    $scope.$apply(function() {
-      $scope.issues = issuesQuery.issues;
-    });
-    return issuesQuery;
-  }
-
-  function renderPageCount(issuesQuery) {
-    var pages;
-    if (Array.isArray(issuesQuery.totalCount)) {
-      pages = Math.ceil(issuesQuery.totalCount[0][COUNT_PROPERTY_NAME] / ITEMS_PER_PAGE);
-    } else {
-      pages = Math.ceil(issuesQuery.totalCount / ITEMS_PER_PAGE);
-    }
-    $scope.$apply(function(){
-      $scope.pages=new Array(pages);
-    });
-
-    return issuesQuery;
   }
 }
 
