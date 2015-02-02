@@ -14,6 +14,7 @@ function GithubService($window) {
     var operation = typeof msg.data === 'string'?msg.data:msg.data.operation;
     switch(operation) {
       case 'query.exec.success':
+        console.log('query.exec.success', msg);
         resolution = self._queries.get(msg.data.queryId).resolve;
         resolution(msg.data.results)
         break;
@@ -40,11 +41,16 @@ function GithubService($window) {
         });
         break;
       case 'count.update':
-        var subject = self._processes.get(msg.data.processId).subject;
+        var subject = self._processes.get(msg.data.queryId).subject;
         subject.onNext({totalCount: msg.data.count});
         break;
       case 'lastUpdated.set':
-        localStorage.setItem(self._processes.get(msg.data.processId).config.storageKey, msg.data.lastUpdated);
+        localStorage.setItem(self._processes.get(msg.data.queryId).config.storageKey, msg.data.lastUpdated);
+        break;
+      case 'synchronize.fetch.success':
+        console.log('synchronize.fetch.success', msg.data);
+        var subject = self._processes.get(msg.data.queryId).subject;
+        subject.onCompleted({totalCount: msg.data.count});
         break;
     }
   }
@@ -87,14 +93,16 @@ GithubService.prototype.query = function(query) {
 }
 
 GithubService.prototype.synchronize = function(config) {
+  var subject = new Rx.Subject();
   config.operation = 'synchronize.fetch';
-  config.processId = ++this._pids;
+  config.queryId = ++this._queryId;
 
   this._worker.postMessage(config);
-  this._processes.set(config.processId, {
+  this._processes.set(config.queryId, {
     config: config,
-    subject: new Rx.Subject()
+    subject: subject
   });
+  return subject;
 };
 
 angular.module('ghoGithubService', []).

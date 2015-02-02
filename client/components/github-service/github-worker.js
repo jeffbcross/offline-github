@@ -41,6 +41,7 @@ function execCountQuery(queryContext) {
 }
 
 function buildAndExecQuery(queryContext) {
+  console.log('buildAndExecQuery', queryContext);
   return Promise.resolve(setBaseQuery(queryContext)).
     then(setPredicate).
     then(paginate).
@@ -113,7 +114,8 @@ function storageTranslator (object, defaults) {
           object[k] = object[k][instructions[1]];
           break;
         case 'as_date':
-          object[k] = new Date(object[k]);
+          object[k] = new Date(object[k] || undefined);
+
           break;
       }
     } else {
@@ -143,7 +145,7 @@ function setLastUpdated(queryContext) {
     queryContext.lastUpdated = queryContext.res.data[0].updated_at;
     postMessage({
       operation: 'lastUpdated.set',
-      processId: queryContext.processId,
+      queryId: queryContext.queryId,
       lastUpdated: queryContext.lastUpdated
     });
   }
@@ -165,7 +167,7 @@ function countItems(queryContext) {
     exec().then(function(count){
       postMessage({
         operation: 'count.update',
-        processId: queryContext.processId,
+        queryId: queryContext.queryId,
         query: queryContext.query,
         count: count[0][queryContext.countPropertyName]
       });
@@ -210,10 +212,12 @@ function setPredicate(queryContext) {
 }
 
 function paginate (queryContext) {
-  if (queryContext.skip && queryContext.limit) {
-    queryContext.query = queryContext.query.limit(queryContext.limit).
-    skip(queryContext.skip);
-  } else {
+  console.log('paginate', queryContext.skip, queryContext.limit, queryContext);
+  if (queryContext.limit) {
+    queryContext.query = queryContext.query.limit(queryContext.limit);
+  }
+  if (queryContext.skip) {
+    queryContext.query = queryContext.query.skip(queryContext.skip);
   }
 
   return queryContext;
