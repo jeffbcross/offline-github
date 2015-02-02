@@ -51,6 +51,7 @@ angular.module('ghIssuesApp', [
     'ghoFirebaseAuth',
     'ghoGithubService',
     'ghoIssueDefaultsFactory',
+    'ghoParamsObservable',
     'ghoOrganizationDefaultsFactory',
     'ghoRepositoryDefaultsFactory',
     'ghoLovefieldQueryFactory'

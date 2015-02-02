@@ -12,27 +12,15 @@ function filterByOrg () {
 }
 
 function IssuesListController ($filter, $location, $scope, github, issueDefaults,
-    lovefieldQueryBuilder, firebaseAuth, organizationDefaults, repositoryDefaults) {
+    lovefieldQueryBuilder, firebaseAuth, paramsObservable, organizationDefaults,
+    repositoryDefaults) {
   var ITEMS_PER_PAGE = 30;
   var COUNT_PROPERTY_NAME = 'COUNT(id)';
   var params = $location.search();
   $scope.issues = [];
   $scope.synchronizing = {};
 
-  Rx.Observable.$locationParamsWatch = function (scope, watchExpression) {
-    return Rx.Observable.create(function (observer) {
-      // Create function to handle old and new Value
-      function listener () {
-        observer.onNext($location.search());
-      }
-
-      // Returns function which disconnects the $watch expression
-      return scope.$on(watchExpression, listener);
-    });
-  };
-
-  var locationObservable = Rx.Observable.$locationParamsWatch($scope,
-      '$locationChangeStart').
+  var paramsObserver = paramsObservable($scope, '$locationChangeStart').
     map(function (param) {
       return {
         owner: param.owner,
@@ -45,7 +33,7 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
   /**
    * Synchronize and keep total page counter up to date.
    **/
-  locationObservable
+  paramsObserver
     .do(function(data) {
       $scope.synchronizing[data.owner+data.repository] = true;
     })
@@ -60,7 +48,7 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       });
     }, console.error.bind(console));
 
-  locationObservable
+  paramsObserver
     .do(function (data) {
       $scope.loadingNewIssues = true;
       $scope.issues = [];
@@ -178,7 +166,6 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       skip: skipValue
     }
 
-
     return github.query(query).
       then(function(issues) {
         issuesQuery.issues = issues;
@@ -192,7 +179,8 @@ angular.module('ghIssuesApp').
   controller(
       'IssuesListController',
       ['$filter', '$location', '$scope', 'github', 'issueDefaults', 'lovefieldQueryBuilder',
-          'firebaseAuth', 'organizationDefaults', 'repositoryDefaults', IssuesListController]).
+          'firebaseAuth', 'paramsObservable', 'organizationDefaults', 'repositoryDefaults',
+          IssuesListController]).
   filter('filterByOrg', [filterByOrg]);
 
 }());

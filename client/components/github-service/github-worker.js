@@ -223,7 +223,6 @@ function orderBy (queryContext) {
 }
 
 function execQuery(queryContext) {
-  var startTime = performance.now();
   return queryContext.query.exec().then(function(results) {
     queryContext.results = results;
     return queryContext;
