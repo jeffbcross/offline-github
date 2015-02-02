@@ -11,7 +11,7 @@ function filterByOrg () {
   };
 }
 
-function IssuesListController ($filter, $location, $rootScope, $scope, github, issueDefaults,
+function IssuesListController ($filter, $location, $scope, github, issueDefaults,
     lovefieldQueryBuilder, firebaseAuth, organizationDefaults, repositoryDefaults) {
   var ITEMS_PER_PAGE = 30;
   var COUNT_PROPERTY_NAME = 'COUNT(id)';
@@ -59,9 +59,7 @@ function IssuesListController ($filter, $location, $rootScope, $scope, github, i
           $scope.pages = new Array(Math.ceil(count.totalCount[0][COUNT_PROPERTY_NAME] / ITEMS_PER_PAGE));
         });
       });
-    }, console.error.bind(console),
-    function() {
-    });
+    }, console.error.bind(console));
 
   locationObservable
     .do(function (data) {
@@ -91,8 +89,8 @@ function IssuesListController ($filter, $location, $rootScope, $scope, github, i
     });
   };
 
-  // getRepositories();
-  // getOrganizations();
+  getRepositories();
+  getOrganizations();
 
   function IssuesQuery (params) {
     this.owner = params.owner;
@@ -323,7 +321,7 @@ function IssuesListController ($filter, $location, $rootScope, $scope, github, i
 angular.module('ghIssuesApp').
   controller(
       'IssuesListController',
-      ['$filter', '$location', '$rootScope', '$scope', 'github', 'issueDefaults', 'lovefieldQueryBuilder',
+      ['$filter', '$location', '$scope', 'github', 'issueDefaults', 'lovefieldQueryBuilder',
           'firebaseAuth', 'organizationDefaults', 'repositoryDefaults', IssuesListController]).
   filter('filterByOrg', [filterByOrg]);
 

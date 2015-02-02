@@ -53,7 +53,7 @@ function fetchAndInsertData(queryContext) {
     then(insertData).
     then(getNextPageUrl).
     then(setLastUpdated).
-    then(notifyMainThreadProgress)
+    then(notifyMainThreadProgress).
     then(loadMore);
 }
 
@@ -132,16 +132,20 @@ function getNextPageUrl (queryContext) {
     var index = header.indexOf('Link');
     return index === 0;
   })[0];
-  if (!linkHeader) queryContext.nextUrl = null;
-  var matched = /^Link: <(https:\/\/[a-z0-9\.\/\?_=&]*)>; rel="next"/gi.exec(linkHeader);
+  if (!linkHeader) {
+    queryContext.nextUrl = null;
+  }
+  var matched = /^Link: <(https:\/\/[a-z0-9\.\/\?\%\-_=&]*)>; rel="next"/gi.exec(linkHeader);
   queryContext.nextUrl = matched? matched[1] : null;
-
   return queryContext;
 }
 
 function setLastUpdated(queryContext) {
   if (queryContext.res && queryContext.res.data && queryContext.res.data.length) {
     queryContext.lastUpdated = queryContext.res.data[0].updated_at;
+    if (queryContext.lastUpdated instanceof Date) {
+      queryContext.lastUpdated = queryContext.lastUpdated.toISOString();
+    }
     postMessage({
       operation: 'lastUpdated.set',
       queryId: queryContext.queryId,
