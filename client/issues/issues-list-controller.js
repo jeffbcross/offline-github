@@ -40,14 +40,23 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
     .flatMapLatest(function(latest) {
       return syncFromWorker(latest);
     })
-    .subscribe(function(data) {
-      countPages(data.rawQueryPredicate).then(function(count) {
-        $scope.$apply(function() {
-          $scope.pages = new Array(Math.ceil(count.totalCount[0][COUNT_PROPERTY_NAME] / ITEMS_PER_PAGE));
-        });
+    .flatMapLatest(function(data) {
+      console.log('data', data);
+      return Rx.Observable.fromPromise(countPages(data.rawQueryPredicate).
+        then(function(count) {
+          return count.totalCount[0][data.countPropertyName]
+        }));
+    })
+    .subscribe(function(numItems) {
+      console.log('subscribe', numItems);
+      $scope.$apply(function() {
+        $scope.pages = new Array(Math.ceil(numItems / ITEMS_PER_PAGE));
       });
     }, console.error.bind(console));
 
+  /**
+   * Load actual issues into view.
+   **/
   paramsObserver
     .do(function (data) {
       $scope.loadingNewIssues = true;
