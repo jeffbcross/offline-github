@@ -41,14 +41,12 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       return syncFromWorker(latest);
     })
     .flatMapLatest(function(data) {
-      console.log('data', data);
       return Rx.Observable.fromPromise(countPages(data.rawQueryPredicate).
         then(function(count) {
           return count.totalCount[0][data.countPropertyName]
         }));
     })
     .subscribe(function(numItems) {
-      console.log('subscribe', numItems);
       $scope.$apply(function() {
         $scope.pages = new Array(Math.ceil(numItems / ITEMS_PER_PAGE));
       });
@@ -63,11 +61,11 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       $scope.issues = [];
     })
     .flatMapLatest(function(latest) {
-      return Rx.Observable.fromPromise(fetchIssues(latest));
+      return fetchIssues(latest);
     })
     .subscribe(function (data) {
       $scope.loadingNewIssues = false;
-      $scope.issues = data.issues;
+      $scope.issues = data;
       $scope.$digest();
     });
 
@@ -175,11 +173,7 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       skip: skipValue
     }
 
-    return github.query(query).
-      then(function(issues) {
-        issuesQuery.issues = issues;
-        return issuesQuery;
-      });
+    return github.query(query);
 
   }
 }

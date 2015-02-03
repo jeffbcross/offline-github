@@ -14,12 +14,19 @@ function GithubService($window) {
     var operation = typeof msg.data === 'string'?msg.data:msg.data.operation;
     switch(operation) {
       case 'query.exec.success':
-        resolution = self._queries.get(msg.data.queryId).resolve;
-        resolution(msg.data.results)
+        var observer = self._queries.get(msg.data.queryId);
+        console.log('observer', observer)
+        observer.onNext(msg.data.results);
+        observer.onCompleted();
+        break;
+      case 'query.exec.progress':
+        var observer = self._queries.get(msg.data.queryId);
+        observer.onNext(msg.data.results);
         break;
       case 'query.exec.error':
-        rejection = self._queries.get(msg.data.queryId).reject;
-        rejection(msg.data.error)
+        var observer = self._queries.get(msg.data.queryId);
+        observer.onError(msg.data.error);
+        observer.onCompleted();
         break;
       case 'count.exec.success':
         resolution = self._queries.get(msg.data.queryId).resolve;
@@ -78,14 +85,11 @@ GithubService.prototype.count = function(config) {
 
 GithubService.prototype.query = function(query) {
   var self = this;
-  return new Promise(function(resolve, reject) {
+  return Rx.Observable.create(function(observer) {
     query.operation = 'query.exec';
     query.queryId = self._queryId++;
 
-    self._queries.set(query.queryId, {
-      resolve: resolve,
-      reject: reject
-    });
+    self._queries.set(query.queryId, observer);
 
     self._worker.postMessage(query);
   });
