@@ -11,30 +11,30 @@ function GithubService($window) {
 
   this._worker.onmessage = function(msg) {
     var resolution, rejection;
+    var observer = self._queries.get(msg.data.queryId)
     var operation = typeof msg.data === 'string'?msg.data:msg.data.operation;
     switch(operation) {
       case 'query.exec.success':
-        var observer = self._queries.get(msg.data.queryId);
-        console.log('observer', observer)
         observer.onNext(msg.data.results);
         observer.onCompleted();
         break;
       case 'query.exec.progress':
-        var observer = self._queries.get(msg.data.queryId);
         observer.onNext(msg.data.results);
         break;
       case 'query.exec.error':
-        var observer = self._queries.get(msg.data.queryId);
         observer.onError(msg.data.error);
         observer.onCompleted();
         break;
       case 'count.exec.success':
-        resolution = self._queries.get(msg.data.queryId).resolve;
-        resolution(msg.data.results)
+        observer.onNext(msg.data.results);
+        observer.onCompleted();
         break;
       case 'count.exec.error':
-        rejection = self._queries.get(msg.data.queryId).reject;
-        rejection(msg.data.error)
+        observer.onError(msg.data.error);
+        observer.onCompleted();
+        break;
+      case 'count.exec.progress':
+        observer.onNext(msg.data.results);
         break;
       case 'dbInstance.success':
         self._dbInstanceResolvers.forEach(function(resolver) {
@@ -74,11 +74,8 @@ GithubService.prototype.count = function(config) {
   var self = this;
   config.operation = 'count.exec';
   config.queryId = this._queryId++
-  return new Promise(function(resolve, reject) {
-    self._queries.set(config.queryId, {
-      resolve: resolve,
-      reject: reject
-    });
+  return Rx.Observable.create(function(observer) {
+    self._queries.set(config.queryId, observer);
     self._worker.postMessage(config);
   });
 }

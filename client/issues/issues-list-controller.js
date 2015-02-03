@@ -41,10 +41,10 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       return syncFromWorker(latest);
     })
     .flatMapLatest(function(data) {
-      return Rx.Observable.fromPromise(countPages(data.rawQueryPredicate).
-        then(function(count) {
-          return count.totalCount[0][data.countPropertyName]
-        }));
+      return countPages(data.rawQueryPredicate);
+    })
+    .map(function(count){
+      return count[0]['COUNT(id)']
     })
     .subscribe(function(numItems) {
       $scope.$apply(function() {
@@ -147,10 +147,7 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
         owner: issuesQuery.owner,
         repository: issuesQuery.repository
       }
-    }).then(function(count) {
-      issuesQuery.totalCount = count;
-      return issuesQuery;
-    })
+    });
   }
 
   function fetchIssues(issuesQuery) {
