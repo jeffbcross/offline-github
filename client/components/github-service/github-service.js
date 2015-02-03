@@ -2,11 +2,8 @@
 
 function GithubService($window) {
   var self = this;
+  var queryId = 0;
   this._worker = new $window.Worker('components/github-service/github-worker.js');
-  this._queries = new Map();
-  this._queryId = 0;
-  this._dbInstanceResolvers = [];
-  this._dbInstanceRejectors = [];
   this._queries = new Map();
   this._configs = new Map();
 
@@ -37,16 +34,6 @@ function GithubService($window) {
       case 'count.exec.progress':
         observer.onNext(msg.data.results);
         break;
-      case 'dbInstance.success':
-        self._dbInstanceResolvers.forEach(function(resolver) {
-          resolver();
-        });
-        break;
-      case 'dbInstance.error':
-        self._dbInstanceRejectors.forEach(function(rejector) {
-          rejector();
-        });
-        break;
       case 'synchronize.fetch.progress':
         observer.onNext(self._configs.get(msg.data.queryId));
         break;
@@ -60,51 +47,26 @@ function GithubService($window) {
         break;
     }
   }
-}
 
-GithubService.prototype.whenDbLoaded = function() {
-  var self = this;
-  return new Promise(function(resolve, reject) {
-    self._dbInstanceResolvers.push(resolve);
-    self._dbInstanceRejectors.push(reject);
-  });
-};
+  function workerConnectionFactory (operation) {
+    return function(config) {
+      return Rx.Observable.create(function(observer) {
+        config.operation = operation;
+        config.queryId = getQueryId();
+        self._queries.set(config.queryId, observer);
+        self._configs.set(config.queryId, config);
+        self._worker.postMessage(config);
+      });
+    }
+  }
 
-GithubService.prototype.count = function(config) {
-  var self = this;
-  config.operation = 'count.exec';
-  config.queryId = this._getQueryId();
-  return Rx.Observable.create(function(observer) {
-    self._queries.set(config.queryId, observer);
-    self._worker.postMessage(config);
-  });
-}
+  this.count = workerConnectionFactory('count.exec');
+  this.query = workerConnectionFactory('query.exec');
+  this.synchronize = workerConnectionFactory('synchronize.fetch');
 
-GithubService.prototype.query = function(query) {
-  var self = this;
-  return Rx.Observable.create(function(observer) {
-    query.operation = 'query.exec';
-    query.queryId = self._getQueryId();
-
-    self._queries.set(query.queryId, observer);
-    self._worker.postMessage(query);
-  });
-}
-
-GithubService.prototype.synchronize = function(config) {
-  var self = this;
-  config.operation = 'synchronize.fetch';
-  config.queryId = self._getQueryId();
-
-  return Rx.Observable.create(function(observer) {
-    self._queries.set(config.queryId, observer);
-    self._configs.set(config.queryId, config);
-    self._worker.postMessage(config);
-  });
-};
-
-GithubService.prototype._getQueryId = function() {
-  return ++this._queryId;
+  var getQueryId = function() {
+    return ++queryId;
+  }
 }
 
 angular.module('ghoGithubService', []).
