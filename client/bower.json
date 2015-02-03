@@ -9,7 +9,8 @@
     "bootstrap": "~3.3.1",
     "rxjs": "~2.3.24",
     "lodash": "~3.0.0",
-    "angular-strap": "~2.1.6"
+    "angular-strap": "~2.1.6",
+    "immutable": "~3.6.2"
   },
   "homepage": "https://github.com/jeffbcross/offline-github",
   "_release": "0.0.1",

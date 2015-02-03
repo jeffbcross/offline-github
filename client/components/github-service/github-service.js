@@ -8,40 +8,43 @@ function GithubService($window) {
   this._configs = new Map();
 
   this._worker.onmessage = function(msg) {
-    var resolution, rejection;
-    var observer = self._queries.get(msg.data.queryId)
-    var operation = typeof msg.data === 'string'?msg.data:msg.data.operation;
+    console.log('msg', msg);
+    if (angular.isObject(msg.data)) {
+      var data = Immutable.Map(msg.data);
+      var observer = self._queries.get(data.get('queryId'));
+      var operation = data.get('operation');
+    }
     switch(operation) {
       case 'query.exec.success':
-        observer.onNext(msg.data.results);
+        observer.onNext(Immutable.List(data.get('results')));
         observer.onCompleted();
         break;
       case 'query.exec.progress':
-        observer.onNext(msg.data.results);
+        observer.onNext(Immutable.List(data.get('results')));
         break;
       case 'query.exec.error':
-        observer.onError(msg.data.error);
+        observer.onError(data.get('error'));
         observer.onCompleted();
         break;
       case 'count.exec.success':
-        observer.onNext(msg.data.results);
+        observer.onNext(Immutable.List(data.get('results')));
         observer.onCompleted();
         break;
       case 'count.exec.error':
-        observer.onError(msg.data.error);
+        observer.onError(data.get('error'));
         observer.onCompleted();
         break;
       case 'count.exec.progress':
-        observer.onNext(msg.data.results);
+        observer.onNext(Immutable.List(data.get('results')));
         break;
       case 'synchronize.fetch.progress':
-        observer.onNext(self._configs.get(msg.data.queryId));
+        observer.onNext(Immutable.Map(self._configs.get(data.get('queryId'))));
         break;
       case 'lastUpdated.set':
-        localStorage.setItem(msg.data.storageKey, msg.data.lastUpdated);
+        localStorage.setItem(data.get('storageKey'), data.get('lastUpdated'));
         break;
       case 'synchronize.fetch.success':
-        var config = self._configs.get(msg.data.queryId);
+        var config = Immutable.Map(self._configs.get(data.get('queryId')));
         observer.onNext(config);
         observer.onCompleted();
         break;
@@ -51,11 +54,14 @@ function GithubService($window) {
   function workerConnectionFactory (operation) {
     return function(config) {
       return Rx.Observable.create(function(observer) {
-        config.operation = operation;
-        config.queryId = getQueryId();
-        self._queries.set(config.queryId, observer);
-        self._configs.set(config.queryId, config);
-        self._worker.postMessage(config);
+        config = config.merge({
+          operation: operation,
+          queryId: getQueryId()
+        });
+        self._queries.set(config.get('queryId'), observer);
+        self._configs.set(config.get('queryId'), config);
+        console.log('config to js', config.toJS());
+        self._worker.postMessage(config.toJS());
       });
     }
   }

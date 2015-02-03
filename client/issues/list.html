@@ -26,7 +26,7 @@
       <div class="alert alert-warning" ng-show="error">{{error}}</div>
 
       <h3>
-        Page {{getPage()}} of {{pages.length || 1}}
+        Page {{getPage()}} of {{pages || 1}}
       </h3>
 
       <nav>
@@ -39,8 +39,8 @@
             </a>
           </li>
           <li class="next"
-              ng-disabled="getPage() >= pages.length"
-              ng-class="{'disabled':getPage() >= pages.length}">
+              ng-disabled="getPage() >= pages"
+              ng-class="{'disabled':getPage() >= pages}">
             <a ng-click="goToNextPage()">
               Next
             </a>

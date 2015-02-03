@@ -5,7 +5,7 @@ function paramsObservableFactory($location) {
     return Rx.Observable.create(function (observer) {
       // Create function to handle old and new Value
       function listener () {
-        observer.onNext($location.search());
+        observer.onNext(Immutable.Map($location.search()));
       }
 
       // Returns function which disconnects the $watch expression
