@@ -7,7 +7,8 @@ function GithubService($window) {
   this._queryId = 0;
   this._dbInstanceResolvers = [];
   this._dbInstanceRejectors = [];
-  this._processes = new Map();
+  this._queries = new Map();
+  this._configs = new Map();
 
   this._worker.onmessage = function(msg) {
     var resolution, rejection;
@@ -47,16 +48,15 @@ function GithubService($window) {
         });
         break;
       case 'synchronize.fetch.progress':
-        var subject = self._processes.get(msg.data.queryId).subject;
-        subject.onNext(self._processes.get(msg.data.queryId).config);
+        observer.onNext(self._configs.get(msg.data.queryId));
         break;
       case 'lastUpdated.set':
-        localStorage.setItem(self._processes.get(msg.data.queryId).config.storageKey, msg.data.lastUpdated);
+        localStorage.setItem(msg.data.storageKey, msg.data.lastUpdated);
         break;
       case 'synchronize.fetch.success':
-        var subject = self._processes.get(msg.data.queryId).subject;
-        subject.onCompleted({totalCount: msg.data.count});
-        // subject.dispose();
+        var config = self._configs.get(msg.data.queryId);
+        observer.onNext(config);
+        observer.onCompleted();
         break;
     }
   }
@@ -73,7 +73,7 @@ GithubService.prototype.whenDbLoaded = function() {
 GithubService.prototype.count = function(config) {
   var self = this;
   config.operation = 'count.exec';
-  config.queryId = this._queryId++
+  config.queryId = this._getQueryId();
   return Rx.Observable.create(function(observer) {
     self._queries.set(config.queryId, observer);
     self._worker.postMessage(config);
@@ -84,26 +84,28 @@ GithubService.prototype.query = function(query) {
   var self = this;
   return Rx.Observable.create(function(observer) {
     query.operation = 'query.exec';
-    query.queryId = self._queryId++;
+    query.queryId = self._getQueryId();
 
     self._queries.set(query.queryId, observer);
-
     self._worker.postMessage(query);
   });
 }
 
 GithubService.prototype.synchronize = function(config) {
-  var subject = new Rx.Subject();
+  var self = this;
   config.operation = 'synchronize.fetch';
-  config.queryId = ++this._queryId;
+  config.queryId = self._getQueryId();
 
-  this._worker.postMessage(config);
-  this._processes.set(config.queryId, {
-    config: config,
-    subject: subject
+  return Rx.Observable.create(function(observer) {
+    self._queries.set(config.queryId, observer);
+    self._configs.set(config.queryId, config);
+    self._worker.postMessage(config);
   });
-  return subject;
 };
+
+GithubService.prototype._getQueryId = function() {
+  return ++this._queryId;
+}
 
 angular.module('ghoGithubService', []).
   service('github', ['$window', GithubService]);
