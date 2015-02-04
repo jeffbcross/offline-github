@@ -21,8 +21,9 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
   $scope.synchronizing = {};
 
   var paramsObserver = paramsObservable($scope, '$locationChangeStart').
-    do(function() {
+    do(function(params) {
       $scope.stateFilter = params.get('state') || 'all';
+      safeDigest();
     }).
     map(function (params) {
       return params.merge({
@@ -30,30 +31,42 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       });
     });
 
-  /**
-   * Synchronize and keep total page counter up to date.
-   **/
   paramsObserver
     .distinctUntilChanged(function(params) {
       return params.get('owner')+':'+params.get('repository')+':'+params.get('state');
+    })
+    .map(function(params) {
+      return params.filter(function(v,k) {
+        //Ignore state if it's "all", since predicate should be undefined
+        if (k === 'state' && v === 'all') {
+          return false;
+        }
+        return ['page','owner','repository','state'].indexOf(k) > -1;
+      })
+    })
+    .flatMapLatest(countPages)
+    .map(function(count) {
+      return count.get(0)['COUNT(id)']
+    })
+    .subscribe(function(numItems){
+      $scope.pages = Math.ceil(numItems / ITEMS_PER_PAGE);
+      safeDigest();
+    });
+
+  /**
+   * Synchronize to database if owner or repository has changed
+   **/
+  paramsObserver
+    .distinctUntilChanged(function(params) {
+      return params.get('owner')+':'+params.get('repository');
     })
     .do(function(params) {
       $scope.synchronizing[params.get('owner')+params.get('repository')] = true;
       $scope.pages = undefined;
     })
-    .flatMapLatest(function(params) {
-      return syncFromWorker(params);
-    })
-    .flatMapLatest(function(query) {
-      return countPages(query.get('rawQueryPredicate'));
-    })
-    .map(function(count){
-      return count.get(0)['COUNT(id)']
-    })
-    .subscribe(function(numItems) {
-      $scope.$apply(function() {
-        $scope.pages = Math.ceil(numItems / ITEMS_PER_PAGE);
-      });
+    .flatMapLatest(syncFromWorker)
+    .subscribe(function(evt) {
+      //TODO: add something to UI with progress updates
     }, console.error.bind(console));
 
   /**
@@ -70,7 +83,7 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
     .subscribe(function(data) {
       $scope.loadingNewIssues = false;
       $scope.issues = data.toJS();
-      $scope.$digest();
+      safeDigest();
     });
 
   if (params.get('owner') && params.get('repository')) {
@@ -181,6 +194,12 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       skip: skipValue
     }));
 
+  }
+
+  function safeDigest() {
+    if (!$scope.$$phase) {
+      $scope.$digest();
+    }
   }
 }
 
