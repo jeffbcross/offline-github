@@ -22,8 +22,9 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
 
   var paramsObserver = paramsObservable($scope, '$locationChangeStart').
     do(function(params) {
-      $scope.stateFilter = params.get('state') || 'all';
-      safeDigest();
+      safeApply(function() {
+        $scope.stateFilter = params.get('state') || 'all';
+      });
     }).
     map(function (params) {
       return params.merge({
@@ -49,8 +50,10 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       return count.get(0)['COUNT(id)']
     })
     .subscribe(function(numItems){
-      $scope.pages = Math.ceil(numItems / ITEMS_PER_PAGE);
-      safeDigest();
+      safeApply(function() {
+        $scope.pages = Math.ceil(numItems / ITEMS_PER_PAGE);
+        setPage($location.search().page);
+      });
     });
 
   /**
@@ -81,9 +84,10 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       return fetchIssues(params);
     })
     .subscribe(function(data) {
-      $scope.loadingNewIssues = false;
-      $scope.issues = data.toJS();
-      safeDigest();
+      safeApply(function() {
+        $scope.loadingNewIssues = false;
+        $scope.issues = data.toJS();
+      });
     });
 
   if (params.get('owner') && params.get('repository')) {
@@ -108,20 +112,21 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
   };
 
   $scope.goToNextPage = function() {
-    var page = parseInt($location.search().page, 10) || 1;
-    if ($scope.pages && page < $scope.pages) {
-      setPage(page+1);
-    } else if ($scope.pages && page >= $scope.pages) {
-      setPage($scope.pages);
-    }
+    setPage((parseInt($location.search().page, 10) || 1) + 1);
   };
 
   $scope.getPage = function() {
     return $location.search().page;
   };
 
-  function setPage(num) {
-    $location.search('page', num);
+  function setPage(page) {
+    if ($scope.pages && page <= $scope.pages && page > 0) {
+      $location.search('page', page);
+    } else if ($scope.pages && page >= $scope.pages) {
+      $location.search('page', $scope.pages);
+    } else {
+      $location.search('page', 1);
+    }
   }
 
   function syncFromWorker(params) {
@@ -196,9 +201,11 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
 
   }
 
-  function safeDigest() {
+  function safeApply(exp) {
     if (!$scope.$$phase) {
-      $scope.$digest();
+      $scope.$apply(exp);
+    } else {
+      $scope.$eval(exp);
     }
   }
 }
