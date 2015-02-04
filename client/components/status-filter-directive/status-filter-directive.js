@@ -1,7 +1,7 @@
 (function() {
 
-angular.module('ghoStatusFilterDirective', []).
-  directive('statusFilter', ['$location', function($location) {
+angular.module('ghoStateFilterDirective', []).
+  directive('stateFilter', ['$location', function($location) {
     return {
       scope: false,
       link: function(scope, el, attrs) {
@@ -12,9 +12,9 @@ angular.module('ghoStatusFilterDirective', []).
           }).
           map(function(evt) {
             return evt.target.value;
-          }).subscribe(function(status) {
+          }).subscribe(function(state) {
             scope.$apply(function(){
-              $location.search('status', status);
+              $location.search('state', state);
             });
 
           });

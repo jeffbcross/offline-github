@@ -33,7 +33,7 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
   paramsObserver
     .do(function(params) {
       $scope.synchronizing[params.get('owner')+params.get('repository')] = true;
-      $scope.stateFilter = params.get('status') || 'all';
+      $scope.stateFilter = params.get('state') || 'all';
     })
     .flatMapLatest(function(params) {
       return syncFromWorker(params);
@@ -109,7 +109,7 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
     //TODO: don't sync when just the page changes, only when owner or repository
     var storageKey = params.get('owner') + ':' + params.get('repository') + ':last_update';
     var lastUpdated = localStorage.getItem(storageKey);
-    var status = params.get('status');
+    var state = params.get('state');
     var rawQueryPredicate = Immutable.Map({
       owner: params.get('owner'),
       repository: params.get('repository')
@@ -127,8 +127,8 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       'access_token='+
       firebaseAuth.getAuth().github.accessToken;
 
-    if (status && ['open','closed'].indexOf(status) > -1) {
-      rawQueryPredicate = rawQueryPredicate.set('state', status);
+    if (state && ['open','closed'].indexOf(state) > -1) {
+      rawQueryPredicate = rawQueryPredicate.set('state', state);
     }
     return github.synchronize(Immutable.Map({
       tableName: 'Issues',
@@ -151,7 +151,7 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
 
   function fetchIssues(params) {
     var skipValue = (params.get('page') - 1) * ITEMS_PER_PAGE;
-    var status = params.get('status');
+    var state = params.get('state');
     var rawQueryPredicate = Immutable.Map({
       owner: params.get('owner'),
       repository: params.get('repository')
@@ -161,8 +161,8 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       skipValue = 0;
     }
 
-    if (status && ['open','closed'].indexOf(status) > -1) {
-      rawQueryPredicate = rawQueryPredicate.set('state', status);
+    if (state && ['open','closed'].indexOf(state) > -1) {
+      rawQueryPredicate = rawQueryPredicate.set('state', state);
     }
 
     return github.query(Immutable.Map({
