@@ -21,6 +21,9 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
   $scope.synchronizing = {};
 
   var paramsObserver = paramsObservable($scope, '$locationChangeStart').
+    do(function() {
+      $scope.stateFilter = params.get('state') || 'all';
+    }).
     map(function (params) {
       return params.merge({
         page: parseInt(params.get('page'), 10) || 1
@@ -31,9 +34,12 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
    * Synchronize and keep total page counter up to date.
    **/
   paramsObserver
+    .distinctUntilChanged(function(params) {
+      return params.get('owner')+':'+params.get('repository')+':'+params.get('state');
+    })
     .do(function(params) {
       $scope.synchronizing[params.get('owner')+params.get('repository')] = true;
-      $scope.stateFilter = params.get('state') || 'all';
+      $scope.pages = undefined;
     })
     .flatMapLatest(function(params) {
       return syncFromWorker(params);
