@@ -23,8 +23,7 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
   var paramsObserver = paramsObservable($scope, '$locationChangeStart').
     map(function (params) {
       return params.merge({
-        page: parseInt(params.get('page'), 10) || 1,
-        totalCount: -1
+        page: parseInt(params.get('page'), 10) || 1
       });
     });
 
@@ -34,6 +33,7 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
   paramsObserver
     .do(function(params) {
       $scope.synchronizing[params.get('owner')+params.get('repository')] = true;
+      $scope.stateFilter = params.get('status') || 'all';
     })
     .flatMapLatest(function(params) {
       return syncFromWorker(params);
@@ -109,6 +109,11 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
     //TODO: don't sync when just the page changes, only when owner or repository
     var storageKey = params.get('owner') + ':' + params.get('repository') + ':last_update';
     var lastUpdated = localStorage.getItem(storageKey);
+    var status = params.get('status');
+    var rawQueryPredicate = Immutable.Map({
+      owner: params.get('owner'),
+      repository: params.get('repository')
+    });
     var url = 'https://api.github.com/repos/'+
       params.get('owner')+
       '/'+
@@ -122,13 +127,12 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       'access_token='+
       firebaseAuth.getAuth().github.accessToken;
 
-
+    if (status && ['open','closed'].indexOf(status) > -1) {
+      rawQueryPredicate = rawQueryPredicate.set('state', status);
+    }
     return github.synchronize(Immutable.Map({
       tableName: 'Issues',
-      rawQueryPredicate: {
-        repository: params.get('repository'),
-        owner: params.get('owner')
-      },
+      rawQueryPredicate: rawQueryPredicate,
       countPropertyName: COUNT_PROPERTY_NAME,
       countColumn: 'id',
       defaults: issueDefaults(params.get('owner'), params.get('repository')),
@@ -137,30 +141,34 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
     }));
   }
 
-  function countPages(issuesQuery) {
+  function countPages(rawQueryPredicate) {
     return github.count(Immutable.Map({
       tableName: 'Issues',
       column: 'id',
-      rawQueryPredicate: {
-        owner: issuesQuery.owner,
-        repository: issuesQuery.repository
-      }
+      rawQueryPredicate: rawQueryPredicate
     }));
   }
 
   function fetchIssues(params) {
     var skipValue = (params.get('page') - 1) * ITEMS_PER_PAGE;
+    var status = params.get('status');
+    var rawQueryPredicate = Immutable.Map({
+      owner: params.get('owner'),
+      repository: params.get('repository')
+    });
+
     if (skipValue < 0) {
       skipValue = 0;
+    }
+
+    if (status && ['open','closed'].indexOf(status) > -1) {
+      rawQueryPredicate = rawQueryPredicate.set('state', status);
     }
 
     return github.query(Immutable.Map({
       tableName: 'Issues',
       select: ['number', 'title', 'id', 'comments'],
-      rawQueryPredicate: {
-        owner: params.get('owner'),
-        repository: params.get('repository')
-      },
+      rawQueryPredicate: rawQueryPredicate,
       orderByColumn: 'number',
       orderByDirection: 'DESC',
       limit: ITEMS_PER_PAGE,

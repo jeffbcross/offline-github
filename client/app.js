@@ -54,7 +54,8 @@ angular.module('ghIssuesApp', [
     'ghoParamsObservable',
     'ghoOrganizationDefaultsFactory',
     'ghoRepositoryDefaultsFactory',
-    'ghoLovefieldQueryFactory'
+    'ghoLovefieldQueryFactory',
+    'ghoStatusFilterDirective'
   ]).
   config(['$httpProvider', '$routeProvider', config]).
   run(['$rootScope', '$route', '$location', '$window', 'firebaseAuth', run]);
