@@ -23,7 +23,7 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
   var paramsObserver = paramsObservable($scope, '$locationChangeStart').
     map(function (params) {
       return params.merge({
-        page: parseInt(params.page, 10) || 1,
+        page: parseInt(params.get('page'), 10) || 1,
         totalCount: -1
       });
     });
@@ -90,10 +90,10 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
 
   $scope.goToNextPage = function() {
     var page = parseInt($location.search().page, 10) || 1;
-    if ($scope.pages && page < $scope.pages.length) {
+    if ($scope.pages && page < $scope.pages) {
       setPage(page+1);
-    } else if ($scope.pages && page >= $scope.pages.length) {
-      setPage($scope.pages.length);
+    } else if ($scope.pages && page >= $scope.pages) {
+      setPage($scope.pages);
     }
   };
 
