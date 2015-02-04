@@ -36,11 +36,9 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
       $scope.synchronizing[params.get('owner')+params.get('repository')] = true;
     })
     .flatMapLatest(function(params) {
-      console.log('flatMapLatest syncFromWorker', params);
       return syncFromWorker(params);
     })
     .flatMapLatest(function(query) {
-      console.log('flatMapLatest countPages', query);
       return countPages(query.get('rawQueryPredicate'));
     })
     .map(function(count){
@@ -63,10 +61,9 @@ function IssuesListController ($filter, $location, $scope, github, issueDefaults
     .flatMapLatest(function(params) {
       return fetchIssues(params);
     })
-    .subscribe(function (data) {
-      console.log('data', data)
+    .subscribe(function(data) {
       $scope.loadingNewIssues = false;
-      $scope.issues = data;
+      $scope.issues = data.toJS();
       $scope.$digest();
     });
 

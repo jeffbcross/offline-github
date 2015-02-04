@@ -8,8 +8,7 @@ function GithubService($window) {
   this._configs = new Map();
 
   this._worker.onmessage = function(msg) {
-    console.log('msg', msg);
-    if (angular.isObject(msg.data)) {
+    if (typeof msg.data === 'object') {
       var data = Immutable.Map(msg.data);
       var observer = self._queries.get(data.get('queryId'));
       var operation = data.get('operation');
@@ -60,7 +59,6 @@ function GithubService($window) {
         });
         self._queries.set(config.get('queryId'), observer);
         self._configs.set(config.get('queryId'), config);
-        console.log('config to js', config.toJS());
         self._worker.postMessage(config.toJS());
       });
     }
